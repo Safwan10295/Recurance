@@ -39,8 +39,9 @@ def load_concerns(conn, mask: dict[int, str] | None = None):
 def tfidf_matrix(texts: list[str]):
     from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
+    small = len(texts) < 200  # tiny corpora (tests, pilots) cannot use document-frequency cut-offs
     vec = TfidfVectorizer(stop_words=list(ENGLISH_STOP_WORDS.union(STOP_EXTRA)), ngram_range=(1, 2),
-                          min_df=2, max_df=0.3, sublinear_tf=True)
+                          min_df=1 if small else 2, max_df=1.0 if small else 0.3, sublinear_tf=True)
     X = vec.fit_transform(texts)
     return X, vec
 

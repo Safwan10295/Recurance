@@ -82,33 +82,40 @@ def _ctx(full: str, quote: str) -> str:
     return full[start : start + CONTEXT_CHARS]
 
 
-def load_pair(conn, pair_id: int, later_text_override: dict[str, str] | None = None) -> dict:
+def pair_dict(conn, e_cid: int, l_cid: int, org_id: int | None, pair_id: int | None = None) -> dict:
     p = conn.execute(
-        """SELECT p.*, ce.report_url AS e_url, ce.text_quote AS e_quote, ce.hazard AS e_hazard,
+        """SELECT ce.report_url AS e_url, ce.text_quote AS e_quote, ce.hazard AS e_hazard,
                   cl.report_url AS l_url, cl.text_quote AS l_quote, cl.hazard AS l_hazard,
                   re.report_date AS e_date, re.coroner AS e_coroner, re.area AS e_area, re.concerns AS e_concerns,
-                  rl.report_date AS l_date, rl.coroner AS l_coroner, rl.area AS l_area, rl.concerns AS l_concerns,
-                  o.canonical_name AS org
-           FROM candidate_pairs p
-           JOIN concerns ce ON ce.id = p.earlier_concern_id JOIN concerns cl ON cl.id = p.later_concern_id
-           JOIN reports re ON re.url = ce.report_url JOIN reports rl ON rl.url = cl.report_url
-           LEFT JOIN organisations o ON o.id = p.organisation_id WHERE p.id=?""",
-        (pair_id,),
+                  rl.report_date AS l_date, rl.coroner AS l_coroner, rl.area AS l_area, rl.concerns AS l_concerns
+           FROM concerns ce, concerns cl JOIN reports re ON re.url = ce.report_url JOIN reports rl ON rl.url = cl.report_url
+           WHERE ce.id=? AND cl.id=?""",
+        (e_cid, l_cid),
     ).fetchone()
     d = dict(p)
-    if later_text_override and d["l_url"] in later_text_override:
-        d["l_concerns"] = later_text_override[d["l_url"]]
+    d.update({"id": pair_id, "earlier_concern_id": e_cid, "later_concern_id": l_cid, "organisation_id": org_id})
+    o = conn.execute("SELECT canonical_name FROM organisations WHERE id=?", (org_id,)).fetchone()
+    d["org"] = o[0] if o else "the organisation"
     d["promises"] = [dict(r) for r in conn.execute(
         """SELECT pr.id, pr.action_quote, pr.stated_date_or_deadline, pr.concern_id, rs.organisation_id
            FROM promises pr JOIN responses rs ON rs.id = pr.response_id
            WHERE rs.report_url=? AND pr.quote_verified > 0
            ORDER BY (rs.organisation_id IS ?) DESC, (pr.concern_id = ?) DESC, pr.id LIMIT 6""",
-        (d["e_url"], d["organisation_id"], d["earlier_concern_id"]),
+        (d["e_url"], org_id, e_cid),
     )]
     d["has_response"] = conn.execute(
         "SELECT COUNT(*) FROM responses WHERE report_url=? AND (organisation_id=? OR organisation_id IS NULL)",
-        (d["e_url"], d["organisation_id"]),
+        (d["e_url"], org_id),
     ).fetchone()[0] > 0
+    return d
+
+
+def load_pair(conn, pair_id: int, later_text_override: dict[str, str] | None = None) -> dict:
+    p = conn.execute("SELECT earlier_concern_id, later_concern_id, organisation_id FROM candidate_pairs WHERE id=?",
+                     (pair_id,)).fetchone()
+    d = pair_dict(conn, p[0], p[1], p[2], pair_id)
+    if later_text_override and d["l_url"] in later_text_override:
+        d["l_concerns"] = later_text_override[d["l_url"]]
     return d
 
 
