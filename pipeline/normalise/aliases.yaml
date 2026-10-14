@@ -1,0 +1,188 @@
+# Manual overrides: canonical organisation name -> list of known spellings and legacy names.
+# Matching is on the normalised key (lowercase, punctuation stripped), so case does not matter.
+# Renames from handoff section 3 are included (NOMS -> HMPPS, Highways England -> National Highways).
+
+Department of Health and Social Care:
+  - Department of Health
+  - Department of Health and Social Care
+  - Department for Health and Social Care
+  - Dept of Health
+  - DHSC
+  - Secretary of State for Health
+  - Secretary of State for Health and Social Care
+  - The Secretary of State for Health and Social Care
+  - Minister of State for Health
+  - Department of Health & Social Care
+  - Secretary of State for Health & Social Care
+NHS England:
+  - NHS England
+  - NHSE
+  - NHS England and NHS Improvement
+  - NHS England & NHS Improvement
+  - NHS England and Improvement
+  - NHS Improvement
+  - NHS Commissioning Board
+  - NHS England / NHS Improvement
+  - NHS England (National)
+Ministry of Justice:
+  - Ministry of Justice
+  - MOJ
+  - Secretary of State for Justice
+  - Lord Chancellor and Secretary of State for Justice
+His Majesty's Prison and Probation Service:
+  - HMPPS
+  - HM Prison and Probation Service
+  - Her Majesty's Prison and Probation Service
+  - His Majesty's Prison and Probation Service
+  - National Offender Management Service
+  - NOMS
+  - HM Prison Service
+  - Her Majesty's Prison Service
+  - National Probation Service
+Care Quality Commission:
+  - Care Quality Commission
+  - CQC
+Home Office:
+  - Home Office
+  - Home Secretary
+  - Secretary of State for the Home Department
+  - Secretary of State for the Home Office
+Department for Transport:
+  - Department for Transport
+  - DfT
+  - Secretary of State for Transport
+Medicines and Healthcare products Regulatory Agency:
+  - MHRA
+  - Medicines and Healthcare products Regulatory Agency
+  - Medicines and Healthcare Products Regulatory Agency
+  - Medicines & Healthcare products Regulatory Agency
+National Institute for Health and Care Excellence:
+  - NICE
+  - National Institute for Health and Care Excellence
+  - National Institute for Health and Clinical Excellence
+National Highways:
+  - National Highways
+  - Highways England
+  - Highways Agency
+Network Rail:
+  - Network Rail
+  - Network Rail Infrastructure Ltd
+  - Network Rail Infrastructure Limited
+UK Health Security Agency:
+  - UK Health Security Agency
+  - UKHSA
+  - Public Health England
+  - PHE
+Department for Education:
+  - Department for Education
+  - DfE
+  - Secretary of State for Education
+Department for Work and Pensions:
+  - Department for Work and Pensions
+  - DWP
+  - Secretary of State for Work and Pensions
+Driver and Vehicle Licensing Agency:
+  - DVLA
+  - Driver and Vehicle Licensing Agency
+  - Driver & Vehicle Licensing Agency
+Health and Safety Executive:
+  - Health and Safety Executive
+  - HSE
+  - Health & Safety Executive
+General Medical Council:
+  - General Medical Council
+  - GMC
+Nursing and Midwifery Council:
+  - Nursing and Midwifery Council
+  - NMC
+Welsh Government:
+  - Welsh Government
+  - Welsh Assembly Government
+  - Minister for Health and Social Services
+  - Cabinet Secretary for Health and Social Care
+  - Minister for Health and Social Services Welsh Government
+Royal College of Emergency Medicine:
+  - Royal College of Emergency Medicine
+  - RCEM
+Royal College of Psychiatrists:
+  - Royal College of Psychiatrists
+Royal College of General Practitioners:
+  - Royal College of General Practitioners
+  - RCGP
+Royal College of Nursing:
+  - Royal College of Nursing
+Royal College of Physicians:
+  - Royal College of Physicians
+Royal College of Surgeons:
+  - Royal College of Surgeons
+  - Royal College of Surgeons of England
+Royal College of Obstetricians and Gynaecologists:
+  - Royal College of Obstetricians and Gynaecologists
+  - RCOG
+Royal College of Midwives:
+  - Royal College of Midwives
+College of Policing:
+  - College of Policing
+National Police Chiefs' Council:
+  - National Police Chiefs Council
+  - NPCC
+  - National Police Chiefs' Council
+  - Association of Chief Police Officers
+  - ACPO
+Independent Office for Police Conduct:
+  - IOPC
+  - Independent Office for Police Conduct
+  - Independent Police Complaints Commission
+  - IPCC
+Ofsted:
+  - Ofsted
+Ofcom:
+  - Ofcom
+Office of Rail and Road:
+  - Office of Rail and Road
+  - ORR
+  - Office of Rail Regulation
+Department for Levelling Up, Housing and Communities:
+  - Department for Levelling Up Housing and Communities
+  - DLUHC
+  - Ministry of Housing Communities and Local Government
+  - MHCLG
+  - Ministry of Housing, Communities and Local Government
+  - Department for Communities and Local Government
+  - Secretary of State for Housing Communities and Local Government
+Department for Environment, Food and Rural Affairs:
+  - DEFRA
+  - Department for Environment Food and Rural Affairs
+Department for Business and Trade:
+  - Department for Business and Trade
+  - Department for Business Energy and Industrial Strategy
+  - BEIS
+  - Office for Product Safety and Standards
+  - OPSS
+Department for Science, Innovation and Technology:
+  - Department for Science Innovation and Technology
+  - DSIT
+  - Department for Digital Culture Media and Sport
+  - DCMS
+NHS Resolution:
+  - NHS Resolution
+  - NHS Litigation Authority
+Health Services Safety Investigations Body:
+  - HSSIB
+  - Health Services Safety Investigations Body
+  - Healthcare Safety Investigation Branch
+  - HSIB
+NHS Digital:
+  - NHS Digital
+  - Health and Social Care Information Centre
+British Transport Police:
+  - British Transport Police
+Maritime and Coastguard Agency:
+  - Maritime and Coastguard Agency
+  - MCA
+Chief Coroner:
+  - Chief Coroner
+  - The Chief Coroner
+Food Standards Agency:
+  - Food Standards Agency
+  - FSA
