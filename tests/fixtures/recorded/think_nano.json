@@ -1,0 +1,40 @@
+{
+  "id": "chatcmpl-22e55bf1-d5ea-4513-9a00-2b503e1b1de5",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "\nOK",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": [],
+        "reasoning": "The user asks: \"Reply with the single word OK.\" So we must respond with just \"OK\". No extra punctuation? They said single word OK. Probably just \"OK\". Should we include a period? That would be extra characters. So just \"OK\".\n"
+      },
+      "stop_reason": null,
+      "token_ids": null,
+      "routed_experts": null
+    }
+  ],
+  "created": 1792019640,
+  "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+  "object": "chat.completion",
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": "vllm-0.22.0-b08c96cd",
+  "usage": {
+    "completion_tokens": 58,
+    "prompt_tokens": 23,
+    "total_tokens": 81,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": null
+  },
+  "prompt_logprobs": null,
+  "prompt_token_ids": null,
+  "prompt_text": null,
+  "kv_transfer_params": null
+}
