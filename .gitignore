@@ -1,0 +1,44 @@
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+env1
+*.pem
+*.key
+
+# Data: raw scrape and caches stay local
+data/raw/
+data/cache/
+data/*.sqlite
+data/*.sqlite-*
+data/*.db
+data/exports/private/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Node / Next.js
+node_modules/
+web/.next/
+web/out/
+web/.vercel/
+web/.env*
+!web/.env.example
+web/.local/
+*.tsbuildinfo
+next-env.d.ts
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
