@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* Calm, document-like palette: monochrome with one restrained accent. No alarm red anywhere. */
+:root {
+  --paper: #fbfaf7;
+  --paper-2: #f3f1ec;
+  --ink: #1d2430;
+  --ink-2: #4a5361;
+  --muted: #6b7280;
+  --rule: #e2ded6;
+  --accent: #2f5d62;
+  --accent-soft: #e6eeee;
+  --quote-bar: #9fb7b9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #14171c;
+    --paper-2: #1b1f26;
+    --ink: #e8e6e1;
+    --ink-2: #c3c0b9;
+    --muted: #9a9ea6;
+    --rule: #2c313a;
+    --accent: #8fbcc0;
+    --accent-soft: #1e2a2c;
+    --quote-bar: #4f7377;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --font-serif: var(--font-source-serif);
+  --font-sans: var(--font-source-sans);
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-source-sans), system-ui, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.quote {
+  font-family: var(--font-source-serif), Georgia, serif;
+  border-left: 3px solid var(--quote-bar);
+  padding-left: 1rem;
+  color: var(--ink);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.prose-doc p + p {
+  margin-top: 0.9rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

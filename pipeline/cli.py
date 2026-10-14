@@ -61,7 +61,7 @@ def cmd_stage_a(a):
     if a.pilot:
         rows = A.pilot_rows(conn, n=a.n, must_include=tuple(a.include or ()))
         conn.close()
-        res = A.run(llm, rows, threads=4)
+        res = A.run(llm, rows, threads=4, stage="dev")
         n_full = len(A.eligible(db.connect(), only_missing=False))
         res["extrapolated_full_cost"] = res["cost_per_item"] * n_full
         res["full_items"] = n_full
@@ -112,7 +112,7 @@ def cmd_stage_b(a):
     rows = B.pending_responses(conn, B.scope_report_urls(conn))
     conn.close()
     if a.pilot:
-        res = B.run(llm, rows[: a.n], threads=4)
+        res = B.run(llm, rows[: a.n], threads=4, stage="dev")
         res["extrapolated_full_cost"] = res["cost_per_item"] * len(rows)
         res["full_items"] = len(rows)
         _print_stage(res)
@@ -128,7 +128,7 @@ def cmd_stage_c(a):
     ids = C.pending_pairs(conn)
     conn.close()
     if a.pilot:
-        res = C.run(llm, ids[: a.n], threads=4)
+        res = C.run(llm, ids[: a.n], threads=4, stage="dev")
         res["extrapolated_full_cost"] = res["cost_per_item"] * len(ids)
         res["full_items"] = len(ids)
         _print_stage(res)

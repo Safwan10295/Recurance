@@ -118,7 +118,7 @@ class ItemResult:
     truncated_retry: bool = False
 
 
-def extract_one(llm: LLM, row) -> ItemResult:
+def extract_one(llm: LLM, row, stage: str = STAGE) -> ItemResult:
     url = row["url"]
     concerns_text = row["concerns"] or ""
     msgs = build_messages(concerns_text, row["circumstances"] or "", row["receivers_raw"])
@@ -126,7 +126,7 @@ def extract_one(llm: LLM, row) -> ItemResult:
     max_tokens = config.MAX_TOKENS["extract"]
     for attempt in (1, 2):
         try:
-            r = llm.chat(STAGE, "nano", msgs, max_tokens, response_format=SCHEMA, item_id=url)
+            r = llm.chat(stage, "nano", msgs, max_tokens, response_format=SCHEMA, item_id=url)
         except (RequestError, TransportError) as e:
             res.error = f"{type(e).__name__}: {e}"
             return res
@@ -189,13 +189,13 @@ def eligible(conn, only_missing: bool = True) -> list:
     return conn.execute(q + " ORDER BY url").fetchall()
 
 
-def run(llm: LLM, rows: list, threads: int = 8, log_every: int = 100) -> dict:
+def run(llm: LLM, rows: list, threads: int = 8, log_every: int = 100, stage: str = STAGE) -> dict:
     conn = db.connect()
     agg = {"items": 0, "ok": 0, "failed": 0, "quotes": 0, "verified": 0, "snapped": 0, "cost": 0.0,
            "truncated_retries": 0, "errors": []}
     stop = False
     with ThreadPoolExecutor(max_workers=threads) as ex:
-        futs = {ex.submit(extract_one, llm, r): r["url"] for r in rows}
+        futs = {ex.submit(extract_one, llm, r, stage): r["url"] for r in rows}
         for f in as_completed(futs):
             try:
                 res = f.result()

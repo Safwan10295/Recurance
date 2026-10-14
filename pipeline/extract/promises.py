@@ -164,7 +164,7 @@ def build_messages(response_text: str, concerns: list[dict]) -> list[dict]:
     return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]
 
 
-def extract_one(llm: LLM, resp_row, concerns: list[dict]) -> dict:
+def extract_one(llm: LLM, resp_row, concerns: list[dict], stage: str = STAGE) -> dict:
     text = resp_row["text"] or ""
     out = {"response_id": resp_row["id"], "ok": False, "promises": [], "cost": 0.0, "quotes": 0, "verified": 0,
            "error": None}
@@ -175,7 +175,7 @@ def extract_one(llm: LLM, resp_row, concerns: list[dict]) -> dict:
     max_tokens = config.MAX_TOKENS["promise"]
     for attempt in (1, 2):
         try:
-            r = llm.chat(STAGE, "nano", msgs, max_tokens, response_format=SCHEMA, item_id=str(resp_row["id"]))
+            r = llm.chat(stage, "nano", msgs, max_tokens, response_format=SCHEMA, item_id=str(resp_row["id"]))
         except (RequestError, TransportError) as e:
             out["error"] = f"{type(e).__name__}: {e}"
             return out
@@ -237,7 +237,7 @@ def pending_responses(conn, report_urls: list[str]) -> list:
     ).fetchall()
 
 
-def run(llm: LLM, rows: list, threads: int = 8) -> dict:
+def run(llm: LLM, rows: list, threads: int = 8, stage: str = STAGE) -> dict:
     conn = db.connect()
     agg = {"items": 0, "ok": 0, "failed": 0, "quotes": 0, "verified": 0, "cost": 0.0, "promises": 0,
            "errors": [], "budget_stopped": False}
@@ -251,7 +251,7 @@ def run(llm: LLM, rows: list, threads: int = 8) -> dict:
 
     jobs = [(r, concerns_for(r["report_url"])) for r in rows]
     with ThreadPoolExecutor(max_workers=threads) as ex:
-        futs = [ex.submit(extract_one, llm, r, c) for r, c in jobs]
+        futs = [ex.submit(extract_one, llm, r, c, stage) for r, c in jobs]
         for f in as_completed(futs):
             try:
                 res = f.result()

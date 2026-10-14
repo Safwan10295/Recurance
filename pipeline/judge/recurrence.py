@@ -128,13 +128,13 @@ def build_messages(d: dict) -> list[dict]:
     return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]
 
 
-def judge_one(llm: LLM, d: dict) -> dict:
+def judge_one(llm: LLM, d: dict, stage: str = STAGE) -> dict:
     out = {"pair_id": d["id"], "ok": False, "cost": 0.0, "error": None}
     msgs = build_messages(d)
     max_tokens = config.MAX_TOKENS["judge"]
     for attempt in (1, 2):
         try:
-            r = llm.chat(STAGE, "super", msgs, max_tokens, response_format=SCHEMA, thinking=True, low_effort=True,
+            r = llm.chat(stage, "super", msgs, max_tokens, response_format=SCHEMA, thinking=True, low_effort=True,
                          item_id=str(d["id"]))
         except (RequestError, TransportError) as e:
             out["error"] = f"{type(e).__name__}: {e}"
@@ -204,14 +204,14 @@ def pending_pairs(conn, ids: list[int] | None = None) -> list[int]:
 
 
 def run(llm: LLM, pair_ids: list[int], threads: int = 8, later_text_override: dict[str, str] | None = None,
-        write: bool = True) -> dict:
+        write: bool = True, stage: str = STAGE) -> dict:
     conn = db.connect()
     agg = {"items": 0, "ok": 0, "failed": 0, "verified": 0, "cost": 0.0, "relations": {}, "errors": [],
            "budget_stopped": False, "results": []}
     data = [load_pair(conn, pid, later_text_override) for pid in pair_ids]
     model_id = config.MODELS["super"].id
     with ThreadPoolExecutor(max_workers=threads) as ex:
-        futs = [ex.submit(judge_one, llm, d) for d in data]
+        futs = [ex.submit(judge_one, llm, d, stage) for d in data]
         for f in as_completed(futs):
             try:
                 res = f.result()
