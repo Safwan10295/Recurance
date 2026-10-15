@@ -110,7 +110,7 @@ def cmd_responses(a):
     conn = db.connect()
     urls = B.scope_report_urls(conn) if not a.all else [r[0] for r in conn.execute(
         "SELECT url FROM reports WHERE duplicate_of IS NULL")]
-    need = B.register_responses(conn, urls)
+    need = B.register_responses(conn, urls, None if a.all else B.scope_report_orgs(conn))
     print(f"responses in scope for {len(urls)} reports; {len(need)} PDFs to fetch")
     if need and a.fetch:
         env.load()

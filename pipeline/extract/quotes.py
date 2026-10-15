@@ -32,6 +32,18 @@ def _word_bounds(s: str, start: int, end: int) -> tuple[int, int]:
     return start, end
 
 
+def _trim_extra_words(span: str, q: str) -> str:
+    """Drop words the alignment picked up beyond the quote's own first and last words."""
+    words = span.split(" ")
+    qw = q.split(" ")
+    head, tail = {w.strip(".,;:").lower() for w in qw[:3]}, {w.strip(".,;:").lower() for w in qw[-3:]}
+    while len(words) > len(qw) and words and words[-1].strip(".,;:").lower() not in tail:
+        words.pop()
+    while len(words) > len(qw) and words and words[0].strip(".,;:").lower() not in head:
+        words.pop(0)
+    return " ".join(words)
+
+
 def _prefix_anchor(q: str, s: str) -> str | None:
     lo, hi = MIN_ANCHOR, len(q)
     if lo > hi or q[:lo] not in s:
@@ -63,7 +75,7 @@ def check_quote(quote: str | None, source: str, snap_threshold: float = 90.0) ->
     al = fuzz.partial_ratio_alignment(q, s, score_cutoff=snap_threshold)
     if al is not None:
         start, end = _word_bounds(s, al.dest_start, al.dest_end)
-        span = s[start:end].strip()
+        span = _trim_extra_words(s[start:end].strip(), q)
         if len(span) >= 20 and abs(len(span) - len(q)) <= max(12, 0.15 * len(q)):
             return SNAPPED, span
     span = _prefix_anchor(q, s)

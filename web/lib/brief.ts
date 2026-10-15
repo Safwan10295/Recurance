@@ -22,6 +22,10 @@ const DATA = path.join(process.cwd(), "data");
 export type Step = { id: string; label: string; status: "running" | "done" | "skipped"; detail?: string };
 export type Emit = (s: Step) => void;
 
+// Compact export format (pipeline/export/web.py).
+type ReportRow = [string, string, string, string | null, string | null, { id: number; o: number | null; q: string; t: string | null }[], string[]];
+type ShardRow = [number, number, string, string, string];
+
 interface ShardItem {
   id: number;
   url: string;
@@ -39,8 +43,21 @@ interface ShardItem {
 interface BriefIndex {
   aliases: Record<string, number>;
   orgs: Record<string, string>;
-  known_reports: Record<string, number[] | number>;
   dim: number;
+}
+
+let reportRows: ReportRow[] | null = null;
+
+function loadShard(orgId: number): ShardItem[] {
+  reportRows ??= readJson<ReportRow[]>("brief/reports.json") ?? [];
+  const rows = readJson<ShardRow[]>(`brief/${orgId}.json`) ?? [];
+  return rows.map(([id, ri, quote, hazard, e]) => {
+    const r = reportRows![ri];
+    return {
+      id, url: r[0], title: r[1], date: r[2], coroner: r[3], area: r[4], quote, hazard, e, chains: r[6],
+      promises: r[5].filter((p) => p.o === null || p.o === orgId).map((p) => ({ id: p.id, quote: p.q, summary: null, timescale: p.t })),
+    };
+  });
 }
 
 export interface BriefMatch {
@@ -230,7 +247,7 @@ export async function runBrief(
     result.notes.push("The organisation was not found among those that have received reports.");
     return result;
   }
-  const shard = readJson<ShardItem[]>(`brief/${org.id}.json`) ?? [];
+  const shard = loadShard(org.id);
 
   // 2. Concerns: reuse the pipeline's extraction for a known report, otherwise Nano.
   emit({ id: "extract", label: "Extracting concerns (Nemotron Nano)", status: "running" });

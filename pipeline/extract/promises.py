@@ -59,8 +59,22 @@ def match_org(conn, report_url: str, filename: str) -> int | None:
     return None
 
 
-def register_responses(conn, report_urls: list[str]) -> list[str]:
-    """Insert response rows for the given reports and return PDF URLs that still need fetching."""
+def scope_report_orgs(conn) -> dict[str, set[int]]:
+    """Earlier report of each candidate pair -> the organisations it was linked through."""
+    out: dict[str, set[int]] = {}
+    for r in conn.execute(
+        "SELECT c.report_url, p.organisation_id FROM candidate_pairs p JOIN concerns c ON c.id = p.earlier_concern_id"
+    ):
+        out.setdefault(r[0], set()).add(r[1])
+    return out
+
+
+def register_responses(conn, report_urls: list[str], orgs: dict[str, set[int]] | None = None) -> list[str]:
+    """Insert response rows and return PDF URLs that still need fetching.
+
+    With orgs, only responses from a linked organisation, or whose sender cannot be
+    matched, are fetched; replies from other addressees are not needed for Stage B.
+    """
     need = []
     for url in report_urls:
         for p in conn.execute("SELECT url, filename FROM report_pdfs WHERE report_url=? AND kind='response'", (url,)):
@@ -70,27 +84,26 @@ def register_responses(conn, report_urls: list[str]) -> list[str]:
                    ON CONFLICT(report_url, pdf_url) DO UPDATE SET organisation_id=excluded.organisation_id""",
                 (url, org, p["url"], p["filename"]),
             )
-            if not cached_path(p["url"], "pdf"):
+            wanted = orgs is None or org is None or org in orgs.get(url, set())
+            if wanted and not cached_path(p["url"], "pdf"):
                 need.append(p["url"])
     conn.commit()
     return list(dict.fromkeys(need))
 
 
-def extract_response_texts(conn, allow_ocr: bool = True) -> dict:
+def extract_response_texts(conn, allow_ocr: bool = True, workers: int = 12) -> dict:
+    from ..parse.pdftext import prepass, text_for
+
     stats = {"extracted": 0, "ocr": 0, "missing": 0, "empty": 0}
     rows = conn.execute("SELECT id, pdf_url FROM responses WHERE text IS NULL").fetchall()
+    stats["prepass"] = prepass([r["pdf_url"] for r in rows], workers=workers, allow_ocr=allow_ocr)
     for r in rows:
-        p = cached_path(r["pdf_url"], "pdf")
-        if not p:
+        t = text_for(r["pdf_url"], allow_ocr=allow_ocr)
+        if t is None:
             stats["missing"] += 1
             continue
-        data = p.read_bytes()
-        text, _, scanned = extract_text(data)
-        used_ocr = 0
-        if scanned and allow_ocr:
-            o = ocr_text(data)
-            if o and len(o) > len(text):
-                text, used_ocr = o, 1
+        text = t["text"]
+        used_ocr = int(t["how"] == "ocr")
         if not text:
             stats["empty"] += 1
         stats["extracted"] += 1
@@ -159,6 +172,15 @@ SYSTEM = (
 )
 
 
+NO_ACTION_RX = re.compile(
+    r"\bno\s+(?:further\s+)?(?:action|changes?)\s+(?:is|are|was|will\s+be)?\s*(?:required|needed|necessary|proposed|planned)", re.I)
+
+
+def _none(v: str | None) -> str | None:
+    v = (v or "").strip()
+    return None if v.lower() in ("", "null", "none", "n/a", "na", "not stated", "unknown") else v
+
+
 def build_messages(response_text: str, concerns: list[dict]) -> list[dict]:
     clist = "\n".join(f"{i}. {c['hazard']}" for i, c in enumerate(concerns)) or "(not available)"
     user = f"CONCERNS RAISED:\n{clist}\n\nRESPONSE:\n{response_text[:MAX_RESPONSE_CHARS]}"
@@ -192,6 +214,8 @@ def extract_one(llm: LLM, resp_row, concerns: list[dict], stage: str = STAGE) ->
         return out
     source = text[:MAX_RESPONSE_CHARS]
     for p in parsed.promises:
+        if NO_ACTION_RX.search(p.action_quote or ""):
+            continue  # a statement that no action is needed is not a promise
         status, q = check_quote(p.action_quote, source)
         out["quotes"] += 1
         out["verified"] += status != UNVERIFIED
@@ -201,8 +225,8 @@ def extract_one(llm: LLM, resp_row, concerns: list[dict], stage: str = STAGE) ->
         out["promises"].append({
             "action_quote": q if status != UNVERIFIED else p.action_quote, "verified": status,
             "action_summary": p.action_summary.strip()[:300],
-            "stated_date_or_deadline": (p.stated_date_or_deadline or None),
-            "owner": (p.owner or None), "concern_id": cid,
+            "stated_date_or_deadline": _none(p.stated_date_or_deadline),
+            "owner": _none(p.owner), "concern_id": cid,
         })
     out["ok"] = True
     return out
@@ -232,10 +256,12 @@ def pending_responses(conn, report_urls: list[str]) -> list:
     if not report_urls:
         return []
     q = ",".join("?" for _ in report_urls)
-    return conn.execute(
+    rows = conn.execute(
         f"SELECT * FROM responses WHERE report_url IN ({q}) AND text IS NOT NULL AND stage_b_done = 0",
         report_urls,
     ).fetchall()
+    orgs = scope_report_orgs(conn)
+    return [r for r in rows if r["organisation_id"] is None or r["organisation_id"] in orgs.get(r["report_url"], set())]
 
 
 def run(llm: LLM, rows: list, threads: int = 8, stage: str = STAGE) -> dict:

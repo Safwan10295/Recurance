@@ -238,44 +238,52 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         orgs_out.append(entry)
         _write(WEB_DATA / "orgs" / f"{o['id']}.json", {**entry, "reports": reps, "chains": org_chains.get(o["id"], [])})
 
-    # Brief retrieval shards: per organisation, concerns with 256-d int8 embeddings.
+    # Brief retrieval data (compact).
+    # brief/reports.json: one row per report [url, title, date, coroner, area, promises, chains],
+    #   where promises are {id, o (organisation id), q (quote), t (timescale)}.
+    # brief/<org>.json: rows [concern_id, report_index, quote, hazard, base64 int8 embedding].
     alias_index = {}
     for a in conn.execute("SELECT alias_text, organisation_id FROM org_aliases"):
         alias_index[org_key(a["alias_text"])] = a["organisation_id"]
     for o in conn.execute("SELECT id, canonical_name FROM organisations"):
         alias_index.setdefault(org_key(o["canonical_name"]), o["id"])
-    shard_rows = defaultdict(list)
-    for c in conn.execute(
-        """SELECT c.id, c.report_url, c.text_quote, c.hazard, c.embedding, r.report_date, r.title, r.coroner, r.area,
-                  rr.organisation_id FROM concerns c JOIN reports r ON r.url=c.report_url
-           JOIN report_receivers rr ON rr.report_url=c.report_url
-           WHERE r.duplicate_of IS NULL AND c.quote_verified>0 AND c.embedding IS NOT NULL"""
-    ):
-        shard_rows[c["organisation_id"]].append(c)
     chain_by_report = defaultdict(list)
     for s in chain_list:
         for r in json.loads((WEB_DATA / "chains" / f"{s['key']}.json").read_text(encoding="utf-8"))["reports"]:
             chain_by_report[r["url"]].append(s["key"])
-    for org, cs in shard_rows.items():
-        items = []
-        for c in cs:
-            v = np.frombuffer(c["embedding"], dtype=np.float32)[:BRIEF_DIM]
-            n = np.linalg.norm(v)
-            v = v / n if n else v
-            q = np.clip(np.round(v * 127), -127, 127).astype(np.int8)
-            items.append({
-                "id": c["id"], "url": c["report_url"], "title": c["title"], "date": c["report_date"],
-                "coroner": c["coroner"], "area": c["area"], "quote": red(c["text_quote"], c["report_url"]),
-                "hazard": c["hazard"], "e": base64.b64encode(q.tobytes()).decode(),
-                "chains": chain_by_report.get(c["report_url"], []),
-                "promises": [p for rs in responses_for(conn, c["report_url"], org, red) for p in rs["promises"]][:4],
-            })
-        _write(WEB_DATA / "brief" / f"{org}.json", items)
+    report_rows: list[list] = []
+    report_idx: dict[str, int] = {}
+
+    def ridx(url: str) -> int:
+        if url not in report_idx:
+            r = conn.execute("SELECT title, report_date, coroner, area FROM reports WHERE url=?", (url,)).fetchone()
+            proms = [{"id": p["id"], "o": p["organisation_id"], "q": red(p["action_quote"], url), "t": p["stated_date_or_deadline"]}
+                     for p in conn.execute(
+                         """SELECT pr.id, pr.action_quote, pr.stated_date_or_deadline, rs.organisation_id FROM promises pr
+                            JOIN responses rs ON rs.id = pr.response_id WHERE rs.report_url=? AND pr.quote_verified>0""", (url,))]
+            report_idx[url] = len(report_rows)
+            report_rows.append([url, r["title"], r["report_date"], r["coroner"], r["area"], proms[:6], chain_by_report.get(url, [])])
+        return report_idx[url]
+
+    shard_rows = defaultdict(list)
+    for c in conn.execute(
+        """SELECT c.id, c.report_url, c.text_quote, c.hazard, c.embedding, rr.organisation_id
+           FROM concerns c JOIN reports r ON r.url=c.report_url JOIN report_receivers rr ON rr.report_url=c.report_url
+           WHERE r.duplicate_of IS NULL AND c.quote_verified>0 AND c.embedding IS NOT NULL"""
+    ):
+        v = np.frombuffer(c["embedding"], dtype=np.float32)[:BRIEF_DIM]
+        n = np.linalg.norm(v)
+        v = v / n if n else v
+        q = np.clip(np.round(v * 127), -127, 127).astype(np.int8)
+        shard_rows[c["organisation_id"]].append(
+            [c["id"], ridx(c["report_url"]), red(c["text_quote"], c["report_url"]), c["hazard"],
+             base64.b64encode(q.tobytes()).decode()])
+    for org, rows in shard_rows.items():
+        _write(WEB_DATA / "brief" / f"{org}.json", rows)
+    _write(WEB_DATA / "brief" / "reports.json", report_rows)
     _write(WEB_DATA / "brief_index.json", {"aliases": alias_index,
                                            "orgs": {o["id"]: o["canonical_name"] for o in conn.execute(
                                                "SELECT id, canonical_name FROM organisations")},
-                                           "known_reports": {r[0]: 1 for r in conn.execute(
-                                               "SELECT DISTINCT report_url FROM concerns")},
                                            "dim": BRIEF_DIM})
 
     # Site-wide numbers, always computed from data.
