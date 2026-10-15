@@ -10,11 +10,13 @@ east of england ambulance service nhs trust,east midlands ambulance service nhs 
 medicines and health regulatory authority,medical and healthcare regulatory authority,88.09523809523809,False
 london royal borough of greenwich,royal borough of greenwich,88.13559322033898,False
 west midlands ambulance service nhs trust,west midlands ambulance service university nhs trust,88.17204301075269,False
+lincolnshire east clinical commissioning group,south lincolnshire clinical commissioning group,88.17204301075269,False
 brompton nhs trust,bolton nhs trust,88.23529411764706,False
 cqc and dept of health and social care,dept of health and social care,88.23529411764706,False
 cardinal health,cardinal healthcare,88.23529411764706,False
 carlisle healthcare,healthcare care,88.23529411764706,False
 nsl care services,cls care services,88.23529411764706,False
+hmp cookham wood,hmyoi cookham wood,88.23529411764706,False
 nhs south yorkshire integrated care board,west yorkshire integrated care board,88.31168831168831,False
 independent office for police complaints,independent office for police conduct,88.31168831168831,False
 dorset health care university nhs trust,dorset healthcare university nhs trust,88.31168831168831,False
@@ -26,25 +28,27 @@ wrexham county council,durham county council,88.37209302325581,False
 eryc highways department,highways department,88.37209302325581,False
 lancashire county council,lincolnshire county council,88.46153846153845,False
 denbighshire county council,derbyshire county council,88.46153846153845,False
-royal cornwall hospital trust,royal cornwall hospital,88.46153846153845,False
 bolton hospital nhs trust,basildon hospital nhs trust,88.46153846153845,False
 care commissioning group for birmingham and solihull,birmingham and solihull clinical commissioning group,88.46153846153845,False
 devon local medical committee,local medical committee,88.46153846153845,False
 flintshire county council,lincolnshire county council,88.46153846153845,False
 association of coloproctology of great britain,association of coloproctology of great britain and ireland,88.46153846153845,False
-james paget university hospital,st james s university hospital,88.52459016393442,False
+royal cornwall hospital truro,royal cornwall hospital,88.46153846153845,False
+st james s university hospital,james paget university hospital,88.52459016393442,False
 deputy mayor of greater manchester,mayor of greater manchester,88.52459016393442,False
 halton clinical commissioning group,oldham clinical commissioning group,88.57142857142857,False
 bradford metropolitan borough council,bury metropolitan borough council,88.57142857142857,False
 wigan metropolitan borough council,walsall metropolitan borough council,88.57142857142857,False
 se london integrated care board,south west london integrated care board,88.57142857142857,False
-university hospital of derby and burton nhs trust,university hospital of derby and burton,88.63636363636364,False
 norfolk and norwich university hospital nhs trust,norfolk and norwich university hospital,88.63636363636364,False
 brighton and sussex university hospital,brighton and sussex university hospital nhs trust,88.63636363636364,False
+university hospital of derby and burton nhs trust,university hospital of derby and burton,88.63636363636364,False
 university hospital of northamptonshire,university hospital of northamptonshire nhs group,88.63636363636364,False
 nottinghamshire clinical commissioning group,nottingham city clinical commissioning group,88.63636363636364,False
 oxfordshire county council,staffordshire county council,88.88888888888889,False
 pennine acute nhs trust,pennine care nhs trust,88.88888888888889,False
+rochdale metropolitan borough council,oldham metropolitan borough council,88.88888888888889,False
+royal berkshire hospital trust,royal berkshire hospital,88.88888888888889,False
 south staffordshire and shropshire healthcare nhs trust,south staffordshire and shropshire nhs trust,88.88888888888889,False
 hm inspectorate of probation,hm inspectorate of prisons,88.88888888888889,False
 ge healthcare,gtd healthcare,88.88888888888889,False
@@ -52,9 +56,7 @@ mhpra,mhra,88.88888888888889,False
 hmps,hmpps,88.88888888888889,False
 evergreen surgery,esher green surgery,88.88888888888889,False
 sherwood hospitals nhs trust,sherwood forest hospitals nhs trust,88.88888888888889,False
-rochdale metropolitan borough council,oldham metropolitan borough council,88.88888888888889,False
 wirral clinical commissioning group,clinical commissioning group,88.88888888888889,False
-royal berkshire hospital trust,royal berkshire hospital,88.88888888888889,False
 university hospital of north midlands nhs trust,north middlesex university hospital nhs trust,89.13043478260869,False
 south western ambulance nhs trust,south western ambulance service nhs trust,89.1891891891892,False
 hertfordshire county council,staffordshire county council,89.28571428571429,False
@@ -65,6 +67,7 @@ doncaster and bassetlaw hospital nhs trust,doncaster and bassetlaw teaching hosp
 milton keynes city council,milton keynes council,89.36170212765957,False
 havering and redbridge university hospital,havering and redbridge university hospital nhs trust,89.36170212765957,False
 heaton medical centre,heaton moor medical centre,89.36170212765957,False
+university hospital of north staffordshire nhs trust,university hospital of north staffordshire,89.36170212765957,False
 dorset healthcare university hospital nhs trust,dorset healthcare university nhs trust,89.41176470588236,False
 lincolnshire community health services,lincolnshire community health service nhs trust,89.41176470588236,False
 manchester mental health nhs trust,greater manchester mental health nhs trust,89.47368421052632,False
@@ -110,12 +113,11 @@ south east ambulance service,south east coast ambulance service,90.3225806451612
 banes clinical commissioning group,clinical commissioning group,90.32258064516128,False
 office of product safety standards,office for product safety and standards,90.41095890410959,False
 oldham metropolitan borough council,rotherham metropolitan borough council,90.41095890410959,False
-sandwell metropolitan borough council,walsall metropolitan borough council,90.41095890410959,False
+walsall metropolitan borough council,sandwell metropolitan borough council,90.41095890410959,False
 denton medical centre,heaton medical centre,90.47619047619048,False
 esk and wear valley nhs,esk and wear valley,90.47619047619048,False
 northumbria health care trust,northumbria health trust,90.56603773584906,False
 cambridge county council,cambridgeshire county council,90.56603773584906,False
-tees esk and wear valleys nhs trust,esk and wear valley nhs trust,90.625,False
 college of emergency medicine,royal college of emergency medicine,90.625,False
 department of culture media and sport,department for culture media and sport,90.66666666666666,False
 south west ambulance service trust,south western ambulance service nhs trust,90.66666666666666,False
@@ -161,13 +163,12 @@ barking havering and redbridge university nhs trust,barking havering and redbrid
 greater manchester west health nhs trust,greater manchester west mental health nhs trust,91.95402298850574,False
 devon partnership trust,devon partnership nhs trust,92.0,True
 north east london trust,north east london nhs trust,92.0,True
+royal cornwall hospital trust,royal cornwall hospitals nhs trust,92.06349206349206,True
 western sussex hospital trust,western sussex hospitals nhs trust,92.06349206349206,True
-royal cornwall hospitals nhs trust,royal cornwall hospital trust,92.06349206349206,True
 cwm taf morgannwg university health,cwm taf morgannwg university health board,92.10526315789474,True
 department of business innovation and skills,department for business innovation and skills,92.13483146067416,True
 sussex partnership trust,sussex partnership nhs trust,92.3076923076923,True
 st georges hospital,st george s hospital,92.3076923076923,True
-tees esk wear valley nhs trust,tees esk and wear valleys nhs trust,92.3076923076923,True
 sandwell hospital and west birmingham hospital nhs trust,sandwell and west birmingham hospitals nhs trust,92.3076923076923,True
 sherwood forest hospital trust,sherwood forest hospitals nhs trust,92.3076923076923,True
 college for policing,college of policing,92.3076923076923,True
@@ -190,11 +191,11 @@ leeds and yorkshire partnership nhs trust,leeds and york partnership nhs trust,9
 shewsbury and telford hospital trust,shrewsbury and telford hospital nhs trust,93.5064935064935,True
 welsh ambulance service trust,welsh ambulance service nhs trust,93.5483870967742,True
 south essex partnership trust,south essex partnership nhs trust,93.5483870967742,True
-royal cornwall hospital nhs trust,royal cornwall hospital trust,93.5483870967742,True
 department of transport,department for transport,93.61702127659575,True
 department of education,department for education,93.61702127659575,True
 london borough hackney,london borough of hackney,93.61702127659575,True
 ashford and st peter s hospital trust,ashford and st peter s hospitals nhs trust,93.67088607594937,True
+tees esk wear valley nhs trust,tees esk and wear valley nhs trust,93.75,True
 care4u healthcare,healthcare care,93.75,True
 hm inspector of prisons,hm inspectorate of prisons,93.87755102040816,True
 south london and maudsley trust,south london and maudsley nhs trust,93.93939393939394,True
@@ -206,6 +207,7 @@ nottinghamshire healthcare trust,nottinghamshire healthcare nhs trust,94.1176470
 nottinghamshire university hospital nhs trust,nottingham university hospital nhs trust,94.11764705882352,True
 greater manchester mental health and social care,greater manchester mental health and social care trust,94.11764705882352,True
 leicestershire partnership trust,leicestershire partnership nhs trust,94.11764705882352,True
+vehicle operator services agency,vehicle and operator services agency,94.11764705882352,True
 nhs bury clinical commissioning group,bury clinical commissioning group,94.28571428571428,True
 british healthcare trades association,british health trades association,94.28571428571428,True
 essex university partnership trust,essex partnership university nhs trust,94.44444444444444,True

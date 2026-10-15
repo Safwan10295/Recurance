@@ -72,17 +72,29 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
               <span className="absolute -left-[7px] top-2 h-3 w-3 rounded-full bg-accent" aria-hidden />
               <div className="space-y-4">
                 <ReportHeader r={r} first={i === 0} />
-                {r.concerns && r.concerns.length > 0 && (
-                  <div className="space-y-3">
-                    {r.concerns.slice(0, 3).map((c, j) => (
-                      <Quote key={j} text={c.quote} />
-                    ))}
-                  </div>
-                )}
+                {(() => {
+                  // The quotes that make the link, not every concern in the report.
+                  const qs = Array.from(
+                    new Set(
+                      chain.links.flatMap((l) =>
+                        l.earlier === r.url ? [l.earlier_quote] : l.later === r.url ? [l.later_quote] : [],
+                      ),
+                    ),
+                  ).slice(0, 2);
+                  return qs.length > 0 ? (
+                    <div className="space-y-3">
+                      {qs.map((q, j) => (
+                        <Quote key={j} text={q} />
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
                 <div className="space-y-3">
                   {r.responses.length === 0 ? (
                     <p className="text-sm text-ink-2 bg-paper-2 border border-rule rounded px-3 py-2">
                       No published response from {chain.org.name} was found for this report.
+                      {Date.now() - new Date(r.date + "T00:00:00Z").getTime() < 90 * 864e5 &&
+                        " The report is recent, so a response may not be due or published yet."}
                     </p>
                   ) : (
                     r.responses.map((rs) => (
