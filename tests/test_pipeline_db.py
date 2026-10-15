@@ -254,3 +254,33 @@ def test_rate_limiter_paces_by_tokens(monkeypatch):
     for _ in range(3):
         rl.wait(MODELS["super"], est_tokens=40_000)  # 40k of a 160k/min budget: one call per 15 s
     assert slept and max(slept) > 20
+
+
+def test_systemic_clusters_span_organisations(tmp_path, monkeypatch):
+    from pipeline.link import systemic
+
+    p = tmp_path / "s.sqlite"
+    monkeypatch.setattr(config, "DB_PATH", p)
+    conn = db.connect(p)
+    rng = np.random.default_rng(1)
+    base = rng.normal(size=1024).astype(np.float32)
+    other = rng.normal(size=1024).astype(np.float32)
+    rows = [("u1", "2016-01-01", 1, base), ("u2", "2018-01-01", 2, base + 0.01), ("u3", "2021-01-01", 3, base + 0.02),
+            ("u4", "2021-02-01", 4, other)]
+    for i, (u, d, org, v) in enumerate(rows, 1):
+        url = f"https://www.judiciary.uk/prevention-of-future-death-reports/{u}/"
+        conn.execute("INSERT INTO reports (url, slug, report_date, title, concerns) VALUES (?,?,?,?,?)",
+                     (url, u, d, f"{u} title", "Paraffin based emollients soaked into clothing increase fire risk"))
+        conn.execute("INSERT OR IGNORE INTO organisations (id, canonical_name) VALUES (?,?)", (org, f"Org {org}"))
+        conn.execute("INSERT INTO report_receivers VALUES (?,?,?)", (url, org, f"Org {org}"))
+        v = v / np.linalg.norm(v)
+        conn.execute("INSERT INTO concerns (id, report_url, idx, text_quote, hazard, quote_verified, embedding) "
+                     "VALUES (?,?,0,?,?,1,?)", (i, url, "Paraffin based emollients soaked into clothing", "emollient fires",
+                                                v.astype(np.float32).tobytes()))
+    conn.commit()
+    clusters = systemic.find_clusters(conn)
+    conn.close()
+    assert len(clusters) == 1
+    c = clusters[0]
+    assert c["n_orgs"] == 3 and c["years"] == 5
+    assert {m["report_url"].rsplit("/", 2)[-2] for m in c["members"]} == {"u1", "u2", "u3"}
