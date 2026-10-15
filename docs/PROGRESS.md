@@ -48,3 +48,20 @@ Spend at the end of Phase 1: $0.80 total. Stage A $0.77 of $1.50, dev $0.02, emb
 Changes to the plan:
 1. Nano's repetition loops led to bounded schemas (D11), and quote repairs fixed a pilot that fell below 90% (D12, blocker B1, resolved).
 2. The listing-page crawl was deferred to run alongside the model-only stages, since the sitemaps already give the count.
+
+## Phase 2: deterministic linking, pilots and gold set (finished 2026-10-15 04:56)
+
+Done:
+1. Embedded all 15,307 concerns with Qwen3-Embedding-8B on Token Factory (1,024 dimensions).
+2. Built 3,285 candidate pairs across 431 organisations: same organisation, at least six months apart, embedding cosine at least 0.62 or TF-IDF at least 0.25, at most 30 pairs per organisation, and top-k retrieval for national bodies (793 pairs). Thresholds came from the coroner-acknowledged pairs (D13).
+3. In 81% of candidate pairs the later report came from a different coroner, and in 71% from a different coroner area.
+4. Gold set: 227 pairs where a later report names an earlier one, by reference number (8) or by the earlier deceased person's full name (219). 42 share an organisation, and 29 of those are six months or more apart; those 29 are the blind test set.
+5. Hand-labelling set: 80 candidate pairs across eight similarity bands in data/exports/hand_labels.csv, with a labelling CLI. Not labelled; that is Pilot's job.
+6. Stage B (authorised after its pilot passed): 1,466 in-scope responses read (569 by OCR), 1,443 processed, 2,060 promises, 1,925 with verified quotes (93%). Ten template lines wrongly taken as promises were removed (D16).
+
+Pilots:
+1. Stage A: passed (D11, D12).
+2. Stage B: schema 100%, quotes 95%, $0.000109 per response.
+3. Stage C: the first pilot failed at 85% (B4), was fixed (D16), and the re-pilot passed with 20 of 20 verified at $0.00078 per pair.
+
+Spend at the end of Phase 2: $1.08 total. Stage A $0.77, Stage B $0.19, dev $0.06, embeddings $0.01, Stage C $0.04 (pilot and systemic clusters).
