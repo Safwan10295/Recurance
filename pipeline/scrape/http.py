@@ -19,6 +19,38 @@ from .. import config
 
 _lock = threading.Lock()
 _last = [0.0]
+# Machine-wide limiter: every process that fetches from judiciary.uk shares this file,
+# so two fetchers running at once still make at most one request per second in total.
+_SLOT_FILE = config.CACHE / ".judiciary_slot"
+
+
+def _claim_slot(delay: float) -> None:
+    import msvcrt  # Windows; on other platforms fcntl would be used
+
+    _SLOT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    while True:
+        with open(_SLOT_FILE, "a+b") as fh:
+            fh.seek(0)
+            msvcrt.locking(fh.fileno(), msvcrt.LK_LOCK, 1)
+            try:
+                fh.seek(0)
+                raw = fh.read().decode() or "0"
+                try:
+                    last = float(raw.split()[-1]) if raw.strip() else 0.0
+                except ValueError:
+                    last = 0.0
+                now = time.time()
+                if now - last >= delay:
+                    fh.seek(0)
+                    fh.truncate()
+                    fh.write(f"{now:.3f}".encode())
+                    fh.flush()
+                    return
+                wait = delay - (now - last)
+            finally:
+                fh.seek(0)
+                msvcrt.locking(fh.fileno(), msvcrt.LK_UNLCK, 1)
+        time.sleep(max(0.05, wait))
 
 
 def _path_for(url: str, kind: str) -> Path:
@@ -44,10 +76,7 @@ class Fetcher:
 
     def _wait(self) -> None:
         with _lock:
-            gap = time.monotonic() - _last[0]
-            if gap < self.delay:
-                time.sleep(self.delay - gap)
-            _last[0] = time.monotonic()
+            _claim_slot(self.delay)
 
     def get(self, url: str, kind: str = "html", refresh: bool = False) -> tuple[int, bytes, str]:
         """Return (status, body, final_url). Cached bodies return status 200 (or the stored status)."""

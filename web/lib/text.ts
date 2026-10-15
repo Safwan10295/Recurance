@@ -144,7 +144,7 @@ export function stableStringify(v: unknown): string {
 }
 
 const BANNED =
-  /\b(ignor(?:e|ed|es|ing)|caus(?:e|ed|es|ing)\s+(?:the\s+)?death|failed\s+to\s+(?:act|respond|learn|address|implement)|fail(?:ure|ed)\s+to|(?:is|are|was|were)\s+responsible|responsib(?:le|ility)\s+for\s+(?:the\s+)?death|negligen(?:t|ce)|at\s+fault|to\s+blame|blame[sd]?|culpab(?:le|ility)|disregard(?:ed)?|neglect(?:ed)?)\b/i;
+  /\b(ignor(?:e|ed|es|ing)|caus(?:e|ed|es|ing)\s+(?:the\s+)?death|failed\s+to\s+(?:act|respond|learn|address|implement)|fail(?:ure|ed)\s+to|(?:is|are|was|were)\s+responsible|responsib(?:le|ility)\s+for\s+(?:the\s+)?death|negligen(?:t|ce)|at\s+fault|to\s+blame|blame[sd]?|culpab(?:le|ility)|disregard(?:ed)?|neglect(?:ed)?|faults?\s+(?:the|its|their))\b/i;
 
 export function wordingClean(s: string | null | undefined): boolean {
   return !BANNED.test(s ?? "");

@@ -13,7 +13,7 @@ from ..llm import LLM, BudgetExceeded, RequestError, TransportError, confirm_ful
 from ..wording import is_clean
 
 STAGE = "C"
-PROMPT_VERSION = "c1"
+PROMPT_VERSION = "c2"  # c2: clearer closely_related definition, shorter reasoning
 CONTEXT_CHARS = 1800
 RELATIONS = ["identical", "closely_related", "related", "different"]
 
@@ -55,19 +55,21 @@ SYSTEM = (
     "You compare two coroners' Prevention of Future Deaths reports sent to the same organisation and decide whether "
     "the later report raises the same hazard as the earlier one. Output one compact JSON object on one line.\n"
     "relation:\n"
-    "- identical: the same specific hazard and mechanism, in substance the same concern.\n"
-    "- closely_related: the same specific hazard with a different emphasis, setting detail or mechanism step.\n"
-    "- related: the same broad area but a different specific hazard.\n"
+    "- identical: the same specific hazard and the same mechanism; in substance the same concern.\n"
+    "- closely_related: the same specific hazard (the same product, procedure, equipment, type of location or failure "
+    "point) where the channel, setting detail or emphasis differs. Example: no limit on buying a medicine in shops, "
+    "then no limit on buying it online.\n"
+    "- related: the same broad area (for example staffing, communication, training) but a different specific failure point.\n"
     "- different: not the same hazard.\n"
-    "Shared generic words (staffing, communication, record keeping, training) are not enough for identical or "
-    "closely_related unless the specific failure point matches.\n"
+    "Shared generic words alone are not enough for identical or closely_related.\n"
     "same_hazard_explanation: two short neutral sentences describing what the two concerns share or how they differ. "
-    "Never say an organisation ignored, caused, failed, neglected or is responsible or to blame.\n"
+    "Never say an organisation ignored, caused, failed, neglected, faults or is responsible or to blame.\n"
     "earlier_quote and later_quote: copy one contiguous passage, 10 to 45 words, character for character from the "
     "EARLIER CONCERNS and LATER CONCERNS text respectively.\n"
     "promise_quote: copy, character for character, the one listed promised action most relevant to the hazard, or null.\n"
     "later_after_promise: true if the later report concerns events after the earlier promise was made.\n"
-    "confidence: 0 to 1, your confidence in the relation label."
+    "confidence: 0 to 1, your confidence in the relation label.\n"
+    "Keep your reasoning short. Do not count words."
 )
 
 

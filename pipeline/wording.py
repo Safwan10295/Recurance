@@ -6,7 +6,7 @@ import re
 BANNED = re.compile(
     r"\b(ignor(?:e|ed|es|ing)|caus(?:e|ed|es|ing)\s+(?:the\s+)?death|failed\s+to\s+(?:act|respond|learn|address|implement)|"
     r"fail(?:ure|ed)\s+to|(?:is|are|was|were)\s+responsible|responsib(?:le|ility)\s+for\s+(?:the\s+)?death|"
-    r"negligen(?:t|ce)|at\s+fault|to\s+blame|blame[sd]?|culpab(?:le|ility)|disregard(?:ed)?|neglect(?:ed)?)\b",
+    r"negligen(?:t|ce)|at\s+fault|to\s+blame|blame[sd]?|culpab(?:le|ility)|disregard(?:ed)?|neglect(?:ed)?|faults?\s+(?:the|its|their))\b",
     re.I,
 )
 

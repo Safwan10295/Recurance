@@ -94,6 +94,43 @@ def followups_for(conn, promise_ids: list[int]) -> list[dict]:
     return out
 
 
+def brief_examples(chain_list: list[dict], n: int = 3) -> list[dict]:
+    """Precomputed briefs for the paused state: the latest report of a chain, with its verified links.
+
+    Built from Stage C verdicts already in the database, so no model call is needed.
+    """
+    out = []
+    picks = sorted(chain_list, key=lambda c: (-c["n_reports"], c["relation"] != "identical", c["last_date"]),)
+    for c in picks:
+        if len(out) >= n:
+            break
+        d = json.loads((WEB_DATA / "chains" / f"{c['key']}.json").read_text(encoding="utf-8"))
+        latest = d["reports"][-1]
+        links = [l for l in d["links"] if l["later"] == latest["url"]]
+        if not links:
+            continue
+        by = {r["url"]: r for r in d["reports"]}
+        matches = []
+        for l in links:
+            e = by[l["earlier"]]
+            proms = [p for rs in e["responses"] for p in rs["promises"]][:2]
+            matches.append({
+                "earlier": {k: e.get(k) for k in ("url", "title", "date", "coroner", "area")},
+                "relation": l["relation"], "confidence": l["confidence"], "explanation": l["explanation"],
+                "earlier_quote": l["earlier_quote"], "later_quote": l["later_quote"], "promises": proms,
+                "chains": [c["key"]],
+            })
+        out.append({
+            "title": latest["title"],
+            "input": {"reportUrl": latest["url"]},
+            "result": {"organisation": {"id": c["org"]["id"], "name": c["org"]["name"]},
+                       "report": {"url": latest["url"], "title": latest["title"], "date": latest["date"]},
+                       "concerns": latest.get("concerns", [])[:3], "matches": matches, "other_earlier": [],
+                       "notes": ["Precomputed example from the verified analysis."]},
+        })
+    return out
+
+
 def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
     conn = db.connect()
     red = Redactor(conn)
@@ -168,7 +205,7 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         summary = {
             "key": ch["chain_key"], "org": {"id": ch["organisation_id"], "name": ch["org"], "type": ch["org_type"],
                                             "national": bool(ch["is_national"])},
-            "hazard": ch["hazard_label"], "relation": ch["relation"],
+            "hazard": hazard_title(ch["hazard_label"]), "relation": ch["relation"],
             "confidence": round(min(l["confidence"] for l in links), 2),
             "first_date": reports[0]["date"], "last_date": reports[-1]["date"], "n_reports": len(reports),
             "coroners": coroners, "areas": sorted({r["area"] for r in reports if r["area"]}),
@@ -272,8 +309,17 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
     _write(WEB_DATA / "site.json", site)
     _write(WEB_DATA / "chains.json", chain_list)
     _write(WEB_DATA / "orgs.json", sorted(orgs_out, key=lambda o: o["name"]))
+    _write(WEB_DATA / "brief_examples.json", brief_examples(chain_list))
     ev = config.EXPORTS / "evaluation.json"
     if ev.exists():
         _write(WEB_DATA / "evaluation.json", json.loads(ev.read_text(encoding="utf-8")))
     conn.close()
     return {"chains": len(chain_list), "orgs": len(orgs_out), "brief_shards": len(shard_rows), "links": pair_stats["links"]}
+
+
+def hazard_title(label: str | None) -> str:
+    """Model-written hazard labels are titles on the site, so they pass the wording check too."""
+    t = (label or "").strip().rstrip(".")
+    if not t or not is_clean(t):
+        return "Recurring hazard (see the quoted concerns)"
+    return t[0].upper() + t[1:]

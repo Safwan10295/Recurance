@@ -77,9 +77,9 @@ PFD_BASE = "https://www.judiciary.uk/prevention-of-future-death-reports/"
 
 # Linking thresholds (initial values; tuned against the coroner-acknowledged set).
 MIN_DAYS_APART = 182
-TFIDF_MIN = 0.15
-EMBED_MIN = 0.55
-MAX_PAIRS_PER_ORG = 40
+TFIDF_MIN = 0.25
+EMBED_MIN = 0.62
+MAX_PAIRS_PER_ORG = 30
 NATIONAL_TOP_K = 5
 
 # Known unique-report figure from prior research (section 3).
