@@ -29,11 +29,11 @@ _COMPILED = {k: re.compile(_LEAD + r"(" + v + r")[ \t:.-]*", re.I) for k, v in H
 
 BOILERPLATE = [
     r"During\s+the\s+course\s+of\s+(?:the|my)\s+(?:investigation|inquest)s?(?:\s+and\s+inquest)?,?\s+(?:my\s+inquiries|the\s+evidence|evidence)\s+revealed\s+(?:matters|a\s+matter)\s+giving\s+rise\s+to\s+(?:the\s+following\s+)?concerns?\.?",
-    r"In\s+my\s+opinion\s+there\s+is\s+a\s+risk\s+that\s+future\s+deaths?\s+(?:could|will|may)\s+occur\s+unless\s+action\s+is\s+taken\.?",
-    r"In\s+the\s+circumstances\s+it\s+is\s+my\s+statutory\s+duty\s+to\s+report\s+(?:to\s+you|(?:the\s+)?matters?\s+of\s+concern\s+to\s+you)\.?",
+    r"(?:In\s+my\s+opinion,?\s+)?there\s+is\s+a\s+risk\s+that\s+future\s+deaths?\s+(?:could|will|may)\s+occur\s+unless\s+action\s+is\s+taken\.?",
+    r"In\s+the\s+circumstances?,?\s+it\s+is\s+my\s+statutory\s+duty\s+to\s+report\s+(?:to\s+you|(?:the\s+)?matters?\s+of\s+concern\s+to\s+you)\.?",
     r"The\s+MATTERS?\s+OF\s+CONCERN\s+(?:are|is)\s+as\s+follows\s*[:.-]*",
     r"\(\s*brief\s+summary\s+of\s+matters\s+of\s+concern\s*\)",
-    r"In\s+my\s+opinion\s+action\s+should\s+be\s+taken\s+to\s+prevent\s+future\s+deaths\s+and\s+I\s+believe\s+you\s*(?:\[?\(?\s*AND/OR\s+your\s+organisation\s*\)?\]?|\(?and/or\s+your\s+organisation\)?)?\s+have\s+the\s+power\s+to\s+take\s+such\s+action\.?",
+    r"In\s+my\s+opinion,?\s+action\s+should\s+be\s+taken\s+to\s+prevent\s+future\s+deaths\s+and\s+I\s+believe\s+you\s*(?:\[?\(?\s*AND/OR\s+your\s+organisation\s*\)?\]?|\(?and/or\s+your\s+organisation\)?)?\s+have\s+the\s+power\s+to\s+take\s+such\s+action\.?",
 ]
 _BOILER = [re.compile(p, re.I) for p in BOILERPLATE]
 _TRAILING_NUM = re.compile(r"(?:\n[ \t]*\(?\d{1,2}[.)]?[ \t]*)+\s*$")
@@ -71,6 +71,12 @@ def split_sections(text: str) -> dict[str, str]:
             # A false early hit (e.g. a cross-reference) is replaced by the real section.
             out[name] = body
     return out
+
+
+def is_boilerplate_quote(q: str | None) -> bool:
+    """True when a quote is only template text (nothing left after removing boilerplate)."""
+    rest = strip_boilerplate(q or "")
+    return len(re.sub(r"[^A-Za-z]+", "", rest)) < 20
 
 
 def strip_boilerplate(s: str) -> str:

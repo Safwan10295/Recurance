@@ -17,3 +17,12 @@ Running notes for the Devpost feedback field. Each item is something observed du
 - 2026-10-15. In guided JSON mode Nano emits a lot of whitespace and newlines between tokens, which inflates output tokens.
 - 2026-10-15. There is no per-key spend limit. For a public demo key this is the most-wanted feature: a hard cap per key would remove the need for app-side cost ceilings.
 - 2026-10-15. There is no balance or credit-expiry endpoint, so a pipeline cannot check remaining credit or promo expiry programmatically.
+- 2026-10-15. Under guided JSON decoding at temperature 0, Nano sometimes loops, repeating one array item (an organisation name, or a whole object) until max_tokens. About 7% of extraction calls hit this. Adding maxItems and maxLength to the schema fixed it, and both are enforced. It would help to document that these keywords are supported, and to recommend them for Nemotron structured output.
+- 2026-10-15. A frequency penalty also stopped the loops but made Nano drop real items, so schema bounds are the better fix.
+- 2026-10-15. Batch job creation was still returning 403 at 01:30 UTC the same night.
+- 2026-10-15. Qwen3-Embedding-8B's dimensions parameter matches truncation of the full vector (cosine 0.99994 between 1024-truncated-to-256 and a direct 256 request), so one stored embedding serves several index sizes.
+
+## Wins (continued)
+
+- 2026-10-15. Nemotron 3 Nano copies quotes accurately: 98% of extracted quotes were exact or near-exact substrings of the source, across HTML, PDF and OCR text.
+- 2026-10-15. Nemotron 3 Super with low_effort costs about $0.0007 per recurrence judgement with reasoning, roughly 30% below our planning estimate.

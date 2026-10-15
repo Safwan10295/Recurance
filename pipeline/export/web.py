@@ -318,6 +318,20 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
     _write(WEB_DATA / "chains.json", chain_list)
     _write(WEB_DATA / "orgs.json", sorted(orgs_out, key=lambda o: o["name"]))
     _write(WEB_DATA / "brief_examples.json", brief_examples(chain_list))
+    sysp = config.EXPORTS / "systemic.json"
+    systemic = []
+    if sysp.exists():
+        for c in json.loads(sysp.read_text(encoding="utf-8")).get("clusters", []):
+            a = c["anchor"]
+            systemic.append({
+                "hazard": hazard_title(c["hazard"]), "n_orgs": c["n_orgs"], "years": c["years"],
+                "anchor": {**a, "quote": red(a["quote"], a["url"])},
+                "members": [{**m, "earlier_quote": red(m["earlier_quote"], a["url"]),
+                             "later_quote": red(m["later_quote"], m["url"]),
+                             "explanation": red(m["explanation"], a["url"], m["url"])}
+                            for m in c["members"] if is_clean(m.get("explanation"))],
+            })
+    _write(WEB_DATA / "systemic.json", [s for s in systemic if s["members"]])
     ev = config.EXPORTS / "evaluation.json"
     if ev.exists():
         _write(WEB_DATA / "evaluation.json", json.loads(ev.read_text(encoding="utf-8")))

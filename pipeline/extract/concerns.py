@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 
@@ -10,7 +11,11 @@ from pydantic import BaseModel, Field, ValidationError
 
 from .. import config, db
 from ..llm import LLM, BudgetExceeded, RequestError, TransportError, confirm_full_run
+from ..parse.sections import is_boilerplate_quote
 from .quotes import UNVERIFIED, check_quote_any
+
+GENERIC_HAZARD = re.compile(r"^\s*(?:(?:wider\s+)?risk\s+of\s+)?(?:future|further)\s+deaths?\s*$|^\s*risk\s+of\s+death\s*$|"
+                            r"^\s*statutory\s+duty\s+to\s+report\s*$", re.I)
 
 STAGE = "A"
 PROMPT_VERSION = "a2"  # a2: bounded schema (maxItems/maxLength) stops Nano repetition loops
@@ -159,6 +164,8 @@ def extract_one(llm: LLM, row, stage: str = STAGE) -> ItemResult:
     for i, c in enumerate(uniq):
         # Quotes from the circumstances excerpt are still the report's own words.
         status, q = check_quote_any(c.quote, source, circ)
+        if is_boilerplate_quote(c.quote):
+            status = UNVERIFIED  # template text proves nothing about the hazard; never displayed
         res.n_quotes += 1
         if status != UNVERIFIED:
             res.n_verified += 1
@@ -196,16 +203,32 @@ def reverify(conn=None) -> dict:
     ).fetchall()
     fixed = 0
     for r in rows:
+        if is_boilerplate_quote(r["text_quote"]):
+            continue
         st, q = check_quote_any(r["text_quote"], (r["concerns"] or "")[:MAX_CONCERNS_CHARS],
                                 (r["circumstances"] or "")[:MAX_CIRC_CHARS])
         if st != UNVERIFIED:
             conn.execute("UPDATE concerns SET text_quote=?, quote_verified=? WHERE id=?", (q, st, r["id"]))
             fixed += 1
+    # Template-only quotes are never displayed; concerns that are nothing but template are removed.
+    boiler, dropped = 0, 0
+    for r in conn.execute("SELECT id, hazard, text_quote FROM concerns WHERE quote_verified > 0").fetchall():
+        if is_boilerplate_quote(r["text_quote"]):
+            if GENERIC_HAZARD.search(r["hazard"] or ""):
+                in_pairs = conn.execute("SELECT 1 FROM candidate_pairs WHERE earlier_concern_id=? OR later_concern_id=?",
+                                        (r["id"], r["id"])).fetchone()
+                if not in_pairs:
+                    conn.execute("DELETE FROM concerns WHERE id=?", (r["id"],))
+                    dropped += 1
+                    continue
+            conn.execute("UPDATE concerns SET quote_verified=0 WHERE id=?", (r["id"],))
+            boiler += 1
     conn.commit()
     total = conn.execute("SELECT COUNT(*), SUM(quote_verified>0) FROM concerns").fetchone()
     if own:
         conn.close()
-    return {"rechecked": len(rows), "fixed": fixed, "concerns": total[0], "verified": total[1]}
+    return {"rechecked": len(rows), "fixed": fixed, "boilerplate_hidden": boiler, "boilerplate_dropped": dropped,
+            "concerns": total[0], "verified": total[1]}
 
 
 def mark(conn, item_id: str, status: str, detail: str | None) -> None:

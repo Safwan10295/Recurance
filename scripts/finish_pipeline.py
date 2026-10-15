@@ -30,7 +30,8 @@ ROOT = config.ROOT
 BLOCKERS = ROOT / "docs" / "BLOCKERS.md"
 STATE = config.CACHE / "finish_state.json"
 EVAL_RESERVE_C = 0.35  # kept back from Stage C for the blind evaluation judge runs
-STEPS = ["ingest_checks", "stage_a_rest", "embed", "link", "responses", "stage_b", "stage_c", "chains", "evaluate",
+SYSTEMIC_RESERVE_C = 0.20  # kept back from Stage C for judging systemic clusters
+STEPS = ["ingest_checks", "stage_a_rest", "embed", "link", "responses", "stage_b", "stage_c", "chains", "systemic", "evaluate",
          "dossiers", "followup", "export"]
 
 
@@ -175,7 +176,7 @@ def step_stage_c(st: dict, llm: LLM) -> None:
     in_pilot = set(pilot_ids)
     rest = [i for i in ids if i not in in_pilot]
     cpi = pilot["cost_per_item"]
-    budget = llm.remaining("C") - EVAL_RESERVE_C
+    budget = llm.remaining("C") - EVAL_RESERVE_C - SYSTEMIC_RESERVE_C
     max_pairs = int(budget / cpi) if cpi > 0 else len(rest)
     ok, msg = pilot_ok(pilot, min(len(rest), max_pairs), "C", llm)
     log(msg + f" errors={errs[:3]}")
@@ -188,7 +189,7 @@ def step_stage_c(st: dict, llm: LLM) -> None:
         with (ROOT / "docs" / "DECISIONS.md").open("a", encoding="utf-8") as fh:
             fh.write(f"\n## D14. Stage C judged the top {max_pairs} of {len(rest)} candidate pairs\n\n"
                      f"1. Measured pilot cost was ${cpi:.6f} per pair.\n"
-                     f"2. Stage C cap ${config.STAGE_CAPS['C']:.2f}, minus ${EVAL_RESERVE_C:.2f} kept for the blind evaluation.\n"
+                     f"2. Stage C cap ${config.STAGE_CAPS['C']:.2f}, minus ${EVAL_RESERVE_C:.2f} for the blind evaluation and ${SYSTEMIC_RESERVE_C:.2f} for systemic clusters.\n"
                      f"3. Pairs were judged in order of hybrid score; {len(rest) - max_pairs} lower-scoring pairs were left unjudged.\n")
         rest = rest[:max_pairs]
     confirm_full_run(llm, "C", len(rest), cpi, confirm_spend=True)
@@ -204,6 +205,21 @@ def step_chains(st: dict, llm: LLM) -> None:
 
     st["chains"] = build()
     log(f"chains: {st['chains']}")
+
+
+def step_systemic(st: dict, llm: LLM) -> None:
+    from pipeline.link.systemic import find_clusters, judge_clusters
+
+    conn = db.connect()
+    clusters = find_clusters(conn)
+    conn.close()
+    room = llm.remaining("C") - EVAL_RESERVE_C
+    log(f"systemic: {len(clusters)} candidate clusters; Stage C room ${room:.4f}")
+    if room <= 0.02:
+        log("systemic: skipped, no Stage C budget left after the evaluation reserve")
+        return
+    st["systemic"] = judge_clusters(llm, clusters)
+    log(f"systemic: {st['systemic']}")
 
 
 def step_evaluate(st: dict, llm: LLM) -> None:

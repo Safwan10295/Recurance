@@ -42,3 +42,4 @@ export const getOrgs = () => read<(OrgRef & { n_reports: number; n_chains: numbe
 export const getOrg = (id: string) => (/^\d+$/.test(id) ? read<OrgDetail | null>(`orgs/${id}.json`, null) : null);
 export const getEvaluation = () => read<Record<string, unknown> | null>("evaluation.json", null);
 export const getBriefExamples = () => read<unknown[]>("brief_examples.json", []);
+export const getSystemic = () => read<import("@/components/SystemicList").Systemic[]>("systemic.json", []);
