@@ -1,50 +1,35 @@
 import "server-only";
 import fs from "node:fs";
 import path from "node:path";
+import { getPool } from "./db";
 
-// Small key-value store used by the live brief for its cache, ledger and limits.
-// Production: Supabase table rw_kv (see docs/DEPLOY.md). Development: a JSON file in web/.local/.
-// On Vercel without Supabase there is no shared store, so the live brief stays paused (see limits.ts).
+// Key-value store for the live brief: response cache, ledger, spend and daily limits.
+// Production: the brief_kv table in PostgreSQL (pipeline/db/schema_publish.sql).
+// Development without a database: a JSON file in web/.local/. In production with no database the
+// store is "none" and the live brief stays paused (see limits.ts).
 
 export interface Store {
-  kind: "supabase" | "file" | "none";
+  kind: "postgres" | "file" | "none";
   get<T>(key: string): Promise<T | null>;
   set(key: string, value: unknown): Promise<void>;
   add(key: string, delta: number): Promise<number>;
 }
 
-class SupabaseStore implements Store {
-  kind = "supabase" as const;
-  constructor(private url: string, private key: string) {}
-  private headers() {
-    return { apikey: this.key, Authorization: `Bearer ${this.key}`, "Content-Type": "application/json" };
+class PostgresStore implements Store {
+  kind = "postgres" as const;
+  async get<T>(key: string) {
+    const r = await getPool()!.query("SELECT value FROM brief_kv WHERE key = $1", [key]);
+    return (r.rows[0]?.value ?? null) as T | null;
   }
-  async get<T>(key: string): Promise<T | null> {
-    const r = await fetch(`${this.url}/rest/v1/rw_kv?key=eq.${encodeURIComponent(key)}&select=value`, {
-      headers: this.headers(),
-      cache: "no-store",
-    });
-    if (!r.ok) throw new Error(`store get ${r.status}`);
-    const rows = (await r.json()) as { value: T }[];
-    return rows.length ? rows[0].value : null;
+  async set(key: string, value: unknown) {
+    await getPool()!.query(
+      "INSERT INTO brief_kv (key, value, updated_at) VALUES ($1, $2::jsonb, now()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()",
+      [key, JSON.stringify(value)],
+    );
   }
-  async set(key: string, value: unknown): Promise<void> {
-    const r = await fetch(`${this.url}/rest/v1/rw_kv`, {
-      method: "POST",
-      headers: { ...this.headers(), Prefer: "resolution=merge-duplicates" },
-      body: JSON.stringify({ key, value, updated_at: new Date().toISOString() }),
-    });
-    if (!r.ok) throw new Error(`store set ${r.status}`);
-  }
-  async add(key: string, delta: number): Promise<number> {
-    // Atomic increment through a Postgres function (docs/DEPLOY.md, rw_kv_add).
-    const r = await fetch(`${this.url}/rest/v1/rpc/rw_kv_add`, {
-      method: "POST",
-      headers: this.headers(),
-      body: JSON.stringify({ k: key, delta }),
-    });
-    if (!r.ok) throw new Error(`store add ${r.status}`);
-    return Number(await r.json());
+  async add(key: string, delta: number) {
+    const r = await getPool()!.query("SELECT brief_kv_add($1, $2) AS v", [key, delta]);
+    return Number(r.rows[0].v);
   }
 }
 
@@ -94,14 +79,12 @@ class NoStore implements Store {
   }
 }
 
-let cached: Store | null = null;
+let current: Store | null = null;
 
 export function getStore(): Store {
-  if (cached) return cached;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (url && key) cached = new SupabaseStore(url.replace(/\/$/, ""), key);
-  else if (!process.env.VERCEL) cached = new FileStore();
-  else cached = new NoStore();
-  return cached;
+  if (current) return current;
+  if (getPool()) current = new PostgresStore();
+  else if (process.env.NODE_ENV !== "production") current = new FileStore();
+  else current = new NoStore();
+  return current;
 }

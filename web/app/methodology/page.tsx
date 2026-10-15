@@ -1,23 +1,19 @@
 import Link from "next/link";
-import { getSite } from "@/lib/data";
+import { PageHeader } from "@/components/ui";
+import { getMeta } from "@/lib/queries";
 
 export const metadata = { title: "Methodology and responsible use · Recurrence Watch" };
 
-export default function Methodology() {
-  const site = getSite();
+export default async function Methodology() {
+  const site = (await getMeta()).site;
   const contact = process.env.NEXT_PUBLIC_CORRECTIONS_EMAIL;
   const repo = process.env.NEXT_PUBLIC_REPO_URL;
   return (
-    <article className="space-y-10 max-w-3xl">
-      <header className="space-y-3">
-        <h1 className="font-serif text-3xl">Methodology and responsible use</h1>
-        <p className="text-ink-2">
-          How the links are made, what they mean, and what they do not mean.
-        </p>
-      </header>
+    <article className="space-y-5 max-w-3xl">
+      <PageHeader eyebrow="How we know" title="Methodology and responsible use" description="How the links are made, what they mean, and what they do not mean." />
 
-      <section className="space-y-3">
-        <h2 className="font-serif text-2xl">What a link means</h2>
+      <section className="card p-5 sm:p-6 space-y-3">
+        <h2 className="font-serif text-xl">What a link means</h2>
         <p className="text-ink-2">
           A link says that a later coroner&apos;s report raised the same or a closely related hazard as an earlier report to
           the same organisation, often after the organisation stated an action. It does not say why the concern recurred.
@@ -26,8 +22,8 @@ export default function Methodology() {
         </p>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="font-serif text-2xl">Data source and licence</h2>
+      <section className="card p-5 sm:p-6 space-y-3">
+        <h2 className="font-serif text-xl">Data source and licence</h2>
         <ol className="list-decimal pl-5 space-y-1 text-ink-2">
           <li>Reports and responses are published by the Courts and Tribunals Judiciary at judiciary.uk.</li>
           <li>The material is Crown copyright and is used under the Open Government Licence v3.0.</li>
@@ -37,8 +33,8 @@ export default function Methodology() {
         </ol>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="font-serif text-2xl">How it works</h2>
+      <section className="card p-5 sm:p-6 space-y-3">
+        <h2 className="font-serif text-xl">How it works</h2>
         <ol className="list-decimal pl-5 space-y-2 text-ink-2">
           <li>Each report&apos;s concerns and circumstances sections are separated from the standard Regulation 28 template text, which is removed so it cannot drive similarity.</li>
           <li>Receiver names are normalised into organisations, including known renames such as Highways England to National Highways.</li>
@@ -52,8 +48,8 @@ export default function Methodology() {
         </ol>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="font-serif text-2xl">Safeguards</h2>
+      <section className="card p-5 sm:p-6 space-y-3">
+        <h2 className="font-serif text-xl">Safeguards</h2>
         <ol className="list-decimal pl-5 space-y-1 text-ink-2">
           <li>Every quote shown is checked by code as an exact substring of the source text, after whitespace and typographic quote normalisation. A link whose quotes cannot be verified is not shown.</li>
           <li>Where a model&apos;s quote differed only slightly from the source, the source&apos;s own words are shown instead.</li>
@@ -65,8 +61,8 @@ export default function Methodology() {
         </ol>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="font-serif text-2xl">Limitations</h2>
+      <section className="card p-5 sm:p-6 space-y-3">
+        <h2 className="font-serif text-xl">Limitations</h2>
         <ol className="list-decimal pl-5 space-y-1 text-ink-2">
           <li>Linking is within one organisation. Renamed or merged bodies are linked only where a rename is known.</li>
           <li>Some older reports and responses are scanned images. They were read with OCR, which can introduce errors.</li>
@@ -75,8 +71,8 @@ export default function Methodology() {
         </ol>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="font-serif text-2xl">Prior work</h2>
+      <section className="card p-5 sm:p-6 space-y-3">
+        <h2 className="font-serif text-xl">Prior work</h2>
         <ol className="list-decimal pl-5 space-y-1 text-ink-2">
           <li>PFD Monitor groups coroners&apos; concerns into themes and extracts stated actions. Its responsible-use guidance says it should not be used to decide that an organisation ignored a warning, and we agree.</li>
           <li>The Preventable Deaths Tracker by Georgia Richards tracks responses and overdue replies.</li>
@@ -84,8 +80,8 @@ export default function Methodology() {
         </ol>
       </section>
 
-      <section id="corrections" className="space-y-3">
-        <h2 className="font-serif text-2xl">Corrections and contact</h2>
+      <section id="corrections" className="card p-5 sm:p-6 space-y-3 scroll-mt-24">
+        <h2 className="font-serif text-xl">Corrections and contact</h2>
         <p className="text-ink-2">
           If a link, quote or redaction is wrong, please tell us and it will be reviewed and corrected or removed.{" "}
           {contact ? (

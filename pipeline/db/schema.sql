@@ -180,3 +180,9 @@ CREATE TABLE IF NOT EXISTS stage_items (
     prompt_version TEXT,
     PRIMARY KEY (stage, item_id)
 );
+
+-- Old chain keys and the chain that now contains them, so shared links keep working.
+CREATE TABLE IF NOT EXISTS chain_redirects (
+    old_key TEXT PRIMARY KEY,
+    new_key TEXT NOT NULL
+);

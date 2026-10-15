@@ -21,6 +21,7 @@ import numpy as np
 
 from .. import config, db
 from ..judge.chains import DEFAULT_MIN_CONFIDENCE
+from ..judge.titles import title_for
 from ..llm import Ledger
 from ..normalise.orgs import key as org_key
 from ..redact import redact
@@ -208,7 +209,7 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         summary = {
             "key": ch["chain_key"], "org": {"id": ch["organisation_id"], "name": ch["org"], "type": ch["org_type"],
                                             "national": bool(ch["is_national"])},
-            "hazard": hazard_title(ch["hazard_label"]), "relation": ch["relation"],
+            "hazard": title_for(conn, ch["chain_key"]) or hazard_title(ch["hazard_label"]), "relation": ch["relation"],
             "confidence": round(min(l["confidence"] for l in links), 2),
             "first_date": reports[0]["date"], "last_date": reports[-1]["date"], "n_reports": len(reports),
             "coroners": coroners, "areas": sorted({r["area"] for r in reports if r["area"]}),

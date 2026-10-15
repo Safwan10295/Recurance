@@ -1,0 +1,11 @@
+# Featured chains shown first on the Start here page, in order. Each entry lists report slugs
+# (the last part of the judiciary.uk URL); publish picks the current chain containing them, so
+# this file survives chain key changes. These are the handoff's demo chains, all verified.
+- name: Smart motorways, live-lane breakdowns
+  reports: [jamil-ahmed-2, zoltan-torok-prevention-of-future-deaths-report, david-levett-prevention-of-future-deaths-report]
+- name: Unbarriered platform ends and live rail
+  reports: [taiyah-grace-peebles, jordan-aira, callum-evans]
+- name: Paraffin emollient fires
+  reports: [pauline-taylor-2, brian-bicat]
+- name: Online pharmacy self-certification
+  reports: [karl-willis, joseph-gingell]

@@ -2,11 +2,14 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="space-y-3 max-w-2xl">
-      <h1 className="font-serif text-3xl">Page not found</h1>
-      <p className="text-ink-2">
-        The page may have moved after the data was refreshed. Try the <Link href="/chains">list of chains</Link>.
-      </p>
+    <div className="card p-8 max-w-xl space-y-3">
+      <h1 className="font-serif text-2xl">Page not found</h1>
+      <p className="text-ink-2">This page does not exist, or it moved when the data was refreshed.</p>
+      <div className="flex flex-wrap gap-3 text-sm">
+        <Link href="/">Start here</Link>
+        <Link href="/chains">Recurrence chains</Link>
+        <Link href="/search">Search</Link>
+      </div>
     </div>
   );
 }

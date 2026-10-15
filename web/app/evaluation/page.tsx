@@ -1,5 +1,5 @@
-import { getEvaluation, getSite } from "@/lib/data";
-import { pct } from "@/components/ui";
+import { EmptyState, PageHeader, Section, StatTile, pct } from "@/components/ui";
+import { getMeta } from "@/lib/queries";
 
 export const metadata = { title: "Evaluation · Recurrence Watch" };
 
@@ -13,114 +13,113 @@ type SystemRow = {
 };
 type Evaluation = {
   generated_at: string;
-  acknowledged: { total: number; in_scope: number; in_scope_6m: number; by_evidence: Record<string, number> };
+  acknowledged: { total: number; in_scope: number; in_scope_6m: number; evaluated?: number; by_evidence: Record<string, number> };
   systems: SystemRow[];
   lost_memory: { links: number; diff_coroner: number; diff_area: number; not_cited: number; all_three: number };
-  cost: { total: number; by_stage: Record<string, number>; per_chain: number | null; chains: number };
+  cost: { total: number; by_stage: Record<string, number>; per_chain: number | null; chains: number; analysis_cost?: number };
   hand_labels: { status: string; n_labelled: number };
-  notes: string[];
 };
 
-const fmt = (x: number | null | undefined) => (x === null || x === undefined ? "pending" : pct(x));
+const STAGE_LABEL: Record<string, string> = {
+  A: "Concern extraction (Nano)",
+  B: "Promise extraction (Nano)",
+  C: "Recurrence judge (Super)",
+  D: "Dossiers (Ultra)",
+  F: "Follow-up classification (Nano)",
+  embed: "Embeddings (Qwen3)",
+  dev: "Pilots and development",
+};
 
-export default function EvaluationPage() {
-  const ev = getEvaluation() as unknown as Evaluation | null;
-  const site = getSite();
+export default async function EvaluationPage() {
+  const meta = await getMeta();
+  const ev = meta.evaluation as unknown as Evaluation | null;
+  if (!ev) return <EmptyState title="The evaluation has not been published yet" />;
+  const best = Math.max(...ev.systems.map((s) => s.recall_at_threshold ?? 0));
   return (
-    <article className="space-y-10 max-w-4xl">
-      <header className="space-y-3 max-w-3xl">
-        <h1 className="font-serif text-3xl">Evaluation</h1>
-        <p className="text-ink-2">
-          How well the system finds recurrences, measured against a baseline, and what it cost.
-        </p>
-      </header>
-      {!ev ? (
-        <p className="text-ink-2">The evaluation has not been published yet.</p>
-      ) : (
-        <>
-          <section className="space-y-3">
-            <h2 className="font-serif text-2xl">Test set: pairs the coroners themselves acknowledged</h2>
-            <ol className="list-decimal pl-5 space-y-1 text-ink-2">
-              <li>A later report counts as acknowledging an earlier one when it names the earlier report&apos;s reference number or the earlier deceased person&apos;s full name.</li>
-              <li>{ev.acknowledged.total} such pairs were found. {ev.acknowledged.in_scope} share an organisation, and {ev.acknowledged.in_scope_6m} of those are at least six months apart, which is the test set.</li>
-              <li>Blind test: every sentence carrying the acknowledgement was removed from the later report before the system ran, so it could not find the earlier report by reading the citation.</li>
-            </ol>
-          </section>
+    <div className="space-y-10">
+      <PageHeader
+        eyebrow="How we know"
+        title="Evaluation"
+        description="Does the system find recurrences that coroners themselves recognised, and does Nemotron add anything over simple baselines?"
+      />
 
-          <section className="space-y-3">
-            <h2 className="font-serif text-2xl">Three systems compared</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-rule text-left">
-                    <th className="py-2 pr-4">System</th>
-                    <th className="py-2 pr-4">Recall, blind test</th>
-                    <th className="py-2 pr-4">Earlier report in top 5</th>
-                    <th className="py-2 pr-4">Links shown</th>
-                    <th className="py-2">Precision of shown links</th>
+      <Section title="Finding recurrences the coroners flagged">
+        <div className="card p-5 space-y-5">
+          <p className="text-ink-2 text-sm max-w-3xl">
+            Test set: {ev.acknowledged.in_scope_6m} pairs where a later report itself names an earlier report to the same
+            organisation, at least six months apart. Blind test: the sentences naming the earlier report were removed
+            before the system ran. Each system was allowed to show the same number of links ({ev.systems[0]?.shown_pairs}).
+          </p>
+          <div className="space-y-4">
+            {ev.systems.map((s) => {
+              const r = s.recall_at_threshold ?? 0;
+              return (
+                <div key={s.name} className="space-y-1.5">
+                  <div className="flex justify-between gap-3 text-sm">
+                    <span className="font-medium">{s.name}</span>
+                    <span className="font-serif text-lg">{s.recall_at_threshold === null ? "pending" : pct(r)}</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-paper-2 overflow-hidden" role="img" aria-label={`${s.name}: ${pct(r)} recall`}>
+                    <div
+                      className={`h-full rounded-full ${r === best ? "bg-accent" : "bg-[var(--quote-bar)]"}`}
+                      style={{ width: `${Math.round(r * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted">{s.description}</p>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted">
+            Precision (the share of shown links a person would accept) needs hand labels. Status: {ev.hand_labels.status}.
+          </p>
+        </div>
+      </Section>
+
+      <Section title="Lost memory">
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+          <StatTile value={pct(ev.lost_memory.diff_coroner)} label="of shown links: the later report came from a different coroner" />
+          <StatTile value={pct(ev.lost_memory.diff_area)} label="came from a different coroner area" />
+          <StatTile value={pct(ev.lost_memory.not_cited)} label="did not cite the earlier report" />
+          <StatTile value={pct(ev.lost_memory.all_three)} label="all three at once" />
+        </div>
+        <p className="text-sm text-muted">Across {ev.lost_memory.links.toLocaleString("en-GB")} shown links.</p>
+      </Section>
+
+      <Section title="Cost on Nebius Token Factory">
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
+          <StatTile value={`$${ev.cost.total.toFixed(2)}`} label="total spend for the whole archive" />
+          <StatTile value={ev.cost.per_chain !== null ? `$${ev.cost.per_chain.toFixed(3)}` : "–"} label={`per verified chain (${ev.cost.chains} chains)`} />
+          <StatTile value={meta.site.n_reports.toLocaleString("en-GB")} label="reports analysed" />
+        </div>
+        <div className="card overflow-x-auto">
+          <table className="w-full text-sm">
+            <tbody>
+              {Object.entries(ev.cost.by_stage)
+                .sort((a, b) => b[1] - a[1])
+                .map(([k, v]) => (
+                  <tr key={k} className="border-b border-rule last:border-0">
+                    <td className="p-3">{STAGE_LABEL[k] ?? k}</td>
+                    <td className="p-3 text-right">${v.toFixed(4)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {ev.systems.map((s) => (
-                    <tr key={s.name} className="border-b border-rule align-top">
-                      <td className="py-2 pr-4">
-                        <div className="font-semibold">{s.name}</div>
-                        <div className="text-muted">{s.description}</div>
-                      </td>
-                      <td className="py-2 pr-4">{fmt(s.recall_at_threshold)}</td>
-                      <td className="py-2 pr-4">{fmt(s.recall_at_5)}</td>
-                      <td className="py-2 pr-4">{s.shown_pairs?.toLocaleString("en-GB") ?? "n/a"}</td>
-                      <td className="py-2">{fmt(s.precision)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-sm text-muted">
-              Precision needs hand labels. Status: {ev.hand_labels.status} ({ev.hand_labels.n_labelled} labelled).
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="font-serif text-2xl">Lost memory</h2>
-            <p className="text-ink-2">
-              Of {ev.lost_memory.links} verified links, the later report came from a different coroner in{" "}
-              {pct(ev.lost_memory.diff_coroner)}, from a different coroner area in {pct(ev.lost_memory.diff_area)}, and did
-              not cite the earlier report in {pct(ev.lost_memory.not_cited)}. All three held for {pct(ev.lost_memory.all_three)}.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="font-serif text-2xl">Cost</h2>
-            <p className="text-ink-2">
-              Total Token Factory spend for the analysis: ${ev.cost.total.toFixed(2)}.{" "}
-              {ev.cost.per_chain !== null && <>That is ${ev.cost.per_chain.toFixed(3)} per verified chain across {ev.cost.chains} chains.</>}
-            </p>
-            <ul className="text-sm text-ink-2 list-disc pl-5">
-              {Object.entries(ev.cost.by_stage).map(([k, v]) => (
-                <li key={k}>
-                  {k}: ${v.toFixed(4)}
-                </li>
-              ))}
-            </ul>
-            <p className="text-sm text-muted">
-              Model routing: Nano for extraction ({site.models.nano}), Super for judging ({site.models.super}), Ultra for
-              dossiers ({site.models.ultra}).
-            </p>
-          </section>
-
-          {ev.notes.length > 0 && (
-            <section className="space-y-2">
-              <h2 className="font-serif text-2xl">Weak spots</h2>
-              <ol className="list-decimal pl-5 space-y-1 text-ink-2">
-                {ev.notes.map((n, i) => (
-                  <li key={i}>{n}</li>
                 ))}
-              </ol>
-            </section>
-          )}
-        </>
-      )}
-    </article>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-sm text-muted">
+          Routing: Nano for extraction ({meta.site.models?.nano}), Super for judging ({meta.site.models?.super}), Ultra for
+          dossiers ({meta.site.models?.ultra}).
+        </p>
+      </Section>
+
+      <Section title="Weak spots">
+        <ol className="card p-5 list-decimal pl-9 space-y-1.5 text-sm text-ink-2">
+          <li>The acknowledged test set is small and favours coroners who write cross-references.</li>
+          <li>Many acknowledged pairs are under six months apart and sit outside the six-month rule.</li>
+          <li>Precision is pending hand labels.</li>
+          <li>Linking is within one organisation, so recurrences after an unknown rename are missed.</li>
+        </ol>
+      </Section>
+    </div>
   );
 }

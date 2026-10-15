@@ -1,40 +1,48 @@
 @import "tailwindcss";
 
-/* Calm, document-like palette: monochrome with one restrained accent. No alarm red anywhere. */
+/* Calm, document-like palette with one restrained accent. No alarm red anywhere. */
 :root {
-  --paper: #fbfaf7;
-  --paper-2: #f3f1ec;
-  --ink: #1d2430;
-  --ink-2: #4a5361;
+  --paper: #f7f6f2;
+  --surface: #ffffff;
+  --paper-2: #f0eee8;
+  --ink: #1b2230;
+  --ink-2: #485263;
   --muted: #6b7280;
-  --rule: #e2ded6;
+  --rule: #e3e0d8;
   --accent: #2f5d62;
-  --accent-soft: #e6eeee;
+  --accent-ink: #ffffff;
+  --accent-soft: #e5eeee;
   --quote-bar: #9fb7b9;
+  --shadow: 0 1px 2px rgba(20, 24, 31, 0.05), 0 1px 1px rgba(20, 24, 31, 0.03);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #14171c;
-    --paper-2: #1b1f26;
+    --paper: #12151a;
+    --surface: #181c22;
+    --paper-2: #1e232a;
     --ink: #e8e6e1;
-    --ink-2: #c3c0b9;
+    --ink-2: #c1beb7;
     --muted: #9a9ea6;
-    --rule: #2c313a;
+    --rule: #2b3039;
     --accent: #8fbcc0;
-    --accent-soft: #1e2a2c;
+    --accent-ink: #11181a;
+    --accent-soft: #1d2a2c;
     --quote-bar: #4f7377;
+    --shadow: none;
   }
 }
 
 @theme inline {
   --color-paper: var(--paper);
+  --color-surface: var(--surface);
   --color-paper-2: var(--paper-2);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-muted: var(--muted);
   --color-rule: var(--rule);
   --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
   --font-serif: var(--font-source-serif);
   --font-sans: var(--font-source-sans);
@@ -49,34 +57,41 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-source-sans), system-ui, sans-serif;
-  line-height: 1.6;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
 a {
   color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
+  text-decoration: none;
 }
 a:hover {
-  text-decoration-thickness: 2px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
 }
 
 .quote {
   font-family: var(--font-source-serif), Georgia, serif;
   border-left: 3px solid var(--quote-bar);
-  padding-left: 1rem;
+  padding-left: 0.9rem;
   color: var(--ink);
-  font-size: 1.02rem;
-  line-height: 1.65;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .eyebrow {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
+  font-weight: 600;
 }
 
 .prose-doc p + p {
@@ -86,4 +101,18 @@ a:hover {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

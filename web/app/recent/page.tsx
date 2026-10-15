@@ -1,83 +1,64 @@
-import Link from "next/link";
-import { ConfidenceTag, Quote, RelationTag, formatDate } from "@/components/ui";
-import { getRecent } from "@/lib/data";
+import { RecentCard } from "@/components/cards";
+import { EmptyState, PageHeader, Pagination, orgTypeLabel } from "@/components/ui";
+import { listRecent } from "@/lib/queries";
 
 export const metadata = { title: "Recent recurrences · Recurrence Watch" };
 
-export default function RecentPage() {
-  const recent = getRecent();
+const TYPES = ["nhs_trust", "national_body", "police", "council", "prison", "ambulance", "commissioner", "company", "other"];
+
+export default async function RecentPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const sp = await searchParams;
+  const months = [3, 6, 12, 24].includes(Number(sp.months)) ? Number(sp.months) : 12;
+  const orgType = TYPES.includes(sp.type ?? "") ? sp.type : undefined;
+  const page = Math.max(1, Number(sp.page) || 1);
+  const data = await listRecent({ months, orgType, page });
+  const sel = "rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm";
   return (
-    <div className="space-y-8">
-      <header className="space-y-3 max-w-3xl">
-        <h1 className="font-serif text-3xl">Recent recurrences</h1>
-        <p className="text-ink-2">
-          Reports from the last 12 months that raise a concern already raised with the same organisation in an earlier
-          report. Newest first. {recent.items.length} recent reports match at least one earlier warning.
-        </p>
-        <p className="text-sm text-muted">
-          Reports dated from {formatDate(recent.since)}. Data last refreshed {formatDate(recent.generated_at.slice(0, 10))}.
-          Each match was judged identical or closely related, with both quotes checked word for word.
-        </p>
-      </header>
-
-      {recent.items.length === 0 && <p className="text-ink-2">No recent recurrences in the current data.</p>}
-
-      <ol className="list-none p-0 space-y-6">
-        {recent.items.map((it) => (
-          <li key={it.later.url} className="border border-rule rounded p-4 sm:p-5 space-y-4">
-            <div className="space-y-1">
-              <p className="eyebrow">
-                <Link href={`/organisations/${it.org.id}`}>{it.org.name}</Link>
-              </p>
-              <h2 className="font-serif text-xl">
-                <a href={it.later.url} target="_blank" rel="noopener noreferrer">
-                  {it.later.title}
-                </a>
-              </h2>
-              <p className="text-sm text-ink-2">
-                {formatDate(it.later.date)} · Coroner {it.later.coroner ?? "not stated"} · {it.later.area ?? ""}
-              </p>
-            </div>
-            <p className="text-sm text-ink-2">
-              A similar concern was raised {it.earlier.length === 1 ? "once" : `${it.earlier.length} times`} before with
-              this organisation:
-            </p>
-            <ul className="list-none p-0 space-y-4">
-              {it.earlier.map((e) => (
-                <li key={e.url + e.chain} className="border-l-2 border-rule pl-4 space-y-2">
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <RelationTag relation={e.relation} />
-                    <ConfidenceTag value={e.confidence} />
-                    <span className="text-sm text-muted">
-                      {Math.round(e.days_apart / 365.25)} {Math.round(e.days_apart / 365.25) === 1 ? "year" : "years"} earlier
-                      {e.same_coroner ? " · same coroner" : " · different coroner"}
-                    </span>
-                  </div>
-                  <p className="text-sm">
-                    <a href={e.url} target="_blank" rel="noopener noreferrer">{e.title}</a> ({formatDate(e.date)}, coroner{" "}
-                    {e.coroner ?? "not stated"})
-                  </p>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <Quote text={e.earlier_quote} />
-                    <Quote text={e.later_quote} />
-                  </div>
-                  {e.promise_quote ? (
-                    <div className="space-y-1">
-                      <p className="eyebrow">Stated action in the response to the earlier report</p>
-                      <Quote text={e.promise_quote} />
-                    </div>
-                  ) : !e.earlier_has_response ? (
-                    <p className="text-sm text-muted">No published response from this organisation was found for the earlier report.</p>
-                  ) : null}
-                  <p className="text-sm">
-                    <Link href={`/chains/${e.chain}`}>See the full chain: {e.hazard}</Link>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ol>
+    <div>
+      <PageHeader
+        eyebrow="Use the tool"
+        title="Recent recurrences"
+        description={
+          <>
+            New coroners&apos; reports that raise a concern already raised with the same organisation. Newest first. Each
+            match was judged identical or closely related, and both quotes were checked word for word.
+          </>
+        }
+      />
+      <form className="flex flex-wrap items-end gap-3 mb-5" method="get">
+        <label className="text-sm space-y-1">
+          <span className="block text-muted">Reports from the last</span>
+          <select name="months" defaultValue={String(months)} className={sel}>
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="12">12 months</option>
+            <option value="24">2 years</option>
+          </select>
+        </label>
+        <label className="text-sm space-y-1">
+          <span className="block text-muted">Organisation type</span>
+          <select name="type" defaultValue={orgType ?? ""} className={sel}>
+            <option value="">All</option>
+            {TYPES.map((t) => (
+              <option key={t} value={t}>
+                {orgTypeLabel(t)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button className="rounded-md bg-accent text-accent-ink px-3.5 py-1.5 text-sm font-medium">Apply</button>
+        <span className="text-sm text-muted ml-auto">{data.total} reports</span>
+      </form>
+      {data.rows.length === 0 ? (
+        <EmptyState title="No recurrences in this period">Try a longer period or another organisation type.</EmptyState>
+      ) : (
+        <ul className="space-y-3 p-0">
+          {data.rows.map((it) => (
+            <RecentCard key={it.later.url + it.org.id} it={it} />
+          ))}
+        </ul>
+      )}
+      <Pagination path="/recent" params={{ months: String(months), type: orgType }} page={data.page} total={data.total} size={data.size} />
     </div>
   );
 }

@@ -11,6 +11,7 @@ Usage: python scripts/refresh.py [--max-spend 0.50] [--build]
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import time
@@ -140,7 +141,14 @@ def main() -> None:
             res = C.run(llm, ids[:n], threads=8)
             log(f"Stage C: ok {res['ok']}, {res['relations']}, ${res['cost']:.4f}")
     summary["chains"] = chains.build()
+    from pipeline.judge.titles import generate as generate_titles
+
+    summary["titles"] = generate_titles(llm)
     summary["export"] = web.export()
+    if os.environ.get("DATABASE_URL"):
+        from pipeline.publish.postgres import publish
+
+        summary["publish"] = publish()
     log(f"chains: {summary['chains']}; export: {summary['export']}")
     summary["spent_this_refresh"] = round(lg.spent() - spent_before, 4)
     summary["finished"] = datetime.now(timezone.utc).isoformat(timespec="seconds")

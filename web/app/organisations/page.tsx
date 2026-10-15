@@ -1,21 +1,76 @@
-import OrgIndex from "@/components/OrgIndex";
-import { getOrgs } from "@/lib/data";
+import Link from "next/link";
+import { EmptyState, PageHeader, Pagination, orgTypeLabel } from "@/components/ui";
+import { listOrgs } from "@/lib/queries";
 
 export const metadata = { title: "Organisations · Recurrence Watch" };
 
-export default function OrgsPage() {
-  const orgs = getOrgs();
+const TYPES = ["national_body", "nhs_trust", "police", "council", "prison", "ambulance", "commissioner", "company", "other"];
+
+export default async function OrgsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const sp = await searchParams;
+  const qv = sp.q?.trim() || undefined;
+  const type = TYPES.includes(sp.type ?? "") ? sp.type : undefined;
+  const withChains = sp.chains === "1";
+  const page = Math.max(1, Number(sp.page) || 1);
+  const data = await listOrgs({ q: qv, type, withChains, page });
+  const sel = "rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm";
   return (
-    <div className="space-y-6">
-      <header className="space-y-3 max-w-3xl">
-        <h1 className="font-serif text-3xl">Organisations</h1>
-        <p className="text-ink-2">
-          Each page lists the reports an organisation received, its published responses, the actions it stated, and any
-          chains where a similar concern was raised again. There is no ranking: a higher number of reports often
-          reflects size and the range of services, not performance.
-        </p>
-      </header>
-      <OrgIndex orgs={orgs} />
+    <div>
+      <PageHeader
+        eyebrow="Explore the record"
+        title="Organisations"
+        description="Every organisation that received a report. Each profile shows its reports, its published responses and stated actions, and any recurrence chains. There is no ranking: more reports often reflects size and range of services, not performance."
+      />
+      <form method="get" className="flex flex-wrap items-end gap-3 mb-5">
+        <label className="text-sm space-y-1">
+          <span className="block text-muted">Name</span>
+          <input name="q" defaultValue={qv} placeholder="e.g. National Highways" className={`${sel} w-64`} />
+        </label>
+        <label className="text-sm space-y-1">
+          <span className="block text-muted">Type</span>
+          <select name="type" defaultValue={type ?? ""} className={sel}>
+            <option value="">All</option>
+            {TYPES.map((t) => (
+              <option key={t} value={t}>
+                {orgTypeLabel(t)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex items-center gap-2 text-sm pb-1.5">
+          <input type="checkbox" name="chains" value="1" defaultChecked={withChains} /> Only with chains
+        </label>
+        <button className="rounded-md bg-accent text-accent-ink px-3.5 py-1.5 text-sm font-medium">Apply</button>
+      </form>
+      {data.rows.length === 0 ? (
+        <EmptyState title="No organisations match" />
+      ) : (
+        <div className="card overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b border-rule">
+                <th className="p-3">Organisation</th>
+                <th className="p-3">Type</th>
+                <th className="p-3 text-right">Reports</th>
+                <th className="p-3 text-right">Chains</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.rows.map((o) => (
+                <tr key={o.id} className="border-b border-rule last:border-0">
+                  <td className="p-3">
+                    <Link href={`/organisations/${o.id}`}>{o.name}</Link>
+                  </td>
+                  <td className="p-3 text-ink-2">{orgTypeLabel(o.type)}</td>
+                  <td className="p-3 text-right">{o.n_reports}</td>
+                  <td className="p-3 text-right">{o.n_chains || "–"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <Pagination path="/organisations" params={{ q: qv, type, chains: withChains ? "1" : undefined }} page={data.page} total={data.total} size={data.size} />
     </div>
   );
 }

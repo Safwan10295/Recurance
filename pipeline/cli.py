@@ -202,6 +202,12 @@ def cmd_label(a):
     labelling.interactive()
 
 
+def cmd_publish(a):
+    from .publish.postgres import publish
+
+    print(json.dumps(publish(), indent=1, default=str))
+
+
 def cmd_dossiers_export(a):
     from .dossier import review
 
@@ -273,6 +279,7 @@ def main(argv=None):
     s.set_defaults(fn=cmd_label_prepare)
     sub.add_parser("label", help="interactive labelling for Pilot").set_defaults(fn=cmd_label)
     sub.add_parser("export", help="export JSON for the web app").set_defaults(fn=cmd_export)
+    sub.add_parser("publish", help="publish display-safe data to PostgreSQL (DATABASE_URL)").set_defaults(fn=cmd_publish)
     sub.add_parser("dossiers-export", help="write all dossiers to a Markdown file for reading").set_defaults(
         fn=cmd_dossiers_export)
     sub.add_parser("review", help="Pilot only: approve or reject dossiers for publication").set_defaults(fn=cmd_review)
