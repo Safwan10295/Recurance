@@ -121,13 +121,16 @@ def step_responses(st: dict, llm: LLM) -> None:
     from pipeline.scrape.run import fetch_pdfs
 
     conn = db.connect()
-    orgs = B.scope_report_orgs(conn)
-    need = B.register_responses(conn, list(orgs), orgs)
-    log(f"responses: {len(orgs)} earlier reports in scope, {len(need)} PDFs to fetch")
-    if need:
-        fetch_pdfs(Fetcher(), need, workers=2)
-    log(f"response texts: {B.extract_response_texts(conn)}")
-    conn.close()
+    try:
+        orgs = B.scope_report_orgs(conn)
+        need = B.register_responses(conn, list(orgs), orgs)
+        log(f"responses: {len(orgs)} earlier reports in scope, {len(need)} PDFs to fetch")
+        if need:
+            fetch_pdfs(Fetcher(), need, workers=2)
+        log(f"response texts: {B.extract_response_texts(conn)}")
+        conn.commit()
+    finally:
+        conn.close()
 
 
 LISTING: dict = {}
@@ -324,6 +327,10 @@ def main() -> None:
 
             traceback.print_exc()
             blocker(f"Step {name} raised {type(e).__name__}", f"- {str(e)[:500]}")
+            del e
+            import gc
+
+            gc.collect()  # free connections held by the failed step's frames, releasing any write lock
         st.setdefault("done", []).append(name)
         save_state(st)
         log(f"=== {name} done in {time.time() - t0:.0f}s")

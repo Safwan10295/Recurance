@@ -1,0 +1,728 @@
+[
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/tamara-mills/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sophie-holman/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1176
+  ],
+  "in_scope": true,
+  "later_prior_flag": 1,
+  "days_apart": 1188,
+  "n_candidates": 301,
+  "tfidf": 0.2806412623850528,
+  "tfidf_rank": 2,
+  "emb": 0.9264315962791443,
+  "emb_rank": 1,
+  "hybrid": 0.6681154627215077,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.92,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/michael-uriely-2/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sophie-holman/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1176
+  ],
+  "in_scope": true,
+  "later_prior_flag": 1,
+  "days_apart": 678,
+  "n_candidates": 301,
+  "tfidf": 0.327524296909308,
+  "tfidf_rank": 1,
+  "emb": 0.8652220368385315,
+  "emb_rank": 2,
+  "hybrid": 0.6501429408668421,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.92,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/donna-williamson/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/alex-malcolm/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   474
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 202,
+  "n_candidates": 340,
+  "tfidf": 0.16048804560754243,
+  "tfidf_rank": 1,
+  "emb": 0.7050986886024475,
+  "emb_rank": 2,
+  "hybrid": 0.4872544314044855,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/david-kirsch/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/geoffrey-hutton/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   764
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 583,
+  "n_candidates": 2,
+  "tfidf": 0.16667758660211945,
+  "tfidf_rank": 1,
+  "emb": 0.5528768301010132,
+  "emb_rank": 1,
+  "hybrid": 0.39839713270145566,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/jonathan-shaw-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/hannah-aitken-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   863
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 203,
+  "n_candidates": 633,
+  "tfidf": 0.08664618964599714,
+  "tfidf_rank": 4,
+  "emb": 0.664214015007019,
+  "emb_rank": 10,
+  "hybrid": 0.4331868848626103,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sheila-edwards-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/martin-evans-patricia-evans-and-neil-errington-prevention-of-future-deaths-report/",
+  "evidence": [
+   "ref"
+  ],
+  "shared_orgs": [
+   468
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 182,
+  "n_candidates": 106,
+  "tfidf": 0.13447731518912598,
+  "tfidf_rank": 4,
+  "emb": 0.7167470455169678,
+  "emb_rank": 1,
+  "hybrid": 0.48383915338583106,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "closely_related",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sheila-edwards-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/christopher-sampson-prevention-of-future-deaths-report/",
+  "evidence": [
+   "ref"
+  ],
+  "shared_orgs": [
+   468
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 209,
+  "n_candidates": 147,
+  "tfidf": 0.11844238422425984,
+  "tfidf_rank": 4,
+  "emb": 0.8016404509544373,
+  "emb_rank": 1,
+  "hybrid": 0.5283612242623663,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/geoffrey-toase-and-michael-midgley-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/christopher-sampson-prevention-of-future-deaths-report/",
+  "evidence": [
+   "ref"
+  ],
+  "shared_orgs": [
+   530
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 457,
+  "n_candidates": 147,
+  "tfidf": 0.08272514885010268,
+  "tfidf_rank": 14,
+  "emb": 0.7636204957962036,
+  "emb_rank": 3,
+  "hybrid": 0.4912623570177632,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "different",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/ian-harris-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/christopher-sampson-prevention-of-future-deaths-report/",
+  "evidence": [
+   "ref"
+  ],
+  "shared_orgs": [
+   530
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 317,
+  "n_candidates": 147,
+  "tfidf": 0.09764758751506396,
+  "tfidf_rank": 9,
+  "emb": 0.743581235408783,
+  "emb_rank": 7,
+  "hybrid": 0.48520777625129535,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rosemary-mcandrew-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/christopher-sampson-prevention-of-future-deaths-report/",
+  "evidence": [
+   "ref"
+  ],
+  "shared_orgs": [
+   468
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 194,
+  "n_candidates": 147,
+  "tfidf": 0.1014513002117256,
+  "tfidf_rank": 7,
+  "emb": 0.7523168325424194,
+  "emb_rank": 4,
+  "hybrid": 0.4919706196101419,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.95,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/leon-briggs-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/andrew-mccleary-prevention-of-future-death-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   135
+  ],
+  "in_scope": true,
+  "later_prior_flag": 1,
+  "days_apart": 1513,
+  "n_candidates": 5,
+  "tfidf": 0.05994041310354241,
+  "tfidf_rank": 1,
+  "emb": 0.6334711313247681,
+  "emb_rank": 1,
+  "hybrid": 0.4040588440362778,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "related",
+   "confidence": 0.8,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/kristopher-tilbury-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/oliver-mulangala-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1146
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 822,
+  "n_candidates": 208,
+  "tfidf": 0.22594255452862044,
+  "tfidf_rank": 1,
+  "emb": 0.7001441717147827,
+  "emb_rank": 4,
+  "hybrid": 0.5104635248403178,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/shona-campbell-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/ruairi-stewart-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   45
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 1348,
+  "n_candidates": 1,
+  "tfidf": 0.08086816665701704,
+  "tfidf_rank": 1,
+  "emb": 0.7105420827865601,
+  "emb_rank": 1,
+  "hybrid": 0.4586725163347428,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "related",
+   "confidence": 0.8,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/ian-allen/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/mohammed-hussain-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   474,
+   3575
+  ],
+  "in_scope": true,
+  "later_prior_flag": 1,
+  "days_apart": 1059,
+  "n_candidates": 443,
+  "tfidf": 0.28072528085969456,
+  "tfidf_rank": 1,
+  "emb": 0.7735287547111511,
+  "emb_rank": 1,
+  "hybrid": 0.5764073651705685,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "closely_related",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/nasar-ahmed-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/karanbir-cheema/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   215,
+   474
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 728,
+  "n_candidates": 248,
+  "tfidf": 0.3064473521749506,
+  "tfidf_rank": 1,
+  "emb": 0.7524919509887695,
+  "emb_rank": 1,
+  "hybrid": 0.5740741114632419,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "closely_related",
+   "confidence": 0.8,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/piotr-kierzkowski/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/timothy-de-boos-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   474
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 1523,
+  "n_candidates": 585,
+  "tfidf": 0.10755907089638177,
+  "tfidf_rank": 2,
+  "emb": 0.7383555173873901,
+  "emb_rank": 7,
+  "hybrid": 0.4860369387909868,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/nicola-rayner-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/timothy-de-boos-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   474
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 281,
+  "n_candidates": 585,
+  "tfidf": 0.19189963570934176,
+  "tfidf_rank": 1,
+  "emb": 0.7240478992462158,
+  "emb_rank": 12,
+  "hybrid": 0.5111885938314662,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/connor-wellsted-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/mia-gauci-lamport-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   287,
+   474,
+   1176,
+   2548
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 883,
+  "n_candidates": 886,
+  "tfidf": 0.10633307385781882,
+  "tfidf_rank": 1,
+  "emb": 0.7438556551933289,
+  "emb_rank": 6,
+  "hybrid": 0.4888466226591249,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/deborah-headspeath/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/kim-robinson-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   474
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 1901,
+  "n_candidates": 606,
+  "tfidf": 0.1092383564067486,
+  "tfidf_rank": 1,
+  "emb": 0.7215182781219482,
+  "emb_rank": 2,
+  "hybrid": 0.47660630943586835,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "closely_related",
+   "confidence": 0.92,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/daniel-klosi-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/billie-wicks-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1500,
+   1513,
+   1527
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 213,
+  "n_candidates": 31,
+  "tfidf": 0.07214698697380652,
+  "tfidf_rank": 2,
+  "emb": 0.6589251756668091,
+  "emb_rank": 3,
+  "hybrid": 0.42421390018960803,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "different",
+   "confidence": 0.95,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/freeda-glausiusz-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/heather-findlay-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   3807
+  ],
+  "in_scope": true,
+  "later_prior_flag": 1,
+  "days_apart": 600,
+  "n_candidates": 311,
+  "tfidf": 0.06981618835801918,
+  "tfidf_rank": 9,
+  "emb": 0.6159865856170654,
+  "emb_rank": 70,
+  "hybrid": 0.39751842671344695,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/louis-thorold-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/peter-westwell-mary-cunningham-grace-foulds-anne-ferguson-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   468
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 608,
+  "n_candidates": 89,
+  "tfidf": 0.1851151155492555,
+  "tfidf_rank": 1,
+  "emb": 0.6538697481155396,
+  "emb_rank": 2,
+  "hybrid": 0.4663678950890259,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "related",
+   "confidence": 0.8,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/donna-williamson/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/jessica-laverack-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   474,
+   863
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 1188,
+  "n_candidates": 457,
+  "tfidf": 0.13499608455661713,
+  "tfidf_rank": 1,
+  "emb": 0.7247519493103027,
+  "emb_rank": 1,
+  "hybrid": 0.4888496034088285,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "related",
+   "confidence": 0.8,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/tamara-mills/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/michael-uriely-2/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1176,
+   1226
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 510,
+  "n_candidates": 81,
+  "tfidf": 0.7475115356124139,
+  "tfidf_rank": 1,
+  "emb": 0.9073634147644043,
+  "emb_rank": 1,
+  "hybrid": 0.8434226631036081,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.96,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/leroy-hamilton-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/philip-malone-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   152,
+   474,
+   3575
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 316,
+  "n_candidates": 475,
+  "tfidf": 0.06284166570765758,
+  "tfidf_rank": 7,
+  "emb": 0.6953531503677368,
+  "emb_rank": 21,
+  "hybrid": 0.44234855650370514,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/finnulla-martin/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/emmanuel-ladapo-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   2971
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 3282,
+  "n_candidates": 17,
+  "tfidf": 0.026057568997835765,
+  "tfidf_rank": 6,
+  "emb": 0.7670177221298218,
+  "emb_rank": 1,
+  "hybrid": 0.47063366087702735,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "closely_related",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sarah-clarke-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/alice-litman-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1176
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 568,
+  "n_candidates": 256,
+  "tfidf": 0.03779498224292366,
+  "tfidf_rank": 28,
+  "emb": 0.5426298975944519,
+  "emb_rank": 92,
+  "hybrid": 0.3406959314538406,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/leroy-medford/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/neal-saunders-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   384,
+   1766
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 1255,
+  "n_candidates": 19,
+  "tfidf": 0.13310348670332237,
+  "tfidf_rank": 2,
+  "emb": 0.557040810585022,
+  "emb_rank": 9,
+  "hybrid": 0.3874658810323421,
+  "hybrid_candidate": false
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/charlotte-grace/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/brenda-shield-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1309,
+   1885
+  ],
+  "in_scope": true,
+  "later_prior_flag": 0,
+  "days_apart": 1317,
+  "n_candidates": 4,
+  "tfidf": 0.09936768539619137,
+  "tfidf_rank": 1,
+  "emb": 0.7139238119125366,
+  "emb_rank": 1,
+  "hybrid": 0.4681013613059985,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.9,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ }
+]

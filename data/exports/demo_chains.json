@@ -1,0 +1,271 @@
+{
+ "Smart motorways (National Highways)": {
+  "reports": [
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/jamil-ahmed-2/",
+    "present": true,
+    "date": "2019-11-15",
+    "coroner": "James Bennett",
+    "source": "pdf",
+    "concerns_chars": 842,
+    "concerns": 3,
+    "orgs": [
+     "National Highways"
+    ],
+    "duplicate_of": null
+   },
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/zoltan-torok-prevention-of-future-deaths-report/",
+    "present": true,
+    "date": "2022-03-21",
+    "coroner": "Ian Wade QC",
+    "source": "pdf",
+    "concerns_chars": 2016,
+    "concerns": 4,
+    "orgs": [
+     "National Highways"
+    ],
+    "duplicate_of": null
+   },
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/david-levett-prevention-of-future-deaths-report/",
+    "present": true,
+    "date": "2023-04-18",
+    "coroner": "Anne Pember",
+    "source": "html",
+    "concerns_chars": 225,
+    "concerns": 1,
+    "orgs": [
+     "National Highways"
+    ],
+    "duplicate_of": null
+   }
+  ],
+  "pairs": [
+   {
+    "a": "jamil-ahmed-2",
+    "b": "zoltan-torok-prevention-of-future-deaths-report",
+    "id": 799,
+    "hybrid_score": 0.6403496233751026,
+    "embed_score": 0.7945054173469543,
+    "tfidf_score": 0.409115932417325,
+    "relation": null,
+    "confidence": null,
+    "quotes_verified": null
+   },
+   {
+    "a": "zoltan-torok-prevention-of-future-deaths-report",
+    "b": "david-levett-prevention-of-future-deaths-report",
+    "id": 822,
+    "hybrid_score": 0.5496569345101029,
+    "embed_score": 0.8124263882637024,
+    "tfidf_score": 0.1555027538797037,
+    "relation": null,
+    "confidence": null,
+    "quotes_verified": null
+   }
+  ],
+  "chain_keys": []
+ },
+ "Unbarriered platform ends (Network Rail)": {
+  "reports": [
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/taiyah-grace-peebles/",
+    "present": true,
+    "date": "2018-07-24",
+    "coroner": "Ian Goldup",
+    "source": "ocr",
+    "concerns_chars": 666,
+    "concerns": 1,
+    "orgs": [
+     "Network Rail"
+    ],
+    "duplicate_of": null
+   },
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/jordan-aira/",
+    "present": true,
+    "date": "2020-03-30",
+    "coroner": "Caroline Topping",
+    "source": "pdf",
+    "concerns_chars": 525,
+    "concerns": 4,
+    "orgs": [
+     "Department for Education",
+     "Network Rail",
+     "South Western Railways"
+    ],
+    "duplicate_of": null
+   },
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/callum-evans/",
+    "present": true,
+    "date": "2021-05-18",
+    "coroner": "Jason Pegg",
+    "source": "pdf",
+    "concerns_chars": 1007,
+    "concerns": 1,
+    "orgs": [
+     "Network Rail"
+    ],
+    "duplicate_of": null
+   }
+  ],
+  "pairs": [
+   {
+    "a": "taiyah-grace-peebles",
+    "b": "jordan-aira",
+    "id": 313,
+    "hybrid_score": 0.6028202766757629,
+    "embed_score": 0.856330931186676,
+    "tfidf_score": 0.22255429490939319,
+    "relation": null,
+    "confidence": null,
+    "quotes_verified": null
+   },
+   {
+    "a": "taiyah-grace-peebles",
+    "b": "callum-evans",
+    "id": 319,
+    "hybrid_score": 0.5814097082580316,
+    "embed_score": 0.8014878630638123,
+    "tfidf_score": 0.2512924760493608,
+    "relation": null,
+    "confidence": null,
+    "quotes_verified": null
+   },
+   {
+    "a": "jordan-aira",
+    "b": "callum-evans",
+    "id": 316,
+    "hybrid_score": 0.5928537891189359,
+    "embed_score": 0.7848117351531982,
+    "tfidf_score": 0.30491687006754253,
+    "relation": null,
+    "confidence": null,
+    "quotes_verified": null
+   }
+  ],
+  "chain_keys": []
+ },
+ "Paraffin emollient fires": {
+  "reports": [
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/pauline-taylor-2/",
+    "present": true,
+    "date": "2017-07-21",
+    "coroner": "Mary Burke",
+    "source": "ocr",
+    "concerns_chars": 2247,
+    "concerns": 6,
+    "orgs": [
+     "Care Quality Commission",
+     "Department of Health and Social Care",
+     "Medicines and Healthcare products Regulatory Agency",
+     "NHS England",
+     "Arjo Huntliegh",
+     "Locala",
+     "Proprietary Association",
+     "Thornton and Ross Ltd",
+     "UK Home Care"
+    ],
+    "duplicate_of": null
+   },
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/brian-bicat/",
+    "present": true,
+    "date": "2018-05-29",
+    "coroner": "Martin Fleming",
+    "source": "ocr",
+    "concerns_chars": 2023,
+    "concerns": 6,
+    "orgs": [
+     "Bradford District Care NHS Trust",
+     "Department of Health and Social Care",
+     "Medicines and Healthcare products Regulatory Agency",
+     "NHS England",
+     "Alliance Pharmaceutical",
+     "Diprobase Bayer Public Limited"
+    ],
+    "duplicate_of": null
+   }
+  ],
+  "pairs": [
+   {
+    "a": "pauline-taylor-2",
+    "b": "brian-bicat",
+    "id": 34,
+    "hybrid_score": 0.9217529285430168,
+    "embed_score": 0.9788403511047363,
+    "tfidf_score": 0.8361217947004375,
+    "relation": null,
+    "confidence": null,
+    "quotes_verified": null
+   }
+  ],
+  "chain_keys": []
+ },
+ "Online pharmacy self-certification (NHS England)": {
+  "reports": [
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/karl-willis/",
+    "present": true,
+    "date": "2018-08-24",
+    "coroner": "Lydia Brown",
+    "source": "ocr",
+    "concerns_chars": 650,
+    "concerns": 3,
+    "orgs": [
+     "NHS England"
+    ],
+    "duplicate_of": null
+   },
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/joseph-gingell/",
+    "present": true,
+    "date": "2020-02-17",
+    "coroner": "Caroline Beasley-Murray",
+    "source": "pdf",
+    "concerns_chars": 402,
+    "concerns": 1,
+    "orgs": [
+     "NHS England"
+    ],
+    "duplicate_of": null
+   }
+  ],
+  "pairs": [
+   {
+    "a": "karl-willis",
+    "b": "joseph-gingell",
+    "id": 70,
+    "hybrid_score": 0.7039587351635507,
+    "embed_score": 0.702012836933136,
+    "tfidf_score": 0.7068775825091728,
+    "relation": null,
+    "confidence": null,
+    "quotes_verified": null
+   }
+  ],
+  "chain_keys": []
+ },
+ "Pennine Care (related, not identical)": {
+  "reports": [
+   {
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/david-power-prevention-of-future-deaths-report/",
+    "present": true,
+    "date": "2024-09-18",
+    "coroner": "Anna Morris KC",
+    "source": "html",
+    "concerns_chars": 1659,
+    "concerns": 1,
+    "orgs": [
+     "Pennine Care NHS Trust"
+    ],
+    "duplicate_of": null
+   }
+  ],
+  "pairs": [],
+  "chain_keys": []
+ }
+}

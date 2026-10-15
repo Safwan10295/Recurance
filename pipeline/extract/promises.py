@@ -97,8 +97,13 @@ def extract_response_texts(conn, allow_ocr: bool = True, workers: int = 12) -> d
     stats = {"extracted": 0, "ocr": 0, "missing": 0, "empty": 0}
     rows = conn.execute("SELECT id, pdf_url FROM responses WHERE text IS NULL").fetchall()
     stats["prepass"] = prepass([r["pdf_url"] for r in rows], workers=workers, allow_ocr=allow_ocr)
-    for r in rows:
-        t = text_for(r["pdf_url"], allow_ocr=allow_ocr)
+    for i, r in enumerate(rows, 1):
+        try:
+            t = text_for(r["pdf_url"], allow_ocr=allow_ocr)
+        except Exception:
+            t = {"text": "", "how": "unreadable"}  # one bad PDF must not stop the rest
+        if i % 200 == 0:
+            conn.commit()
         if t is None:
             stats["missing"] += 1
             continue

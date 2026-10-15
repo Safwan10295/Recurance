@@ -51,12 +51,17 @@ def ocr_text(data: bytes, max_pages: int = 12, dpi: int = 200) -> str | None:
     import pypdfium2 as pdfium
 
     out = []
-    with tempfile.TemporaryDirectory() as td:
-        doc = pdfium.PdfDocument(data)
-        for i in range(min(len(doc), max_pages)):
-            img = doc[i].render(scale=dpi / 72).to_pil()
-            p = Path(td) / f"p{i}.png"
-            img.save(p)
-            r = subprocess.run([tess, str(p), "stdout", "-l", "eng"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
-            out.append(r.stdout)
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            doc = pdfium.PdfDocument(data)
+            for i in range(min(len(doc), max_pages)):
+                img = doc[i].render(scale=dpi / 72).to_pil()
+                p = Path(td) / f"p{i}.png"
+                img.save(p)
+                r = subprocess.run([tess, str(p), "stdout", "-l", "eng"], capture_output=True, text=True,
+                                   encoding="utf-8", errors="replace", timeout=120)
+                out.append(r.stdout)
+    except Exception:
+        # Corrupt or unreadable PDF (e.g. PDFium data format error): no OCR text rather than a crash.
+        return None
     return tidy("\n\n".join(out))
