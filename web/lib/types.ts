@@ -118,3 +118,34 @@ export interface Site {
   flagship: string | null;
   themes: Record<string, number>;
 }
+
+export interface RecentEarlier {
+  url: string;
+  title: string;
+  date: string;
+  coroner: string | null;
+  area: string | null;
+  relation: Relation;
+  confidence: number;
+  chain: string;
+  hazard: string;
+  earlier_quote: string;
+  later_quote: string;
+  promise_quote: string | null;
+  days_apart: number;
+  same_coroner: boolean;
+  earlier_has_response: boolean;
+}
+
+export interface RecentItem {
+  later: { url: string; title: string; date: string; coroner: string | null; area: string | null };
+  org: OrgRef;
+  earlier: RecentEarlier[];
+}
+
+export interface Recent {
+  generated_at: string;
+  since: string;
+  days: number;
+  items: RecentItem[];
+}

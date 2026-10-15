@@ -1,0 +1,17 @@
+{
+ "started": "2026-10-15T17:39:54+00:00",
+ "new_reports": 0,
+ "new_pairs": 0,
+ "chains": {
+  "shown_verdicts": 1217,
+  "chains": 618
+ },
+ "export": {
+  "chains": 618,
+  "orgs": 980,
+  "brief_shards": 3684,
+  "links": 1217
+ },
+ "spent_this_refresh": 0.0378,
+ "finished": "2026-10-15T18:05:03+00:00"
+}

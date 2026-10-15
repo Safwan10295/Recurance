@@ -14,7 +14,7 @@ import base64
 import json
 import re
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import numpy as np
@@ -28,6 +28,7 @@ from ..wording import is_clean
 
 WEB_DATA = config.ROOT / "web" / "data"
 BRIEF_DIM = 256
+RECENT_DAYS = 365  # the Recent page covers later reports from the last year
 
 
 def _write(path: Path, obj) -> None:
@@ -148,6 +149,8 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
     chain_list = []
     pair_stats = {"links": 0, "diff_coroner": 0, "diff_area": 0, "no_response": 0, "not_cited": 0}
     org_chains: dict[int, list[str]] = defaultdict(list)
+    recent_cutoff = (date.today() - timedelta(days=RECENT_DAYS)).isoformat()
+    recent: dict[str, dict] = defaultdict(lambda: {"earlier": []})
     for ch in chains:
         members = conn.execute(
             """SELECT v.*, p.tfidf_score, p.embed_score, p.hybrid_score, p.days_apart, p.same_coroner, p.same_area,
@@ -218,6 +221,20 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         _write(WEB_DATA / "chains" / f"{ch['chain_key']}.json", {
             **summary, "reports": reports, "links": links, "followups": followups_for(conn, pids), "dossier": dossier_out,
         })
+        # Recent recurrences: links whose later report is from the last RECENT_DAYS days.
+        by_url = {r["url"]: r for r in reports}
+        for l in links:
+            lr, er = by_url[l["later"]], by_url[l["earlier"]]
+            if lr["date"] and lr["date"] >= recent_cutoff:
+                recent[l["later"]]["later"] = {k: lr.get(k) for k in ("url", "title", "date", "coroner", "area")}
+                recent[l["later"]]["org"] = summary["org"]
+                recent[l["later"]]["earlier"].append({
+                    **{k: er.get(k) for k in ("url", "title", "date", "coroner", "area")},
+                    "relation": l["relation"], "confidence": l["confidence"], "chain": ch["chain_key"],
+                    "hazard": summary["hazard"], "earlier_quote": l["earlier_quote"], "later_quote": l["later_quote"],
+                    "promise_quote": l["promise_quote"], "days_apart": l["days_apart"],
+                    "same_coroner": l["same_coroner"], "earlier_has_response": l["earlier_has_response"],
+                })
 
     # Organisation pages: only organisations that appear in a chain or have 2+ reports.
     orgs_out = []
@@ -316,6 +333,13 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
     }
     _write(WEB_DATA / "site.json", site)
     _write(WEB_DATA / "chains.json", chain_list)
+    recent_list = []
+    for item in recent.values():
+        item["earlier"].sort(key=lambda e: e["date"] or "")
+        recent_list.append(item)
+    recent_list.sort(key=lambda r: r["later"]["date"] or "", reverse=True)
+    _write(WEB_DATA / "recent.json", {"generated_at": site["generated_at"], "since": recent_cutoff,
+                                      "days": RECENT_DAYS, "items": recent_list})
     _write(WEB_DATA / "orgs.json", sorted(orgs_out, key=lambda o: o["name"]))
     _write(WEB_DATA / "brief_examples.json", brief_examples(chain_list))
     sysp = config.EXPORTS / "systemic.json"

@@ -43,3 +43,5 @@ export const getOrg = (id: string) => (/^\d+$/.test(id) ? read<OrgDetail | null>
 export const getEvaluation = () => read<Record<string, unknown> | null>("evaluation.json", null);
 export const getBriefExamples = () => read<unknown[]>("brief_examples.json", []);
 export const getSystemic = () => read<import("@/components/SystemicList").Systemic[]>("systemic.json", []);
+export const getRecent = () =>
+  read<import("./types").Recent>("recent.json", { generated_at: "", since: "", days: 365, items: [] });

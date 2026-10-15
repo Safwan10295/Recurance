@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
+  ["/recent", "Recent"],
   ["/chains", "Chains"],
   ["/organisations", "Organisations"],
   ["/brief", "Pre-inquest brief"],

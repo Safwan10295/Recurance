@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Stat, pct } from "@/components/ui";
-import { getChains, getSite } from "@/lib/data";
+import { getChains, getRecent, getSite } from "@/lib/data";
 
 export default function Home() {
   const site = getSite();
   const flagship = getChains().find((c) => c.key === site.flagship);
+  const recent = getRecent();
   return (
     <div className="space-y-14">
       <section className="space-y-5 max-w-3xl">
@@ -51,6 +52,12 @@ export default function Home() {
           </div>
         ) : (
           <p className="text-ink-2">The analysis has not been published yet.</p>
+        )}
+        {recent.items.length > 0 && (
+          <p className="text-ink-2">
+            In the last 12 months, {recent.items.length} reports raised a concern already raised with the same
+            organisation. <Link href="/recent">See recent recurrences</Link>.
+          </p>
         )}
         <p className="text-sm text-muted">
           Computed from {site.n_reports.toLocaleString("en-GB")} reports. Numbers are recalculated whenever the data is
