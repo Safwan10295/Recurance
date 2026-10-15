@@ -98,3 +98,42 @@ Each entry: date, question, answer, source. Newest phase at the bottom.
 - Question: Confirm the live rules.
 - Answer: The Devpost rules page returned HTTP 403 to automated fetches. Secondary listings agree on: runs on Token Factory or Nebius AI Cloud with at least one NVIDIA open model; close 30 Oct 2026 10:00 PT; judging 1 to 15 Dec 2026; tracks include Best Apps and Agents; a Best Use of Tavily prize. Pilot should read the live page once.
 - Sources: https://www.startupgrantsindia.com/competitions/nebius-x-nvidia-global-ai-hackathon ; https://lucaberton.com/blog/aaif-builders-brews-amsterdam-nebius-nvidia-hackathon-2026/
+
+## Phase 1 (2026-10-15)
+
+### Listing pages and URL discovery
+
+- Date: 2026-10-15
+- Question: Pagination and listing structure.
+- Answer: The archive at /prevention-of-future-death-reports/ has 651 listing pages of 10 (page/N/). The Yoast sitemaps pfd-sitemap.xml to pfd-sitemap7.xml list 6,484 report URLs, matching the handoff's figure of about 6,480. The sitemaps are the primary source and the listing crawl is a cross-check.
+- Source: https://www.judiciary.uk/sitemap_index.xml ; https://www.judiciary.uk/prevention-of-future-death-reports/
+
+### Is the report text in the page HTML?
+
+- Date: 2026-10-15
+- Question: Is the report text on the page, or only in PDFs?
+- Answer: Report pages from about 2023 onwards carry the full Regulation 28 text in an HTML table. Older pages carry only metadata (date, ref, deceased, coroner, area, category, receivers) and links to PDFs, so their text comes from the report PDF. Two template generations exist: the 2013 form (coroner, legal powers, investigation, circumstances, concerns, action, response, copies) and a newer form that puts date, recipients, response and a summary of concerns first. Pages also link a generic PFD-Publication-Policy PDF, which is excluded.
+- Source: sample pages /jamil-ahmed-2/, /david-levett-prevention-of-future-deaths-report/, /pamela-hindley-prevention-of-future-deaths-report/
+
+### OCR need rate
+
+- Date: 2026-10-15
+- Question: How many PDFs are scanned images?
+- Answer: In the first 335 report PDFs processed, 166 (50%) had no usable text layer and were read with Tesseract 5.4 OCR. OCR takes 2 to 7 seconds per PDF and was run on 12 processes. Response PDFs show a similar pattern. Final rates are in docs/PROGRESS.md.
+- Source: pipeline/parse/pdftext.py run logs.
+
+### Older report formats
+
+- Date: 2026-10-15
+- Question: Do all reports follow the Regulation 28 template?
+- Answer: No. Reports from before the 2013 regulations are Rule 43 letters with no section headings; their concerns are taken from the letter body. Some Regulation 28 reports omit the "CORONER'S CONCERNS" heading but keep "The MATTERS OF CONCERN are as follows"; Devon uses "DETAIL OF CONCERNS". All three are handled.
+- Source: parsed PDFs in data/raw/pdf.
+
+## Phase 5 preparation
+
+### NTSB CAROL
+
+- Date: 2026-10-15
+- Question: Can NTSB safety recommendations be exported for the stretch adapter?
+- Answer: CAROL holds over 15,000 safety recommendations. Its help page says "You may download a CSV or JSON file containing all query records" from the search interface. No public API is documented for recommendations; a 2020 press release mentions APIs for partner agencies. NTSB material is a US federal government work. An unattended build would need browser-driven exports, so the adapter is deferred unless Phases 0 to 4 finish early.
+- Sources: https://www.ntsb.gov/Pages/CAROL.aspx ; https://www-s.ntsb.gov/news/press-releases/Pages/NR20201013.aspx

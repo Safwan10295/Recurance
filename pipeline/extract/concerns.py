@@ -241,7 +241,7 @@ def eligible(conn, only_missing: bool = True) -> list:
          "WHERE duplicate_of IS NULL AND concerns IS NOT NULL AND length(concerns) >= 40")
     if only_missing:
         q += (" AND url NOT IN (SELECT item_id FROM stage_items WHERE stage='A' AND "
-              "(status='ok' OR prompt_version=?))")
+              "(status='ok' OR (status='failed' AND prompt_version=?)))")
         return conn.execute(q + " ORDER BY url", (PROMPT_VERSION,)).fetchall()
     return conn.execute(q + " ORDER BY url").fetchall()
 
@@ -273,7 +273,8 @@ def run(llm: LLM, rows: list, threads: int = 8, log_every: int = 100, stage: str
             else:
                 agg["failed"] += 1
                 agg["errors"].append(f"{res.url}: {res.error}")
-                mark(conn, res.url, "failed", res.error)
+                # Transport errors (timeouts, 429, 5xx) are transient and may be tried again in a later run.
+                mark(conn, res.url, "transient" if (res.error or "").startswith("TransportError") else "failed", res.error)
             if agg["items"] % log_every == 0:
                 conn.commit()
                 print(f"[A] {agg['items']}/{len(rows)} ok={agg['ok']} cost=${agg['cost']:.4f} "

@@ -260,12 +260,16 @@ def parse_json_content(text: str) -> Any:
 
 
 class _RateLimiter:
+    """Paces calls under both the requests-per-minute and tokens-per-minute limits (at 80%)."""
+
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._next: dict[str, float] = {}
 
-    def wait(self, model: Model, fraction: float = 0.8) -> None:
-        interval = 60.0 / max(1.0, model.rpm * fraction)
+    def wait(self, model: Model, est_tokens: int = 0, fraction: float = 0.8) -> None:
+        by_requests = 60.0 / max(1.0, model.rpm * fraction)
+        by_tokens = est_tokens * 60.0 / max(1.0, model.tpm * fraction)
+        interval = max(by_requests, by_tokens)
         with self._lock:
             now = time.monotonic()
             slot = max(now, self._next.get(model.key, now))
@@ -399,11 +403,13 @@ class LLM:
             raise RuntimeError(f"offline mode: cache miss for {h[:12]}")
 
         prompt_text = json.dumps(messages, ensure_ascii=False)
-        worst = cost_of(m, estimate_tokens(prompt_text), max_tokens)
+        est_in = estimate_tokens(prompt_text)
+        worst = cost_of(m, est_in, max_tokens)
         token = self._reserve(stage, worst)
         t0 = time.monotonic()
         try:
-            self._limiter.wait(m)
+            # Typical output is well under max_tokens; half of it is a fair pacing estimate.
+            self._limiter.wait(m, int(est_in * 0.75) + max_tokens // 2)
             _, data, headers = self._send_with_one_retry("chat/completions", body)
         except Exception as e:
             self.ledger.record(

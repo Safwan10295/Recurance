@@ -204,7 +204,7 @@ def mark(conn, pair_id: int, status: str, detail: str | None) -> None:
 
 def pending_pairs(conn, ids: list[int] | None = None) -> list[int]:
     q = ("SELECT id FROM candidate_pairs WHERE CAST(id AS TEXT) NOT IN "
-         "(SELECT item_id FROM stage_items WHERE stage='C' AND prompt_version=?)")
+         "(SELECT item_id FROM stage_items WHERE stage='C' AND (status='ok' OR (status='failed' AND prompt_version=?)))")
     rows = [r[0] for r in conn.execute(q + " ORDER BY hybrid_score DESC", (PROMPT_VERSION,))]
     if ids is not None:
         s = set(ids)
@@ -244,7 +244,8 @@ def run(llm: LLM, pair_ids: list[int], threads: int = 8, later_text_override: di
                 agg["failed"] += 1
                 agg["errors"].append(f"{res['pair_id']}: {res['error']}")
                 if write:
-                    mark(conn, res["pair_id"], "failed", res["error"])
+                    transient = (res["error"] or "").startswith("TransportError")
+                    mark(conn, res["pair_id"], "transient" if transient else "failed", res["error"])
             if agg["items"] % 100 == 0:
                 conn.commit()
                 print(f"[C] {agg['items']}/{len(data)} cost=${agg['cost']:.4f} {agg['relations']}", flush=True)

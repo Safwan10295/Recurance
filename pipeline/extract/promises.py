@@ -300,7 +300,8 @@ def run(llm: LLM, rows: list, threads: int = 8, stage: str = STAGE) -> dict:
                 agg["failed"] += 1
                 agg["errors"].append(f"{res['response_id']}: {res['error']}")
                 # 2 = attempted and failed; never retried without a change to the prompt or input.
-                conn.execute("UPDATE responses SET stage_b_done=2 WHERE id=?", (res["response_id"],))
+                if not (res["error"] or "").startswith("TransportError"):  # transport errors stay retryable
+                    conn.execute("UPDATE responses SET stage_b_done=2 WHERE id=?", (res["response_id"],))
             if agg["items"] % 100 == 0:
                 conn.commit()
                 print(f"[B] {agg['items']}/{len(rows)} cost=${agg['cost']:.4f}", flush=True)

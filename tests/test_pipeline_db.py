@@ -220,3 +220,37 @@ def test_export_hides_unreviewed_dossier_and_redacts(mini_db, tmp_path, monkeypa
     text = json.dumps(detail)
     assert "Dana Staff" not in text and "[name redacted]" in text
     assert all(l["relation"] in ("identical", "closely_related") for l in detail["links"])
+
+
+def test_transport_failure_is_retryable_but_schema_failure_is_not(mini_db, tmp_path, monkeypatch):
+    from pipeline.extract import concerns as A
+    from pipeline.llm import LLM, Ledger, TransportError
+
+    monkeypatch.setattr("pipeline.llm.time.sleep", lambda s: None)
+    conn = db.connect()
+    rows = A.eligible(conn)[:2]
+    conn.close()
+    bad_schema = {"choices": [{"message": {"content": "{\"nope\": 1}"}, "finish_reason": "stop"}],
+                  "usage": {"prompt_tokens": 10, "completion_tokens": 3}}
+    t = Replay(TransportError("a"), TransportError("b"), bad_schema)
+    A.run(LLM(Ledger(tmp_path / "l.sqlite"), transport=t), rows, threads=1)
+    conn = db.connect()
+    left = {r["url"] for r in A.eligible(conn)}
+    status = dict(conn.execute("SELECT item_id, status FROM stage_items").fetchall())
+    conn.close()
+    assert sorted(status.values()) == ["failed", "transient"]
+    transient_url = next(u for u, s in status.items() if s == "transient")
+    failed_url = next(u for u, s in status.items() if s == "failed")
+    assert transient_url in left and failed_url not in left
+
+
+def test_rate_limiter_paces_by_tokens(monkeypatch):
+    from pipeline.config import MODELS
+    from pipeline.llm import _RateLimiter
+
+    slept = []
+    monkeypatch.setattr("pipeline.llm.time.sleep", lambda s: slept.append(s))
+    rl = _RateLimiter()
+    for _ in range(3):
+        rl.wait(MODELS["super"], est_tokens=40_000)  # 40k of a 160k/min budget: one call per 15 s
+    assert slept and max(slept) > 20
