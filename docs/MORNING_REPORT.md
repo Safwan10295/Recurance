@@ -87,7 +87,7 @@ See docs/BLOCKERS.md for each note in full.
 7. Choose the contact email for the scraper User-Agent if it should differ from the one in .env (A5 question 1).
 8. Decide who signs off dossiers: Ubaid, Safwan, or both (A5 question 3).
 9. Read the live Devpost rules page once; automated fetches were blocked.
-10. Before making the repo public, run bash scripts/purge_private_exports.sh (removes three files with unredacted or unreviewed text from earlier local commits), then gitleaks detect on the full history, then make it public and set the MIT licence in the About section.
+10. Before making the repo public, run bash scripts/purge_private_exports.sh (removes three files with unredacted or unreviewed text from earlier local commits), then gitleaks detect --config .gitleaks.toml on the full history, then make it public and set the MIT licence in the About section.
 11. Record the demo video from docs/DEMO_SCRIPT.md and upload it to YouTube.
 12. Submit on Devpost, pasting the feedback from docs/FEEDBACK.md.
 13. Consider rotating the three keys after the hackathon, since they were pasted into a chat.

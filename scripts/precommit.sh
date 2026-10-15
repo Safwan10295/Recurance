@@ -4,5 +4,5 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 .venv/Scripts/python.exe scripts/secret_scan.py
 GL="${GITLEAKS:-$HOME/go/bin/gitleaks.exe}"
-"$GL" protect --staged --redact --no-banner
+"$GL" protect --staged --redact --no-banner --config .gitleaks.toml
 echo "precommit: both scans clean"

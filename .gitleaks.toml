@@ -1,0 +1,8 @@
+# Extend the default gitleaks rules. Chain keys in web/data are 16-character hex hashes
+# ("key": "7d7b41f91717dc72"), which the generic-api-key rule mistakes for secrets.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Recurrence Watch chain keys (sha1 prefixes of public report URLs), not secrets"
+regexes = ['''^[a-f0-9]{16}$''']
