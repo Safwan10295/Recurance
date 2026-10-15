@@ -1,12 +1,26 @@
 {
- "known_report_url": {
-  "seconds": 5.0,
+ "picked_known_report": {
+  "seconds": 5.8,
   "steps": [
-   "Reading the report on judiciary.uk — David Levett: Prevention of future deaths report",
+   "Finding the report — David Levett: Prevention of future deaths report (already in the archive)",
    "Resolving the organisation — National Highways",
    "Extracting concerns (Nemotron Nano) — 1 concerns already analysed",
-   "Searching earlier reports to this organisation — 130 earlier concerns searched; 3 closest sent to the judge",
-   "Judging the closest matches (Nemotron Super) — 1 shown as the same or a closely related hazard",
+   "Searching this organisation's earlier warnings — 130 earlier concerns searched; the 3 closest sent to the judge",
+   "Judging the closest matches (Nemotron Super) — 3 judged the same or a closely related hazard",
+   "Assembling the brief"
+  ],
+  "final": "result",
+  "matches": 3,
+  "notes": [],
+  "paused_reason": null
+ },
+ "pasted_new_concerns": {
+  "seconds": 17.0,
+  "steps": [
+   "Resolving the organisation — Network Rail",
+   "Extracting concerns (Nemotron Nano) — 2 concerns found",
+   "Searching this organisation's earlier warnings — 57 earlier concerns searched; the 3 closest sent to the judge",
+   "Judging the closest matches (Nemotron Super) — 1 judged the same or a closely related hazard",
    "Assembling the brief"
   ],
   "final": "result",
@@ -14,21 +28,19 @@
   "notes": [],
   "paused_reason": null
  },
- "pasted_draft_concerns": {
-  "seconds": 3.4,
+ "new_report_url_not_in_archive": {
+  "seconds": 1.1,
   "steps": [
-   "Resolving the organisation — Network Rail",
-   "Extracting concerns (Nemotron Nano) — 2 concerns",
-   "Searching earlier reports to this organisation — 57 earlier concerns searched; 3 closest sent to the judge",
-   "Judging the closest matches (Nemotron Super) — 2 shown as the same or a closely related hazard",
-   "Assembling the brief"
+   "Finding the report — Could not read that page"
   ],
   "final": "result",
-  "matches": 2,
-  "notes": [],
+  "matches": 0,
+  "notes": [
+   "That address could not be read as a Prevention of Future Deaths report page on judiciary.uk."
+  ],
   "paused_reason": null
  },
  "repeat_cached": true,
- "spend_usd": 0.0027844799999999998,
+ "spend_usd": 0.0033280800000000006,
  "web_ledger_rows": 8
 }

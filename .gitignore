@@ -50,3 +50,5 @@ data/logs/
 data/exports/hand_labels.csv
 data/exports/dossiers_for_review.md
 data/exports/systemic.json
+server-data.tar.gz
+data/exports/web_json/

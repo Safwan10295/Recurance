@@ -37,6 +37,29 @@ def post(payload: dict) -> list[dict]:
     return events
 
 
+def read_store() -> dict:
+    """The web app keeps its cache, ledger and spend in Postgres (brief_kv) when DATABASE_URL is set."""
+    url = dotenv_values(ROOT / ".env").get("DATABASE_URL")
+    if url:
+        import psycopg
+
+        with psycopg.connect(url) as c:
+            return {k: v for k, v in c.execute("SELECT key, value FROM brief_kv").fetchall()}
+    return json.loads((STORE / "store.json").read_text()) if (STORE / "store.json").exists() else {}
+
+
+def clear_store() -> None:
+    """Remove the test's rows so the local store starts clean (the server has its own database)."""
+    url = dotenv_values(ROOT / ".env").get("DATABASE_URL")
+    if url:
+        import psycopg
+
+        with psycopg.connect(url) as c:
+            c.execute("DELETE FROM brief_kv")
+            c.commit()
+    shutil.rmtree(STORE, ignore_errors=True)
+
+
 def main() -> None:
     vals = dotenv_values(ROOT / ".env")
     env = dict(os.environ)
@@ -46,6 +69,7 @@ def main() -> None:
         "LIVE_COST_CEILING_USD": "0.05",
         "LIVE_GLOBAL_DAILY_CAP": "5",
         "LIVE_PER_IP_DAILY_CAP": "5",
+        "DATABASE_URL": vals.get("DATABASE_URL") or "",
     })
     shutil.rmtree(STORE, ignore_errors=True)
     npx = "npx.cmd" if os.name == "nt" else "npx"
@@ -81,7 +105,7 @@ def main() -> None:
     finally:
         proc.terminate()
         subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)], capture_output=True) if os.name == "nt" else None
-    store = json.loads((STORE / "store.json").read_text()) if (STORE / "store.json").exists() else {}
+    store = read_store()
     spent = float(store.get("spend:total", 0))
     rows = [r for k, v in store.items() if k.startswith("ledger:") for r in v]
     lg = Ledger()
@@ -93,7 +117,7 @@ def main() -> None:
     results["spend_usd"] = spent
     results["web_ledger_rows"] = len(rows)
     (ROOT / "data" / "exports" / "live_brief_test.json").write_text(json.dumps(results, indent=1, ensure_ascii=False))
-    shutil.rmtree(STORE, ignore_errors=True)
+    clear_store()
     print(f"live brief test spend ${spent:.4f}, copied {len(rows)} ledger rows into the pipeline ledger")
 
 

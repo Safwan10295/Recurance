@@ -20,6 +20,7 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
     page: Math.max(1, Number(sp.page) || 1),
   };
   const [data, facets, systemic] = await Promise.all([listChains(f), chainFacets(), getSystemic()]);
+  const active = [f.orgType, f.theme, f.relation, sp.conf, sp.min].filter(Boolean).length;
   const sel = "w-full rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm";
   const tab = (id: string, label: string, n: number) => (
     <Link
@@ -54,53 +55,6 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
               <input name="q" defaultValue={f.q} placeholder="e.g. smart motorway" className={sel} />
             </label>
             <label className="block text-sm space-y-1">
-              <span className="text-muted">Organisation type</span>
-              <select name="type" defaultValue={f.orgType ?? ""} className={sel}>
-                <option value="">All</option>
-                {facets.types.map((t) => (
-                  <option key={t.org_type} value={t.org_type}>
-                    {orgTypeLabel(t.org_type)} ({t.n})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-sm space-y-1">
-              <span className="text-muted">Theme</span>
-              <select name="theme" defaultValue={f.theme ?? ""} className={sel}>
-                <option value="">All</option>
-                {facets.themes.map((t) => (
-                  <option key={t.theme} value={t.theme}>
-                    {t.theme} ({t.n})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-sm space-y-1">
-              <span className="text-muted">Relation</span>
-              <select name="relation" defaultValue={f.relation ?? ""} className={sel}>
-                <option value="">Identical or closely related</option>
-                <option value="identical">Identical only</option>
-                <option value="closely_related">Closely related only</option>
-              </select>
-            </label>
-            <label className="block text-sm space-y-1">
-              <span className="text-muted">At least</span>
-              <select name="min" defaultValue={sp.min ?? ""} className={sel}>
-                <option value="">2 reports</option>
-                <option value="3">3 reports</option>
-                <option value="5">5 reports</option>
-                <option value="10">10 reports</option>
-              </select>
-            </label>
-            <label className="block text-sm space-y-1">
-              <span className="text-muted">Minimum confidence</span>
-              <select name="conf" defaultValue={sp.conf ?? ""} className={sel}>
-                <option value="">0.70 (all shown)</option>
-                <option value="0.8">0.80</option>
-                <option value="0.9">0.90</option>
-              </select>
-            </label>
-            <label className="block text-sm space-y-1">
               <span className="text-muted">Order</span>
               <select name="sort" defaultValue={f.sort} className={sel}>
                 <option value="recent">Most recent report first</option>
@@ -108,6 +62,60 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
                 <option value="largest">Most reports first</option>
               </select>
             </label>
+            <details open={active > 0} className="group">
+              <summary className="cursor-pointer text-sm text-accent list-none [&::-webkit-details-marker]:hidden">
+                More filters{active > 0 ? ` (${active} on)` : ""} <span aria-hidden className="inline-block group-open:rotate-180">▾</span>
+              </summary>
+              <div className="space-y-3 pt-3">
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">Organisation type</span>
+                  <select name="type" defaultValue={f.orgType ?? ""} className={sel}>
+                    <option value="">All</option>
+                    {facets.types.map((t) => (
+                      <option key={t.org_type} value={t.org_type}>
+                        {orgTypeLabel(t.org_type)} ({t.n})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">Theme</span>
+                  <select name="theme" defaultValue={f.theme ?? ""} className={sel}>
+                    <option value="">All</option>
+                    {facets.themes.map((t) => (
+                      <option key={t.theme} value={t.theme}>
+                        {t.theme} ({t.n})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">Relation</span>
+                  <select name="relation" defaultValue={f.relation ?? ""} className={sel}>
+                    <option value="">Identical or closely related</option>
+                    <option value="identical">Identical only</option>
+                    <option value="closely_related">Closely related only</option>
+                  </select>
+                </label>
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">At least</span>
+                  <select name="min" defaultValue={sp.min ?? ""} className={sel}>
+                    <option value="">2 reports</option>
+                    <option value="3">3 reports</option>
+                    <option value="5">5 reports</option>
+                    <option value="10">10 reports</option>
+                  </select>
+                </label>
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">Minimum confidence</span>
+                  <select name="conf" defaultValue={sp.conf ?? ""} className={sel}>
+                    <option value="">0.70 (all shown)</option>
+                    <option value="0.8">0.80</option>
+                    <option value="0.9">0.90</option>
+                  </select>
+                </label>
+              </div>
+            </details>
             <div className="flex gap-2 pt-1">
               <button className="rounded-md bg-accent text-accent-ink px-3.5 py-1.5 text-sm font-medium">Apply</button>
               <Link href="/chains" className="rounded-md border border-rule px-3.5 py-1.5 text-sm hover:no-underline">

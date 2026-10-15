@@ -48,71 +48,76 @@
   --font-sans: var(--font-source-sans);
 }
 
-html {
-  background: var(--paper);
-  color: var(--ink);
+/* Element defaults sit in the base layer so Tailwind utilities (text-*, hover:no-underline) override them. */
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-source-sans), system-ui, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-source-sans), system-ui, sans-serif;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-}
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
 
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
+  .quote {
+    font-family: var(--font-source-serif), Georgia, serif;
+    border-left: 3px solid var(--quote-bar);
+    padding-left: 0.9rem;
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-}
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
 
-.quote {
-  font-family: var(--font-source-serif), Georgia, serif;
-  border-left: 3px solid var(--quote-bar);
-  padding-left: 0.9rem;
-  color: var(--ink);
-  font-size: 1rem;
-  line-height: 1.6;
-}
+  .prose-doc p + p {
+    margin-top: 0.9rem;
+  }
 
-.eyebrow {
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 600;
-}
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 
-.prose-doc p + p {
-  margin-top: 0.9rem;
-}
-
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }

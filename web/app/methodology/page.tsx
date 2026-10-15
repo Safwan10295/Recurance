@@ -6,8 +6,8 @@ export const metadata = { title: "Methodology and responsible use · Recurrence 
 
 export default async function Methodology() {
   const site = (await getMeta()).site;
-  const contact = process.env.NEXT_PUBLIC_CORRECTIONS_EMAIL;
-  const repo = process.env.NEXT_PUBLIC_REPO_URL;
+  const contact = process.env.CORRECTIONS_EMAIL;
+  const repo = process.env.REPO_URL;
   return (
     <article className="space-y-5 max-w-3xl">
       <PageHeader eyebrow="How we know" title="Methodology and responsible use" description="How the links are made, what they mean, and what they do not mean." />

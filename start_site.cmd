@@ -1,6 +1,9 @@
 @echo off
-rem Starts the Recurrence Watch site locally. Open http://localhost:3000 once it says "Ready".
-rem Close this window to stop it.
+rem Starts Recurrence Watch locally: Postgres (in WSL Ubuntu) and the web app.
+rem Open http://localhost:3000 once the second window says "Ready". Close both windows to stop.
+start "Recurrence Watch database" /min wsl -d Ubuntu-24.04 -u root -- bash -c "service postgresql start; echo Postgres running. Keep this window open.; exec sleep infinity"
+timeout /t 5 /nobreak >nul
 cd /d "%~dp0web"
+if not exist ".next\BUILD_ID" call npm run build
 start "" http://localhost:3000
 npx next start -p 3000

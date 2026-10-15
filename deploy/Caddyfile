@@ -1,0 +1,12 @@
+# SITE_ADDRESS is a domain (for example recurrencewatch.example.org) or an sslip.io name for the
+# server's IP (for example 203-0-113-5.sslip.io). Caddy fetches an HTTPS certificate for either.
+# Set it to :80 for plain HTTP while testing.
+{$SITE_ADDRESS} {
+	encode gzip
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+	}
+	reverse_proxy web:3000
+}

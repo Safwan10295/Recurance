@@ -1,0 +1,78 @@
+# Recurrence Watch on one server: Postgres + pgvector, web app, pipeline worker, Caddy (HTTPS).
+# Run from this folder:  docker compose --env-file .env up -d --build
+# See deploy/README.md for the full steps.
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: recurrence
+      POSTGRES_USER: rw
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      WEB_DB_PASSWORD: ${WEB_DB_PASSWORD:?set WEB_DB_PASSWORD in deploy/.env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rw -d recurrence"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: ../web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # The web app connects as a restricted role: read the published tables, write only brief_kv.
+      DATABASE_URL: postgresql://rw_web:${WEB_DB_PASSWORD}@db:5432/recurrence
+      NEBIUS_LIVE_API_KEY: ${NEBIUS_LIVE_API_KEY:-}
+      SCRAPER_CONTACT_EMAIL: ${SCRAPER_CONTACT_EMAIL:-}
+      LIVE_COST_CEILING_USD: ${LIVE_COST_CEILING_USD:-4.50}
+      LIVE_GLOBAL_DAILY_CAP: ${LIVE_GLOBAL_DAILY_CAP:-40}
+      LIVE_PER_IP_DAILY_CAP: ${LIVE_PER_IP_DAILY_CAP:-5}
+      LIVE_BRIEF_PAUSED: ${LIVE_BRIEF_PAUSED:-}
+      CORRECTIONS_EMAIL: ${CORRECTIONS_EMAIL:-}
+      REPO_URL: ${REPO_URL:-}
+
+  worker:
+    build:
+      context: ..
+      dockerfile: deploy/worker.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://rw:${POSTGRES_PASSWORD}@db:5432/recurrence
+      NEBIUS_API_KEY: ${NEBIUS_API_KEY:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      SCRAPER_CONTACT_EMAIL: ${SCRAPER_CONTACT_EMAIL:-}
+      REFRESH_EVERY_HOURS: ${REFRESH_EVERY_HOURS:-168}
+      REFRESH_MAX_SPEND: ${REFRESH_MAX_SPEND:-0.50}
+      REFRESH_PAUSED: ${REFRESH_PAUSED:-}
+    volumes:
+      - ../data:/app/data
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

@@ -1,5 +1,5 @@
 import "server-only";
-import { cached, q, q1 } from "./db";
+import { DbUnavailable, cached, q, q1 } from "./db";
 import type { ChainDetail, ChainSummary, Dossier, Followup, Link, Relation, ReportCard, ResponseDoc, Site } from "./types";
 
 // ---------- meta ----------
@@ -328,6 +328,9 @@ export async function dbHealthy(): Promise<{ ok: boolean; published_at?: string;
     const r = await q1<{ value: string }>("SELECT value #>> '{}' AS value FROM pub_meta WHERE key = 'published_at'");
     return { ok: true, published_at: r?.value };
   } catch (e) {
-    return { ok: false, error: String(e).slice(0, 120) };
+    // Plain states only: never echo driver messages to the public.
+    const code = (e as { code?: string }).code;
+    const error = code === "42P01" ? "no data published yet" : e instanceof DbUnavailable ? "database unreachable" : "database error";
+    return { ok: false, error };
   }
 }

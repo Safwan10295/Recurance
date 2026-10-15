@@ -13,13 +13,30 @@ sys.path.insert(0, str(ROOT))
 FIXTURES = ROOT / "tests" / "fixtures"
 
 
+_LOCAL = {"127.0.0.1", "::1", "localhost"}
+_real_connect = socket.socket.connect
+_real_create = socket.create_connection
+
+
 @pytest.fixture(autouse=True)
 def _no_network(monkeypatch):
-    def guard(*a, **k):
+    """No test may reach the internet. A local PostgreSQL on localhost is allowed for publish tests."""
+
+    def is_local(addr) -> bool:
+        return isinstance(addr, tuple) and str(addr[0]) in _LOCAL
+
+    def guard_connect(self, addr, *a, **k):
+        if is_local(addr):
+            return _real_connect(self, addr, *a, **k)
         raise RuntimeError("network access is forbidden in tests")
 
-    monkeypatch.setattr(socket, "create_connection", guard)
-    monkeypatch.setattr(socket.socket, "connect", guard)
+    def guard_create(addr, *a, **k):
+        if is_local(addr):
+            return _real_create(addr, *a, **k)
+        raise RuntimeError("network access is forbidden in tests")
+
+    monkeypatch.setattr(socket, "create_connection", guard_create)
+    monkeypatch.setattr(socket.socket, "connect", guard_connect)
     monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
     monkeypatch.delenv("TAVILY_API_KEY", raising=False)
 

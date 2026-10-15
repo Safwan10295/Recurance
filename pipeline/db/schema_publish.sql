@@ -147,3 +147,13 @@ BEGIN
   RETURNING (value)::text::double precision INTO v;
   RETURN v;
 END $$;
+
+-- The web app's restricted role (created on the server by deploy/initdb/01-roles.sh):
+-- read the published tables, write only the live brief's store.
+DO $$BEGIN
+  IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'rw_web') THEN
+    GRANT SELECT ON ALL TABLES IN SCHEMA public TO rw_web;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON brief_kv TO rw_web;
+    GRANT EXECUTE ON FUNCTION brief_kv_add(text, double precision) TO rw_web;
+  END IF;
+END$$;

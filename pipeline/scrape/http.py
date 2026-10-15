@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import threading
 import time
 from pathlib import Path
@@ -24,14 +25,23 @@ _last = [0.0]
 _SLOT_FILE = config.CACHE / ".judiciary_slot"
 
 
-def _claim_slot(delay: float) -> None:
-    import msvcrt  # Windows; on other platforms fcntl would be used
+def _lock_file(fh, lock: bool) -> None:
+    if os.name == "nt":
+        import msvcrt
 
+        fh.seek(0)
+        msvcrt.locking(fh.fileno(), msvcrt.LK_LOCK if lock else msvcrt.LK_UNLCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(fh.fileno(), fcntl.LOCK_EX if lock else fcntl.LOCK_UN)
+
+
+def _claim_slot(delay: float) -> None:
     _SLOT_FILE.parent.mkdir(parents=True, exist_ok=True)
     while True:
         with open(_SLOT_FILE, "a+b") as fh:
-            fh.seek(0)
-            msvcrt.locking(fh.fileno(), msvcrt.LK_LOCK, 1)
+            _lock_file(fh, True)
             try:
                 fh.seek(0)
                 raw = fh.read().decode() or "0"
@@ -48,8 +58,7 @@ def _claim_slot(delay: float) -> None:
                     return
                 wait = delay - (now - last)
             finally:
-                fh.seek(0)
-                msvcrt.locking(fh.fileno(), msvcrt.LK_UNLCK, 1)
+                _lock_file(fh, False)
         time.sleep(max(0.05, wait))
 
 

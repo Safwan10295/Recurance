@@ -27,7 +27,7 @@ from ..normalise.orgs import key as org_key
 from ..redact import redact
 from ..wording import is_clean
 
-WEB_DATA = config.ROOT / "web" / "data"
+WEB_DATA = config.EXPORTS / "web_json"  # JSON export for offline use and tests; the site reads Postgres
 BRIEF_DIM = 256
 RECENT_DAYS = 365  # the Recent page covers later reports from the last year
 
