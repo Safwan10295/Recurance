@@ -29,7 +29,7 @@ Log out and back in so the group change applies.
 
 ## 3. Copy the code and data
 
-On your own PC, from the repository root, build the data archive (about 1 GB):
+On your own PC, from the repository root, build the data archive (about 320 MB, 1.3 GB unpacked):
 
 ```
 python scripts/pack_server_data.py

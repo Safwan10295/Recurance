@@ -74,17 +74,18 @@ if blk.exists():
     L += ["- " + ln[3:] for ln in blk.read_text(encoding="utf-8").splitlines() if ln.startswith("## ")] + [""]
 L += ["## Things only you can do", "",
       "1. Check in the Token Factory console when your credits were issued. Builder credits expire 90 days after issue, so credits issued before 16 Sep would expire before judging ends on 15 Dec.",
-      "2. Label the 80 candidate pairs: python -m pipeline.cli label. Then python -m pipeline.cli evaluate (free, cached) to fill in precision.",
-      "3. Read the dossiers in data/exports/dossiers_for_review.md, then approve the ones you are happy with: python -m pipeline.cli review. Then python -m pipeline.cli export.",
-      "4. Create a separate Token Factory key for the deployed app (named recurrence-watch-live).",
-      "5. Create or confirm the Supabase and Vercel projects, then follow docs/DEPLOY.md to deploy.",
-      "6. Choose the corrections contact address for the methodology page (NEXT_PUBLIC_CORRECTIONS_EMAIL).",
-      "7. Choose the contact email for the scraper User-Agent if it should differ from the one in .env (A5 question 1).",
-      "8. Decide who signs off dossiers: Ubaid, Safwan, or both (A5 question 3).",
-      "9. Read the live Devpost rules page once; automated fetches were blocked.",
-      "10. Before making the repo public, run bash scripts/purge_private_exports.sh (removes three files with unredacted or unreviewed text from earlier local commits), then gitleaks detect --config .gitleaks.toml on the full history, then make it public and set the MIT licence in the About section.",
-      "11. Record the demo video from docs/DEMO_SCRIPT.md and upload it to YouTube.",
-      "12. Submit on Devpost, pasting the feedback from docs/FEEDBACK.md.",
-      "13. Consider rotating the three keys after the hackathon, since they were pasted into a chat.", ""]
+      "2. Check whether your Nebius credits cover an AI Cloud CPU VM. If they do, create one (deploy/README.md, step 1). If not, any Linux VPS works with the same files.",
+      "3. Create a separate Token Factory key for the hosted brief, named recurrence-watch-live (docs/DEPLOY.md).",
+      "4. Optional: a domain name. Without one, the site gets HTTPS on an sslip.io name for the server's IP.",
+      "5. Choose the corrections contact address for the methodology page (CORRECTIONS_EMAIL in deploy/.env).",
+      "6. Read the dossiers (python -m pipeline.cli dossiers-export writes them to data/exports/dossiers_for_review.md), approve the ones you are happy with (python -m pipeline.cli review), then python -m pipeline.cli publish. The handoff asks for at least three reviewed.",
+      "7. Label the 80 candidate pairs: python -m pipeline.cli label. Then python -m pipeline.cli evaluate (free, cached) and publish, to fill in precision.",
+      "8. Optional: approve more Tavily credits for follow-up searches after the monthly reset. Only 82 promises have a follow-up check.",
+      "9. Decide who signs off dossiers: Ubaid, Safwan, or both (A5 question 3).",
+      "10. Read the live Devpost rules page once; automated fetches were blocked.",
+      "11. Before making the repo public, run bash scripts/purge_private_exports.sh (removes three files with unredacted or unreviewed text from earlier local commits), then gitleaks detect --config .gitleaks.toml on the full history, then make it public and set the MIT licence in the About section.",
+      "12. Record the demo video from docs/DEMO_SCRIPT.md and upload it to YouTube.",
+      "13. Submit on Devpost, pasting the feedback from docs/FEEDBACK.md.",
+      "14. Consider rotating the three keys after the hackathon, since they were pasted into a chat.", ""]
 (ROOT / "docs" / "MORNING_REPORT.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 print("wrote docs/MORNING_REPORT.md")

@@ -61,4 +61,4 @@ def interactive() -> None:
             conn.commit()
             print("kept hidden")
     conn.close()
-    print("Run python -m pipeline.cli export to update the site.")
+    print("Run python -m pipeline.cli publish to update the site.")

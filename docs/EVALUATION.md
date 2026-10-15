@@ -29,7 +29,7 @@ Status: pending: no labels filled in yet. Labelled pairs: 0.
 
 1. Pilot labels the 80 pairs in data/exports/hand_labels.csv with python -m pipeline.cli label.
 2. Then python -m pipeline.cli evaluate recomputes everything. The judge calls are answered from the cache, so it costs nothing.
-3. Then python scripts/write_evaluation_md.py and python -m pipeline.cli export refresh this file and the site.
+3. Then python scripts/write_evaluation_md.py and python -m pipeline.cli publish refresh this file and the site.
 
 ## Lost memory among shown links
 

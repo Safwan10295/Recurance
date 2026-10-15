@@ -110,3 +110,43 @@ Spend at the end of Phase 4: $5.05 total (dev $0.07, embeddings $0.01, A $0.77, 
 
 1. Methodology and Evaluation pages are live in the build.
 2. The NTSB stretch was not built. Spend was under $12 and Phases 0 to 4 were complete, but CAROL has no documented public API for recommendations; its exports run through the web interface, which an unattended run cannot use reliably. The video uses the systemic clusters for that slot instead.
+
+## Phase 6: PostgreSQL, the tool redesign and the server package (2026-10-15 evening)
+
+Pilot's review: the site read as information on a page, not a tool; it ran only on one PC; and it should use PostgreSQL on our own server. The plan was approved and built in full.
+
+1. Data layer: python -m pipeline.cli publish loads display-safe rows into PostgreSQL 16 with pgvector (D21). 6,454 reports, 3,832 organisations, 618 chains, 1,217 links and 27,747 brief concerns.
+2. Stable chain keys with redirects (D20). The smart motorways chain is now /chains/c52cded99f756309, and its old key redirects.
+3. Chain titles from Nano (D22). Four featured chains are named in pipeline/publish/featured.yaml.
+4. Web app rebuilt as a tool:
+   - an app shell with a sidebar, global search and a "Check a report" button;
+   - Start here with a 60-second tour;
+   - Recent, Explore chains (filters, two tabs) and a tabbed chain viewer;
+   - organisation and report pages;
+   - search, evaluation and methodology.
+5. Live brief on PostgreSQL: pick a report from the archive, paste a web address or paste concerns. Results have a shareable link.
+6. Server package in deploy/ (D23), with weekly refresh by the worker.
+7. One more dossier drafted, for the emollient fires chain ($0.004). 25 dossiers in total, the Stage D maximum, all unreviewed.
+
+Verified:
+1. 49 Python tests and 5 TypeScript tests pass. New tests cover stable keys and publishing to a throwaway PostgreSQL schema (redaction, hidden dossiers, kept first-seen dates).
+2. The Docker stack was built from a clean copy of the repo and run in WSL:
+   - the first-boot publish matched the local counts;
+   - every route returned 200, and unknown keys returned 404;
+   - the old chain key redirected;
+   - search found the smart motorways chain;
+   - the brief paused gracefully without a key;
+   - the web role could not change published tables.
+3. Every main page at 375 px wide, light and dark: no sideways scrolling.
+4. The live brief on PostgreSQL with the pipeline key, locally: archive report, pasted concerns, bad URL and a repeat from cache, $0.0033.
+
+Fixed along the way:
+1. Primary buttons had invisible text. A global link colour outranked Tailwind's utilities, so the element styles moved into a CSS layer.
+2. On phones, chain filters now fold under "More filters".
+3. The health endpoint no longer echoes database error text.
+
+Not tested:
+1. The stack on a real Nebius VM, with HTTPS from a real certificate. Both need Pilot's VM.
+2. The hosted brief with its own key.
+
+Spend: $5.10 of $20. The $5 live reserve and the $9.50 margin are untouched.

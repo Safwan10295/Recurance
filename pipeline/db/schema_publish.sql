@@ -1,7 +1,7 @@
 -- Published (display-safe) data for the web app, in PostgreSQL with pgvector.
 -- Written only by `python -m pipeline.cli publish`, which applies the same display rules as the
 -- JSON export: verified quotes only, redaction, wording checks, reviewed dossiers only.
--- Replaces the earlier schema_postgres.sql. Safe to run repeatedly.
+-- Safe to run repeatedly.
 
 CREATE EXTENSION IF NOT EXISTS vector;
 

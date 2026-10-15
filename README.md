@@ -39,25 +39,25 @@ Features of Token Factory used:
 3. The models endpoint with verbose pricing, used to set the budget guard from live prices.
 4. Rate-limit headers, used by the wrapper to pace calls.
 
-### Cost ledger summary (full run, 15 Oct 2026)
+### Cost ledger summary (15 Oct 2026)
 
 | Stage | Model | Paid calls | Spend |
 |---|---|---|---|
 | A, concerns from 6,196 reports | Nano | 6,780 | $0.77 |
-| B, promises from 1,453 responses | Nano | 1,453 | $0.19 |
+| B, promises from responses, including one incremental refresh | Nano | 1,751 | $0.23 |
 | C, 4,061 report pairs judged, plus evaluation and systemic clusters | Super | 4,122 | $3.02 |
-| D, flagship dossiers | Ultra | 75 | $0.96 |
+| D, flagship dossiers | Ultra | 76 | $0.97 |
 | F, follow-up classification | Nano | 82 | $0.01 |
 | Embeddings | Qwen3-Embedding-8B | 310 | $0.01 |
-| Pilots and development | mixed | 182 | $0.07 |
-| Total | | 13,004 | $5.05 |
+| Pilots, development and chain titles | mixed | 808 | $0.08 |
+| Total | | 13,929 | $5.10 |
 
-Every call is in the llm_calls ledger (13,181 rows, including 177 free cache hits). No call failed. Tavily used 250 credits for follow-up searches.
+Every call is in the llm_calls ledger (14,109 rows, including 179 free cache hits). One row is a local attempt made before the key was loaded; it sent nothing and cost nothing. Tavily used 250 credits for follow-up searches.
 
 ## Results
 
 1. 6,454 unique reports ingested, 15,366 concerns extracted, 98% with quotes verified against the source.
-2. 1,217 links shown, in 619 chains, each with verbatim quotes from both reports, a relation and a confidence.
+2. 1,217 links shown, in 618 chains, each with verbatim quotes from both reports, a relation and a confidence.
 3. In 84% of shown links the later report came from a different coroner, and in 99% it did not cite the earlier report.
 4. On a blind test of 29 pairs that coroners themselves acknowledged, at the same number of shown links, recall was 34% for TF-IDF, 41% for embeddings and 52% for the hybrid with the Nemotron Super judge.
 5. Precision of shown links needs hand labels, which are prepared but not yet done (docs/EVALUATION.md).
@@ -66,11 +66,12 @@ Every call is in the llm_calls ledger (13,181 rows, including 177 free cache hit
 
 | Path | Contents |
 |---|---|
-| pipeline/ | Python 3.11 pipeline: scrape, parse, normalise, link, extract, judge, dossier, followup, evaluate, export |
+| pipeline/ | Python 3.11 pipeline: scrape, parse, normalise, link, extract, judge, dossier, followup, evaluate, export, publish |
 | pipeline/cli.py | One entry point with a subcommand per step |
-| web/ | Next.js app (App Router, TypeScript, Tailwind) |
+| web/ | Next.js app (App Router, TypeScript, Tailwind) that reads PostgreSQL |
+| deploy/ | Docker Compose for one server: PostgreSQL with pgvector, the web app, a refresh worker and Caddy |
 | tests/ | Offline tests. They use recorded fixtures and never call the live API |
-| docs/ | Research log, decisions, evaluation, feedback, demo script, deploy steps |
+| docs/ | Research log, decisions, evaluation, feedback, demo script |
 
 ## Setup
 
@@ -84,8 +85,9 @@ python -m venv .venv
 ```
 
 3. Copy .env.example to .env and fill in NEBIUS_API_KEY, TAVILY_API_KEY and SCRAPER_CONTACT_EMAIL.
-4. Optional, for scanned PDFs: install Tesseract OCR.
-5. Run the tests: python -m pytest
+4. Install PostgreSQL 16 with pgvector, create a database, and set DATABASE_URL in .env. On Windows, PostgreSQL in WSL Ubuntu works.
+5. Optional, for scanned PDFs: install Tesseract OCR.
+6. Run the tests: python -m pytest. The publish test uses a throwaway schema in the local PostgreSQL and is skipped if none is running.
 
 ## Running the pipeline
 
@@ -108,19 +110,29 @@ python -m pipeline.cli chains
 python -m pipeline.cli dossiers              # at most 25, stored unreviewed
 python -m pipeline.cli followup              # Tavily, capped at 250 credits
 python -m pipeline.cli evaluate
-python -m pipeline.cli export                # writes web/data/
+python -m pipeline.cli titles                # short chain titles (Nano)
+python -m pipeline.cli publish               # display-safe rows into PostgreSQL; the site reads these
 python -m pipeline.cli spend                 # ledger summary
 ```
+
+To pick up new reports later, python scripts/refresh.py runs every step on new reports only, with a spending ceiling (--max-spend, default $0.50), then publishes.
 
 ## Running the web app
 
 ```
 cd web
 npm install
-npm run dev
+npm run build
+npm start
 ```
 
-The pages read web/data/. The live brief needs NEBIUS_LIVE_API_KEY, a separate key from the pipeline's. Without it the brief shows precomputed examples. Deployment steps are in docs/DEPLOY.md.
+web/.env.local sets DATABASE_URL to a read-only role on the published tables. Pages read PostgreSQL directly, so a publish shows up within two minutes with no rebuild. On Windows, start_site.cmd starts PostgreSQL in WSL and then the site.
+
+The live brief needs NEBIUS_LIVE_API_KEY, a separate key from the pipeline's. Without it the brief shows precomputed examples.
+
+## Running on a server
+
+deploy/README.md has the steps for one Linux server with Docker Compose. A worker refreshes the data weekly and republishes.
 
 ## Responsible use
 

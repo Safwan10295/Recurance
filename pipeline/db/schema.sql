@@ -1,4 +1,4 @@
--- Corpus schema (SQLite). Mirrors handoff section 7.5; schema_postgres.sql is the Supabase twin.
+-- Corpus schema (SQLite), the pipeline's working database. Mirrors handoff section 7.5. The site reads schema_publish.sql in PostgreSQL.
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS reports (

@@ -202,6 +202,12 @@ def cmd_label(a):
     labelling.interactive()
 
 
+def cmd_titles(a):
+    from .judge.titles import generate
+
+    print(json.dumps(generate(_llm()), indent=1, default=str))
+
+
 def cmd_publish(a):
     from .publish.postgres import publish
 
@@ -278,6 +284,7 @@ def main(argv=None):
     s.add_argument("--n", type=int, default=80)
     s.set_defaults(fn=cmd_label_prepare)
     sub.add_parser("label", help="interactive labelling for Pilot").set_defaults(fn=cmd_label)
+    sub.add_parser("titles", help="short display titles for new or changed chains (Nano, cached)").set_defaults(fn=cmd_titles)
     sub.add_parser("export", help="export JSON for the web app").set_defaults(fn=cmd_export)
     sub.add_parser("publish", help="publish display-safe data to PostgreSQL (DATABASE_URL)").set_defaults(fn=cmd_publish)
     sub.add_parser("dossiers-export", help="write all dossiers to a Markdown file for reading").set_defaults(

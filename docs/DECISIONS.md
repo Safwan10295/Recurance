@@ -28,7 +28,7 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 
 1. Local work uses SQLite at data/recurrence.sqlite, with tables that mirror section 7.5.
 2. Reason: there is no local Postgres, no Docker, and no Supabase credentials in the environment.
-3. pipeline/db/schema_postgres.sql carries the same schema for Supabase, and an export step can load it once credentials exist.
+3. pipeline/db/schema_postgres.sql carried the same schema for Supabase. Superseded by D21: Supabase was dropped and that file removed.
 4. The web app reads precomputed JSON exports, so it needs no database to render pages.
 
 ## D6. Ledger file
@@ -118,3 +118,32 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 2. Links are now joined only through the same concern, so a chain follows one hazard. A report that raises two hazards can sit in two chains.
 3. Result: 619 chains instead of 453. The largest are single hazards that genuinely recur, for example ambulance arrival delays (33 reports) and a lack of acute psychiatric beds (22).
 4. Chain keys changed, so dossiers were redrafted for the new flagship chains, within the Stage D cap and the 25-chain maximum.
+
+## D20. Stable chain keys with redirects
+
+1. Chain keys were hashes of their members, so every rebuild that added a report changed the key and broke links, including the demo URL.
+2. A key is now a hash of the organisation and the chain's earliest link (its earliest concern pair). Later reports joining a chain do not change it.
+3. When a key does change (chains merge or split), chain_redirects maps the old key to the new one and the site redirects. A dossier moves with its chain, and keeps its review only if the chain's concerns are unchanged.
+4. A second rebuild of the full data redirected nothing. A test checks this on fixtures.
+
+## D21. PostgreSQL as the published layer, with a restricted web role
+
+1. Pilot asked for PostgreSQL on our own server, not Vercel or Supabase, so the site works from anywhere and stays current.
+2. The pipeline keeps its tested SQLite working database. python -m pipeline.cli publish writes only display-safe rows into PostgreSQL in one transaction: verified quotes, redaction, wording checks, reviewed dossiers only. It reuses the export's selection code, so the rules live in one place.
+3. The site reads PostgreSQL at request time, with a two-minute in-process cache, so a refresh needs no rebuild.
+4. The web app connects as rw_web, which can read the published tables and write only brief_kv (the live brief's cache, ledger and limits). The pipeline connects as the owner.
+5. Live brief retrieval uses pgvector nearest neighbours per organisation instead of JSON shards.
+6. Full-text search covers report titles, concern quotes, chain hazards, link quotes and organisation names.
+
+## D22. Chain titles from Nano
+
+1. Hazard labels from Stage A are short lowercase fragments and read badly as page titles.
+2. Nano writes one neutral title per chain from its verified quotes, cached by the chain's contents and billed to the dev bucket. 603 of 618 chains got a title for $0.009.
+3. Titles pass the same wording check as other model text. Chains without one fall back to the formatted hazard label.
+
+## D23. Self-hosting with Docker Compose
+
+1. One server runs PostgreSQL with pgvector, the web app, a worker and Caddy for HTTPS. The target is a small CPU VM on Nebius AI Cloud; the same files work on any Linux VPS.
+2. The worker publishes on first boot, then runs the incremental refresh weekly with a $0.50 ceiling per run, and republishes.
+3. Without a domain, Caddy gets a certificate for an sslip.io name on the server's IP.
+4. The whole stack was built and run locally in Docker on WSL before handing over: first-boot publish, every route, redirects, search, the paused brief and the restricted role all checked.

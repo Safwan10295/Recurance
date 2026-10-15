@@ -1,16 +1,16 @@
 # Demo script (under 3 minutes)
 
-Pilot records and narrates in his own voice. Tone: respectful, about organisations' patterns, not individuals' tragedies. Times are targets.
+Pilot records and narrates in their own voice. Tone: respectful, about organisations' patterns, not individuals' tragedies. Times are targets.
 
 Before recording:
 
-1. Confirm the flagship chain is verified and its dossier reviewed (reviewed_by_human set by Pilot).
-2. Warm the live brief once with the chosen input so the take is quick, then clear the cache entry if you want a live run on camera.
-3. Use a browser window at 1280 wide, light mode, zoom 110%.
+1. Review the smart motorways dossier (python -m pipeline.cli review), then publish, so the chain's Dossier tab appears. The chain works without it.
+2. Use a browser window 1280 wide, light mode, zoom 110%.
+3. Run the brief once with the chosen report so the take is quick. For a live run on camera, choose a different report.
 
 ## 0:00 to 0:20. The problem
 
-On screen: the home page, the four steps.
+On screen: Start here.
 
 Say:
 
@@ -19,41 +19,49 @@ Say:
 3. "Years later, a similar death happens in front of a different coroner."
 4. "Nobody connects the record. Recurrence Watch does."
 
-## 0:20 to 1:10. One flagship chain
+Point to the three live numbers: verified chains, recent reports that repeat an earlier warning, and the share where the later coroner was different.
 
-On screen: the chain page for the lead chain. The pipeline verified the smart motorways chain on its own: /chains/7d7b41f91717dc72 (Jamil Ahmed 2019, Zoltan Torok 2022, David Levett 2023; three coroners). Chain keys change if the data is rebuilt; data/exports/demo_chains.json always has the current keys.
+## 0:20 to 1:10. One chain
 
-Say:
-
-1. Name the hazard and organisation, and how many coroners and years the chain spans.
-2. Scroll the timeline: first warning, the response and its stated action, then the later report.
-3. Open "Why these reports are linked": read the two quotes side by side. "Both quotes are checked by code, word for word, against the original reports."
-4. Point to the follow-up evidence from Tavily, and say that "no evidence found" is never treated as "did not happen".
-
-## 1:10 to 1:50. Live pre-inquest brief
-
-On screen: /brief, paste a recent report URL.
+On screen: the featured card "No hard shoulder on smart motorways causing unsafe stops", which opens /chains/c52cded99f756309.
 
 Say:
 
-1. "A coroner or family preparing for an inquest pastes a new report."
-2. Let the steps appear: organisation resolved, concerns extracted by Nemotron Nano, earlier concerns retrieved, Nemotron Super judging.
-3. Read one match: the earlier warning, what was promised, and a link to what happened next.
+1. On Summary: National Highways, 7 reports from 7 different coroners, 2019 to 2025. Move along the timeline strip.
+2. Open Evidence: read one pair of quotes side by side. "Both quotes are checked by code, word for word, against the original reports."
+3. Open Promises and follow-up: what the response said it would do, and what the web search found. "No evidence found is never treated as did not happen."
+4. Open How it was found: the scores, and which Nemotron model judged it.
+
+## 1:10 to 1:50. Check a report
+
+On screen: the "Check a report" button in the top bar.
+
+Say:
+
+1. "A coroner, family or lawyer preparing for an inquest starts here."
+2. Pick a report from the archive by name, or paste a web address.
+3. Let the steps tick through: organisation found, concerns extracted by Nemotron Nano, earlier concerns retrieved, Nemotron Super judging.
+4. Read one match: the earlier warning, what was promised, and the link to share the brief.
 
 ## 1:50 to 2:20. Evaluation and routing
 
-On screen: /evaluation.
+On screen: Evaluation, in the sidebar under "How we know".
 
 Say:
 
-1. The test set: pairs where the coroners themselves cited the earlier report, with the citation hidden from the system.
-2. Compare TF-IDF, embeddings and hybrid plus Nemotron at the same number of shown links.
-3. The lost-memory rate: how often the later coroner was different and did not cite the earlier report.
-4. Cost per verified chain, and the routing: Nano extracts, Super judges, Ultra writes dossiers, all on Token Factory.
+1. The test set: pairs where coroners themselves cited the earlier report, with the citation hidden from the system.
+2. The chart: at the same number of shown links, TF-IDF found 34%, embeddings 41%, and the hybrid with the Nemotron judge 52%.
+3. In most shown links, the later coroner was different and did not cite the earlier report.
+4. The routing: Nano extracts, Super judges, Ultra drafts dossiers, all on Token Factory, for about $5 in total.
 
-## 2:20 to 2:45. Beyond one archive
+## 2:20 to 2:45. Across organisations and what's new
 
-The NTSB adapter was not built. Show "The same hazard, raised with different organisations" at the bottom of /chains instead.
+On screen: Explore chains, the "Across organisations" tab, then Recent.
+
+Say:
+
+1. "The same hazard raised with different organisations, checked the same way."
+2. "Every week the server reads new reports and links them. Here is what is new."
 
 ## 2:45 to 3:00. Close
 
