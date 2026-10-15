@@ -202,6 +202,18 @@ def cmd_label(a):
     labelling.interactive()
 
 
+def cmd_dossiers_export(a):
+    from .dossier import review
+
+    print(review.export_markdown())
+
+
+def cmd_review(a):
+    from .dossier import review
+
+    review.interactive()
+
+
 def cmd_export(a):
     from .export import web
 
@@ -261,6 +273,9 @@ def main(argv=None):
     s.set_defaults(fn=cmd_label_prepare)
     sub.add_parser("label", help="interactive labelling for Pilot").set_defaults(fn=cmd_label)
     sub.add_parser("export", help="export JSON for the web app").set_defaults(fn=cmd_export)
+    sub.add_parser("dossiers-export", help="write all dossiers to a Markdown file for reading").set_defaults(
+        fn=cmd_dossiers_export)
+    sub.add_parser("review", help="Pilot only: approve or reject dossiers for publication").set_defaults(fn=cmd_review)
 
     a = p.parse_args(argv)
     a.fn(a)
