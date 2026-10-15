@@ -12,8 +12,8 @@ import re
 _LEAD = r"(?:^|\n)[ \t]*(?:\(?\d{1,2}[.)]?|[IVX]{1,4}[.)])?[ \t]*"
 
 HEADINGS: dict[str, str] = {
-    "summary": r"SUMMARY\s+OF\s+(?:THE\s+)?CORONER'?S?'?\s+CONCERNS?",
-    "concerns": r"(?:THE\s+)?CORONER'?S?'?\s+CONCERNS?|CORONERS\s+CONCERNS?|MATTERS\s+OF\s+CONCERN(?!\s+are)",
+    "summary": r"SUMMARY\s+OF\s+(?:THE\s+)?CORONER'?S?'?\s+CONCERNS?|BRIEF\s+OVERVIEW\s+OF\s+CONCERNS?",
+    "concerns": r"(?:THE\s+)?CORONER'?S?'?\s+CONCERNS?|CORONERS\s+CONCERNS?|DETAIL\s+OF\s+CONCERNS?|MATTERS\s+OF\s+CONCERN(?!\s+are)",
     "circumstances": r"CIRCUMSTANCES\s+(?:OF|SURROUNDING)\s+(?:THE\s+)?DEATH",
     "investigation": r"INVESTIGATION\s+(?:AND|&)\s+INQUEST",
     "action": r"ACTION\s+SHOULD\s+BE\s+TAKEN",
@@ -81,10 +81,37 @@ def strip_boilerplate(s: str) -> str:
     return s.strip(" \n:-")
 
 
+_MATTERS = re.compile(r"MATTERS?\s+OF\s+CONCERN\s+(?:are|is)\s+as\s+follows\s*[:.-]*", re.I)
+_LETTER_START = re.compile(r"\n\s*Dear\b[^\n]*\n", re.I)
+_LETTER_END = re.compile(r"\n\s*Yours\s+(?:sincerely|faithfully)", re.I)
+
+
+def _fallback_concerns(text: str) -> str:
+    """Reports without a CONCERNS heading.
+
+    1. A numbered section whose heading was dropped but which keeps the template line
+       "The MATTERS OF CONCERN are as follows:".
+    2. Pre-2013 Rule 43 letters: the letter body between "Dear" and "Yours sincerely".
+    """
+    m = _MATTERS.search(text)
+    if m:
+        later = [h for h in find_headings(text) if h[0] > m.end()]
+        return text[m.end() : later[0][0] if later else len(text)].strip()
+    if re.search(r"Rule\s+43", text, re.I):
+        a = _LETTER_START.search(text)
+        b = _LETTER_END.search(text, a.end() if a else 0)
+        if a:
+            return text[a.end() : b.start() if b else a.end() + 6000].strip()
+    return ""
+
+
 def concerns_and_circumstances(text: str) -> tuple[str, str, str]:
     """Return (concerns, circumstances, summary), boilerplate removed."""
     sec = split_sections(text)
-    concerns = strip_boilerplate(sec.get("concerns", ""))
+    raw = sec.get("concerns", "")
+    if len(raw) < 40:
+        raw = _fallback_concerns(text) or raw
+    concerns = strip_boilerplate(raw)
     circ = strip_boilerplate(sec.get("circumstances", ""))
     summary = strip_boilerplate(sec.get("summary", ""))
     return concerns, circ, summary

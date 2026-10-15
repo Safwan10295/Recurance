@@ -37,6 +37,24 @@ def cmd_build(a):
     print(json.dumps(build(allow_ocr=not a.no_ocr), indent=1))
 
 
+def cmd_pdftext(a):
+    import glob
+
+    from .parse.pdftext import prepass
+
+    lst = json.loads((config.CACHE / "urls_sitemap.json").read_text())
+    from .scrape.http import cached_path
+    from .parse.report_page import parse_report_page
+
+    urls = []
+    for u in lst:
+        p = cached_path(u)
+        if p:
+            rp = parse_report_page(u, p.read_text(encoding="utf-8", errors="replace"))
+            urls += [x.url for x in rp.pdfs if x.kind == "report"]
+    print(json.dumps(prepass(urls, workers=a.workers), indent=1))
+
+
 def cmd_normalise(a):
     from .normalise.orgs import normalise
 
@@ -197,13 +215,16 @@ def main(argv=None):
 
     sub.add_parser("spend", help="spend report from the ledger").set_defaults(fn=cmd_spend)
     s = sub.add_parser("scrape", help="polite scrape of judiciary.uk")
-    s.add_argument("what", choices=["all", "reports", "reportpdfs", "listing", "pdfs"])
+    s.add_argument("what", choices=["all", "interleaved", "reports", "reportpdfs", "listing", "pdfs"])
     s.add_argument("list", nargs="?", help="for pdfs: JSON list file in data/cache")
     s.set_defaults(fn=cmd_scrape)
     s = sub.add_parser("build", help="parse cached pages into the database")
     s.add_argument("--no-ocr", action="store_true")
     s.set_defaults(fn=cmd_build)
     sub.add_parser("normalise", help="organisation normalisation").set_defaults(fn=cmd_normalise)
+    s = sub.add_parser("pdftext", help="parallel PDF text and OCR cache for report PDFs")
+    s.add_argument("--workers", type=int, default=12)
+    s.set_defaults(fn=cmd_pdftext)
 
     for name, fn in (("stage-a", cmd_stage_a), ("stage-b", cmd_stage_b), ("stage-c", cmd_stage_c)):
         s = sub.add_parser(name)

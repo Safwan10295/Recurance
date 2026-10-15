@@ -123,13 +123,14 @@ SCHEMA = {
             "properties": {
                 "promises": {
                     "type": "array",
+                    "maxItems": 6,
                     "items": {
                         "type": "object",
                         "properties": {
-                            "action_quote": {"type": "string"},
-                            "action_summary": {"type": "string"},
-                            "stated_date_or_deadline": {"type": ["string", "null"]},
-                            "owner": {"type": ["string", "null"]},
+                            "action_quote": {"type": "string", "maxLength": 500},
+                            "action_summary": {"type": "string", "maxLength": 150},
+                            "stated_date_or_deadline": {"type": ["string", "null"], "maxLength": 80},
+                            "owner": {"type": ["string", "null"], "maxLength": 100},
                             "concern_index": {"type": ["integer", "null"]},
                         },
                         "required": ["action_quote", "action_summary", "stated_date_or_deadline", "owner", "concern_index"],

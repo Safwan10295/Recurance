@@ -58,3 +58,20 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 
 1. Part A names Safwan as operator building with Ubaid, while Part B names Ubaid as owner.
 2. All documents address the reader as Pilot, as both parts ask.
+
+## D11. Bounded output schemas (Stage A prompt version a2)
+
+1. In the first full Stage A batch, 50 of 749 reports (6.7%) failed: Nano looped, repeating the same array item until max_tokens.
+2. Adding maxItems and maxLength to every array and string in the json_schema stopped the loops. Guided decoding enforces both.
+3. A frequency penalty was tested and rejected: it made Nano drop real concerns.
+4. The same bounds were added to the Stage B, C, D and F schemas and to the live brief's schemas.
+5. Only reports that failed under a1 were re-run. Reports that succeeded under a1 were kept.
+
+## D12. Quote verification repairs (blocker resolved)
+
+1. The a2 pilot on the 20 hardest reports verified 84% of quotes, below the 90% floor. A blocker note was written and Stage A paused.
+2. Causes: Nano sometimes quoted the circumstances excerpt it was given, and sometimes skipped words mid-quote.
+3. Fix one: a quote is also checked against the circumstances excerpt. Those are still the report's own words.
+4. Fix two: when the first 40 or more characters match exactly, the displayed quote is the source text from that point to the end of the sentence.
+5. Both fixes are deterministic. Stored quotes were re-checked with no new model calls.
+6. After the fix the same pilot verified 56 of 56 quotes, and 97.8% of all quotes so far verified. Stage A resumed.

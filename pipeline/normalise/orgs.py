@@ -67,6 +67,7 @@ def split_receivers(raw: str | None) -> list[str]:
     if not raw:
         return []
     s = raw.replace("’", "'")
+    s = re.sub(r"\[\s*redacted\s*\]|\bredacted\b", " ", s, flags=re.I)
     s = re.sub(r"\(\s*\d+\s*\)|\b\d+[.)]\s+", ";", s)
     parts = re.split(r"\s*[;|\n]\s*|\s+/\s+|\s*,\s*(?:and\s+)?(?=(?:the\s+)?(?:[A-Z][a-z]|NHS|HM|DVLA|CQC|MHRA))", s)
     out = []
@@ -100,6 +101,26 @@ def org_type(name: str, national: bool) -> str:
         if re.search(rx, n):
             return t
     return "other"
+
+
+GENERIC = {
+    "nhs", "trust", "and", "of", "for", "the", "hospital", "hospitals", "university", "service", "services", "group",
+    "council", "county", "borough", "city", "health", "healthcare", "care", "foundation", "partnership", "board",
+    "metropolitan", "district", "hm", "royal", "general", "limited", "ltd", "department", "dept", "of", "teaching",
+}
+
+
+def distinctive_compatible(a: str, b: str) -> bool:
+    """Block merges whose distinctive words differ (Southampton vs Northampton, Midlands vs Middlesex)."""
+    da = [t for t in a.split() if t not in GENERIC]
+    db_ = [t for t in b.split() if t not in GENERIC]
+    if not da or not db_:
+        return True
+
+    def has_match(t: str, pool: list[str]) -> bool:
+        return any(t == u or t.startswith(u) or u.startswith(t) or fuzz.ratio(t, u) >= 88 for u in pool)
+
+    return all(has_match(t, db_) for t in da) and all(has_match(t, da) for t in db_)
 
 
 def load_aliases() -> dict[str, str]:
@@ -156,7 +177,7 @@ def normalise(conn=None, fuzzy_threshold: int = 92, review_band: tuple[int, int]
                 # when their distinguishing tokens differ (e.g. "north" vs "south").
                 dif = set(k.split()) ^ set(cand.split())
                 directional = dif & {"north", "south", "east", "west", "central", "inner", "outer", "mid", "greater"}
-                if score >= fuzzy_threshold and not directional:
+                if score >= fuzzy_threshold and not directional and distinctive_compatible(k, cand):
                     merged_into[k] = cand
                     if review_band[0] <= score < review_band[1]:
                         review.append((k, cand, score))

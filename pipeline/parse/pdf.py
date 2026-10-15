@@ -57,6 +57,6 @@ def ocr_text(data: bytes, max_pages: int = 12, dpi: int = 200) -> str | None:
             img = doc[i].render(scale=dpi / 72).to_pil()
             p = Path(td) / f"p{i}.png"
             img.save(p)
-            r = subprocess.run([tess, str(p), "stdout", "-l", "eng"], capture_output=True, text=True, timeout=120)
+            r = subprocess.run([tess, str(p), "stdout", "-l", "eng"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
             out.append(r.stdout)
     return tidy("\n\n".join(out))

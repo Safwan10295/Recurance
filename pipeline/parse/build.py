@@ -47,17 +47,12 @@ def report_pdf(rp) -> str | None:
 
 
 def body_from_pdf(url: str, allow_ocr: bool) -> tuple[str, str]:
-    path = cached_path(url, "pdf")
-    if not path:
+    from .pdftext import text_for
+
+    t = text_for(url, allow_ocr=allow_ocr)
+    if t is None:
         return "", "missing"
-    data = path.read_bytes()
-    text, _, scanned = extract_text(data)
-    if scanned and allow_ocr:
-        o = ocr_text(data)
-        if o:
-            return o, "ocr"
-        return text, "scanned_no_ocr"
-    return text, "pdf"
+    return t["text"], t["how"]
 
 
 def build(urls: list[str] | None = None, allow_ocr: bool = True, verbose: bool = True) -> dict:

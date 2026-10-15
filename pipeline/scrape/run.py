@@ -98,6 +98,44 @@ def needed_report_pdfs(urls: list[str]) -> list[str]:
     return need
 
 
+def fetch_interleaved(f: Fetcher, urls: list[str], workers: int = 2) -> dict:
+    """Page, then its report PDF if the page lacks the text, so downstream stages can start early.
+
+    Workers overlap slow responses; the shared start-time lock keeps the overall rate at 1 request/second.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    from ..parse.report_page import parse_report_page
+    from ..parse.sections import concerns_and_circumstances
+
+    stats = {"pages": 0, "pdfs": 0, "failed": 0}
+
+    def one(u: str) -> None:
+        try:
+            s, body, _ = f.get(u)
+            if s != 200:
+                stats["failed"] += 1
+                return
+            stats["pages"] += 1
+            rp = parse_report_page(u, body.decode("utf-8", errors="replace"))
+            c, _, _ = concerns_and_circumstances(rp.body_text)
+            if len(c) < 40:
+                pdf = next((x.url for x in rp.pdfs if x.kind == "report"), None)
+                if pdf and not cached_path(pdf, "pdf"):
+                    s2, _, _ = f.get(pdf, kind="pdf")
+                    stats["pdfs" if s2 == 200 else "failed"] += 1
+        except Exception as e:
+            stats["failed"] += 1
+            log(f"error {u}: {type(e).__name__}")
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        for i, _ in enumerate(ex.map(one, urls), 1):
+            if i % 250 == 0:
+                log(f"interleaved {i}/{len(urls)} {stats} requests={f.network_requests}")
+    log(f"interleaved done {stats}")
+    return stats
+
+
 def main(argv: list[str]) -> None:
     from .. import env
 
@@ -106,6 +144,12 @@ def main(argv: list[str]) -> None:
         sys.exit("BLOCKED: SCRAPER_CONTACT_EMAIL is not set; not scraping")
     f = Fetcher()
     what = argv[0] if argv else "all"
+    if what == "interleaved":
+        urls = json.loads(URLS_FILE.read_text())
+        fetch_interleaved(f, list(reversed(urls)))  # newest first: HTML-text reports arrive early
+        crawl_listing(f)
+        log(f"network requests this run: {f.network_requests}")
+        return
     if what in ("all", "reports"):
         urls = json.loads(URLS_FILE.read_text()) if URLS_FILE.exists() and what == "reports" else discover(f)
         fetch_reports(f, urls)

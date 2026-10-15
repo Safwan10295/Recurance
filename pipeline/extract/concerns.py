@@ -10,10 +10,10 @@ from pydantic import BaseModel, Field, ValidationError
 
 from .. import config, db
 from ..llm import LLM, BudgetExceeded, RequestError, TransportError, confirm_full_run
-from .quotes import UNVERIFIED, check_quote
+from .quotes import UNVERIFIED, check_quote_any
 
 STAGE = "A"
-PROMPT_VERSION = "a1"
+PROMPT_VERSION = "a2"  # a2: bounded schema (maxItems/maxLength) stops Nano repetition loops
 MAX_CONCERNS_CHARS = 7000
 MAX_CIRC_CHARS = 900
 PEOPLE_ROLES = ["deceased", "family", "staff", "coroner", "other"]
@@ -40,21 +40,22 @@ class StageAOut(BaseModel):
 SCHEMA = {
     "type": "json_schema",
     "json_schema": {
-        "name": "stage_a_concerns",
+        "name": "stage_a_concerns_v2",
         "strict": True,
         "schema": {
             "type": "object",
             "properties": {
                 "concerns": {
                     "type": "array",
+                    "maxItems": 6,
                     "items": {
                         "type": "object",
                         "properties": {
-                            "quote": {"type": "string"},
-                            "hazard": {"type": "string"},
-                            "mechanism": {"type": "string"},
-                            "setting": {"type": "string"},
-                            "addressed_to": {"type": "array", "items": {"type": "string"}},
+                            "quote": {"type": "string", "maxLength": 500},
+                            "hazard": {"type": "string", "maxLength": 120},
+                            "mechanism": {"type": "string", "maxLength": 200},
+                            "setting": {"type": "string", "maxLength": 80},
+                            "addressed_to": {"type": "array", "maxItems": 3, "items": {"type": "string", "maxLength": 120}},
                         },
                         "required": ["quote", "hazard", "mechanism", "setting", "addressed_to"],
                         "additionalProperties": False,
@@ -62,10 +63,11 @@ SCHEMA = {
                 },
                 "people": {
                     "type": "array",
+                    "maxItems": 12,
                     "items": {
                         "type": "object",
                         "properties": {
-                            "name": {"type": "string"},
+                            "name": {"type": "string", "maxLength": 80},
                             "role": {"type": "string", "enum": PEOPLE_ROLES},
                         },
                         "required": ["name", "role"],
@@ -146,8 +148,17 @@ def extract_one(llm: LLM, row, stage: str = STAGE) -> ItemResult:
         res.error = "truncated twice"
         return res
     source = concerns_text[:MAX_CONCERNS_CHARS]
-    for i, c in enumerate(out.concerns):
-        status, q = check_quote(c.quote, source)
+    seen: set[str] = set()
+    uniq = []
+    for c in out.concerns:
+        k = c.quote.strip().lower()
+        if k and k not in seen:
+            seen.add(k)
+            uniq.append(c)
+    circ = (row["circumstances"] or "")[:MAX_CIRC_CHARS]
+    for i, c in enumerate(uniq):
+        # Quotes from the circumstances excerpt are still the report's own words.
+        status, q = check_quote_any(c.quote, source, circ)
         res.n_quotes += 1
         if status != UNVERIFIED:
             res.n_verified += 1
@@ -175,6 +186,28 @@ def save(conn, res: ItemResult) -> None:
         conn.execute("INSERT OR IGNORE INTO people_mentions VALUES (?,?,?)", (res.url, p["name"], p["role"]))
 
 
+def reverify(conn=None) -> dict:
+    """Re-check unverified stored quotes with the current checker. No model calls."""
+    own = conn is None
+    conn = conn or db.connect()
+    rows = conn.execute(
+        """SELECT c.id, c.text_quote, r.concerns, r.circumstances FROM concerns c
+           JOIN reports r ON r.url = c.report_url WHERE c.quote_verified = 0"""
+    ).fetchall()
+    fixed = 0
+    for r in rows:
+        st, q = check_quote_any(r["text_quote"], (r["concerns"] or "")[:MAX_CONCERNS_CHARS],
+                                (r["circumstances"] or "")[:MAX_CIRC_CHARS])
+        if st != UNVERIFIED:
+            conn.execute("UPDATE concerns SET text_quote=?, quote_verified=? WHERE id=?", (q, st, r["id"]))
+            fixed += 1
+    conn.commit()
+    total = conn.execute("SELECT COUNT(*), SUM(quote_verified>0) FROM concerns").fetchone()
+    if own:
+        conn.close()
+    return {"rechecked": len(rows), "fixed": fixed, "concerns": total[0], "verified": total[1]}
+
+
 def mark(conn, item_id: str, status: str, detail: str | None) -> None:
     conn.execute("INSERT OR REPLACE INTO stage_items VALUES (?,?,?,?,?)",
                  (STAGE, item_id, status, detail, PROMPT_VERSION))
@@ -184,7 +217,8 @@ def eligible(conn, only_missing: bool = True) -> list:
     q = ("SELECT url, concerns, circumstances, receivers_raw FROM reports "
          "WHERE duplicate_of IS NULL AND concerns IS NOT NULL AND length(concerns) >= 40")
     if only_missing:
-        q += " AND url NOT IN (SELECT item_id FROM stage_items WHERE stage='A' AND prompt_version=?)"
+        q += (" AND url NOT IN (SELECT item_id FROM stage_items WHERE stage='A' AND "
+              "(status='ok' OR prompt_version=?))")
         return conn.execute(q + " ORDER BY url", (PROMPT_VERSION,)).fetchall()
     return conn.execute(q + " ORDER BY url").fetchall()
 

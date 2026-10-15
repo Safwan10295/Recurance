@@ -107,3 +107,20 @@ def test_wording_rules():
     assert violations("It failed to act")
     assert not is_clean("The organisation is responsible for the death")
     assert is_clean("A similar concern was raised again in 2022 after a stated action.")
+
+
+def test_fuzzy_guard_blocks_different_places():
+    from pipeline.normalise.orgs import distinctive_compatible
+
+    assert not distinctive_compatible("southampton county council", "northampton county council")
+    assert not distinctive_compatible("university hospital north midlands nhs trust", "north middlesex university hospital nhs trust")
+    assert distinctive_compatible("leicester partnership nhs trust", "leicestershire partnership nhs trust")
+    assert distinctive_compatible("shewsbury and telford hospital trust", "shrewsbury and telford hospital nhs trust")
+
+
+def test_prefix_anchor_snaps_to_source_sentence():
+    src = ("The Network Rail Signaller has no means through which to relay the details of any discussions with drivers "
+           "(in this instance Mr Moore) to the train company Control who could then pass this information on. Next.")
+    st, q = check_quote("The Network Rail Signaller has no means through which to relay the details of any discussions "
+                        "with drivers to the train company Control", src)
+    assert st == SNAPPED and q.endswith("pass this information on.") and verify_quote(q, src)

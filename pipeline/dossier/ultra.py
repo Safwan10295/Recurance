@@ -43,21 +43,22 @@ SCHEMA = {
             "properties": {
                 "timeline": {
                     "type": "array",
+                    "maxItems": 30,
                     "items": {
                         "type": "object",
                         "properties": {
                             "date": {"type": "string"},
                             "event": {"type": "string", "enum": ["warning", "response", "promise", "recurrence", "followup"]},
-                            "summary": {"type": "string"},
-                            "quote": {"type": ["string", "null"]},
-                            "source_ref": {"type": "string"},
+                            "summary": {"type": "string", "maxLength": 300},
+                            "quote": {"type": ["string", "null"], "maxLength": 500},
+                            "source_ref": {"type": "string", "maxLength": 8},
                         },
                         "required": ["date", "event", "summary", "quote", "source_ref"],
                         "additionalProperties": False,
                     },
                 },
-                "narrative": {"type": "string"},
-                "questions": {"type": "array", "items": {"type": "string"}},
+                "narrative": {"type": "string", "maxLength": 1500},
+                "questions": {"type": "array", "maxItems": 6, "items": {"type": "string", "maxLength": 300}},
             },
             "required": ["timeline", "narrative", "questions"],
             "additionalProperties": False,

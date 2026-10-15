@@ -99,12 +99,13 @@ SCHEMA = {
             "type": "object",
             "properties": {
                 "classification": {"type": "string", "enum": ["evidence_found", "not_found", "contradicting"]},
-                "summary": {"type": "string"},
+                "summary": {"type": "string", "maxLength": 400},
                 "evidence": {
                     "type": "array",
+                    "maxItems": 3,
                     "items": {
                         "type": "object",
-                        "properties": {"source": {"type": "integer"}, "quote": {"type": "string"}},
+                        "properties": {"source": {"type": "integer"}, "quote": {"type": "string", "maxLength": 400}},
                         "required": ["source", "quote"],
                         "additionalProperties": False,
                     },

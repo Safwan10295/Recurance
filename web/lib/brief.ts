@@ -115,9 +115,10 @@ const EXTRACT_SCHEMA = {
       properties: {
         concerns: {
           type: "array",
+          maxItems: 6,
           items: {
             type: "object",
-            properties: { quote: { type: "string" }, hazard: { type: "string" } },
+            properties: { quote: { type: "string", maxLength: 500 }, hazard: { type: "string", maxLength: 120 } },
             required: ["quote", "hazard"],
             additionalProperties: false,
           },
@@ -138,9 +139,9 @@ const JUDGE_SCHEMA = {
       type: "object",
       properties: {
         relation: { type: "string", enum: ["identical", "closely_related", "related", "different"] },
-        same_hazard_explanation: { type: "string" },
-        earlier_quote: { type: "string" },
-        later_quote: { type: "string" },
+        same_hazard_explanation: { type: "string", maxLength: 400 },
+        earlier_quote: { type: "string", maxLength: 500 },
+        later_quote: { type: "string", maxLength: 500 },
         confidence: { type: "number" },
       },
       required: ["relation", "same_hazard_explanation", "earlier_quote", "later_quote", "confidence"],
