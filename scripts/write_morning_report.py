@@ -31,7 +31,7 @@ counts = {
     "with_concerns": q("SELECT COUNT(DISTINCT report_url) FROM concerns"),
     "concerns": q("SELECT COUNT(*) FROM concerns"),
     "verified_concerns": q("SELECT COUNT(*) FROM concerns WHERE quote_verified>0"),
-    "orgs": q("SELECT COUNT(*) FROM organisations"),
+    "orgs": q("SELECT COUNT(DISTINCT organisation_id) FROM report_receivers"),
     "pairs": q("SELECT COUNT(*) FROM candidate_pairs"),
     "judged": q("SELECT COUNT(*) FROM recurrence_verdicts"),
     "responses": q("SELECT COUNT(*) FROM responses WHERE text IS NOT NULL"),
@@ -57,9 +57,8 @@ L += [f"1. Report pages parsed: {counts['reports']} ({counts['unique']} unique a
       f"4. Candidate pairs: {counts['pairs']}. Judged by Nemotron Super: {counts['judged']} ({', '.join(f'{k} {v}' for k, v in sorted(rel.items(), key=lambda x: str(x[0])))}).",
       f"5. Response documents read: {counts['responses']}. Promises with verified quotes: {counts['promises']}.",
       f"6. Verified chains: {counts['chains']}. Dossiers drafted (all unreviewed): {counts['dossiers']}. Follow-up checks: {counts['followups']}.", ""]
-if "ingest" in st:
-    i = st["ingest"]
-    L += [f"Unique reports vs the expected 6,449: {i['unique']} ({i['diff_vs_6449']:+.1%}). Listing cross-check: {i.get('listing_urls')} URLs from listing pages, {i.get('sitemap_urls')} from sitemaps.", ""]
+diff = (counts["unique"] - config.EXPECTED_UNIQUE_REPORTS) / config.EXPECTED_UNIQUE_REPORTS
+L += [f"Unique reports vs the expected 6,449: {counts['unique']} ({diff:+.1%}). The listing pages and sitemaps were cross-checked (docs/RESEARCH_LOG.md).", ""]
 if ev:
     L += ["## Evaluation headline", ""]
     for s in ev["systems"]:
@@ -72,7 +71,7 @@ if notes_file.exists():
 blk = ROOT / "docs" / "BLOCKERS.md"
 L += ["## Blockers", "", "See docs/BLOCKERS.md for each note in full." if blk.exists() else "None.", ""]
 if blk.exists():
-    L += [ln for ln in blk.read_text(encoding="utf-8").splitlines() if ln.startswith("## ")] + [""]
+    L += ["- " + ln[3:] for ln in blk.read_text(encoding="utf-8").splitlines() if ln.startswith("## ")] + [""]
 L += ["## Things only you can do", "",
       "1. Check in the Token Factory console when your credits were issued. Builder credits expire 90 days after issue, so credits issued before 16 Sep would expire before judging ends on 15 Dec.",
       "2. Label the 80 candidate pairs: python -m pipeline.cli label. Then python -m pipeline.cli evaluate (free, cached) to fill in precision.",
@@ -83,7 +82,7 @@ L += ["## Things only you can do", "",
       "7. Choose the contact email for the scraper User-Agent if it should differ from the one in .env (A5 question 1).",
       "8. Decide who signs off dossiers: Ubaid, Safwan, or both (A5 question 3).",
       "9. Read the live Devpost rules page once; automated fetches were blocked.",
-      "10. Run gitleaks on the full history, then make the repo public and set the MIT licence in the About section.",
+      "10. Before making the repo public, run bash scripts/purge_private_exports.sh (removes three files with unredacted or unreviewed text from earlier local commits), then gitleaks detect on the full history, then make it public and set the MIT licence in the About section.",
       "11. Record the demo video from docs/DEMO_SCRIPT.md and upload it to YouTube.",
       "12. Submit on Devpost, pasting the feedback from docs/FEEDBACK.md.",
       "13. Consider rotating the three keys after the hackathon, since they were pasted into a chat.", ""]

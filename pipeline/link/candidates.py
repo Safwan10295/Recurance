@@ -119,7 +119,10 @@ def build(tfidf_min: float = config.TFIDF_MIN, embed_min: float = config.EMBED_M
                         "same_area": int((ra["area"] or "").strip().lower() == (rb["area"] or "").strip().lower()),
                         "source": "national" if org in national else "org",
                     }
-        chosen = sorted(best.values(), key=lambda p: -p["hybrid_score"])[:max_pairs_per_org]
+        # The cap grows with the organisation's size, so bodies with hundreds of reports are not
+        # limited to the same 30 pairs as a single hospital trust (D18).
+        cap = max(max_pairs_per_org, int(config.PAIRS_PER_REPORT * len(reps)))
+        chosen = sorted(best.values(), key=lambda p: -p["hybrid_score"])[:cap]
         pairs.extend(chosen)
 
     # One pair of reports may be shared by several organisations; keep the highest-scoring copy.

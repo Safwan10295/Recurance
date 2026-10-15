@@ -105,3 +105,16 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 2. The evaluation's candidate gate was also made exact: it now runs the pipeline's own candidate builder on the masked texts, instead of approximating it with a rank cut-off.
 3. Retrieval for national bodies was widened to the top 10. Only the new pairs were judged, with the c2 prompt that had already passed its pilot, at the measured $0.00074 per pair, and inside the Stage C cap with the evaluation reserve kept.
 4. Chains that grew got new chain keys. Their earlier dossiers were removed and redrafted, so no more than 25 current chains have a dossier.
+
+## D18. Pair cap that scales with organisation size
+
+1. Widening national retrieval (D17) added only 41 pairs, because the cap of 30 pairs per organisation was the real limit. DHSC (821 reports), NHS England (548), CQC (172) and the Department for Transport (127) each had at most 30 candidate pairs.
+2. The cap is now the larger of 30 and half the organisation's number of reports.
+3. This added 735 pairs, estimated at $0.54, judged with the already-piloted c2 prompt inside the Stage C cap with the evaluation reserve kept.
+
+## D19. Chains are joined through shared concerns, not shared reports
+
+1. Joining links whenever two shared a report merged different hazards at large bodies. One DHSC "chain" had 60 reports under a single hazard title.
+2. Links are now joined only through the same concern, so a chain follows one hazard. A report that raises two hazards can sit in two chains.
+3. Result: 619 chains instead of 453. The largest are single hazards that genuinely recur, for example ambulance arrival delays (33 reports) and a lack of acute psychiatric beds (22).
+4. Chain keys changed, so dossiers were redrafted for the new flagship chains, within the Stage D cap and the 25-chain maximum.

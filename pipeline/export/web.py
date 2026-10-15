@@ -297,7 +297,7 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "n_reports": n_reports,
         "n_reports_with_response": n_resp_reports,
-        "n_organisations": conn.execute("SELECT COUNT(*) FROM organisations").fetchone()[0],
+        "n_organisations": conn.execute("SELECT COUNT(DISTINCT organisation_id) FROM report_receivers").fetchone()[0],
         "n_concerns": conn.execute("SELECT COUNT(*) FROM concerns").fetchone()[0],
         "n_candidate_pairs": conn.execute("SELECT COUNT(*) FROM candidate_pairs").fetchone()[0],
         "n_judged": conn.execute("SELECT COUNT(*) FROM recurrence_verdicts").fetchone()[0],

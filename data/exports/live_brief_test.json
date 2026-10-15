@@ -1,0 +1,34 @@
+{
+ "known_report_url": {
+  "seconds": 5.0,
+  "steps": [
+   "Reading the report on judiciary.uk — David Levett: Prevention of future deaths report",
+   "Resolving the organisation — National Highways",
+   "Extracting concerns (Nemotron Nano) — 1 concerns already analysed",
+   "Searching earlier reports to this organisation — 130 earlier concerns searched; 3 closest sent to the judge",
+   "Judging the closest matches (Nemotron Super) — 1 shown as the same or a closely related hazard",
+   "Assembling the brief"
+  ],
+  "final": "result",
+  "matches": 1,
+  "notes": [],
+  "paused_reason": null
+ },
+ "pasted_draft_concerns": {
+  "seconds": 3.4,
+  "steps": [
+   "Resolving the organisation — Network Rail",
+   "Extracting concerns (Nemotron Nano) — 2 concerns",
+   "Searching earlier reports to this organisation — 57 earlier concerns searched; 3 closest sent to the judge",
+   "Judging the closest matches (Nemotron Super) — 2 shown as the same or a closely related hazard",
+   "Assembling the brief"
+  ],
+  "final": "result",
+  "matches": 2,
+  "notes": [],
+  "paused_reason": null
+ },
+ "repeat_cached": true,
+ "spend_usd": 0.0027844799999999998,
+ "web_ledger_rows": 8
+}

@@ -36,20 +36,20 @@ class DossierOut(BaseModel):
 SCHEMA = {
     "type": "json_schema",
     "json_schema": {
-        "name": "stage_d_dossier",
+        "name": "stage_d_dossier_v2",
         "strict": True,
         "schema": {
             "type": "object",
             "properties": {
                 "timeline": {
                     "type": "array",
-                    "maxItems": 30,
+                    "maxItems": 18,
                     "items": {
                         "type": "object",
                         "properties": {
                             "date": {"type": "string"},
                             "event": {"type": "string", "enum": ["warning", "response", "promise", "recurrence", "followup"]},
-                            "summary": {"type": "string", "maxLength": 300},
+                            "summary": {"type": "string", "maxLength": 220},
                             "quote": {"type": ["string", "null"], "maxLength": 500},
                             "source_ref": {"type": "string", "maxLength": 8},
                         },
@@ -57,7 +57,7 @@ SCHEMA = {
                         "additionalProperties": False,
                     },
                 },
-                "narrative": {"type": "string", "maxLength": 1500},
+                "narrative": {"type": "string", "maxLength": 1200},
                 "questions": {"type": "array", "maxItems": 6, "items": {"type": "string", "maxLength": 300}},
             },
             "required": ["timeline", "narrative", "questions"],
@@ -70,7 +70,7 @@ SYSTEM = (
     "You write a neutral, cited dossier about one recurring hazard in coroners' Prevention of Future Deaths reports "
     "sent to one organisation. Readers are coroners, lawyers, families and safety teams. Output one compact JSON object.\n"
     "Rules:\n"
-    "1. timeline: every report, response, promised action and follow-up finding given, in date order. Each item has "
+    "1. timeline: at most 18 items in date order: every report, then the most important responses, promised actions and follow-up findings. Each item has "
     "event (warning for the first report, recurrence for later reports, response, promise, followup), a one-sentence "
     "neutral summary, an optional quote copied character for character from the given SOURCE text, and source_ref "
     "set to the S-number of the source.\n"

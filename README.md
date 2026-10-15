@@ -39,7 +39,28 @@ Features of Token Factory used:
 3. The models endpoint with verbose pricing, used to set the budget guard from live prices.
 4. Rate-limit headers, used by the wrapper to pace calls.
 
-The spend ledger summary for the full run is in docs/PROGRESS.md and on the Evaluation page.
+### Cost ledger summary (full run, 15 Oct 2026)
+
+| Stage | Model | Paid calls | Spend |
+|---|---|---|---|
+| A, concerns from 6,196 reports | Nano | 6,780 | $0.77 |
+| B, promises from 1,453 responses | Nano | 1,453 | $0.19 |
+| C, 4,061 report pairs judged, plus evaluation and systemic clusters | Super | 4,122 | $3.02 |
+| D, flagship dossiers | Ultra | 75 | $0.96 |
+| F, follow-up classification | Nano | 82 | $0.01 |
+| Embeddings | Qwen3-Embedding-8B | 310 | $0.01 |
+| Pilots and development | mixed | 182 | $0.07 |
+| Total | | 13,004 | $5.05 |
+
+Every call is in the llm_calls ledger (13,181 rows, including 177 free cache hits). No call failed. Tavily used 250 credits for follow-up searches.
+
+## Results
+
+1. 6,454 unique reports ingested, 15,366 concerns extracted, 98% with quotes verified against the source.
+2. 1,217 links shown, in 619 chains, each with verbatim quotes from both reports, a relation and a confidence.
+3. In 84% of shown links the later report came from a different coroner, and in 99% it did not cite the earlier report.
+4. On a blind test of 29 pairs that coroners themselves acknowledged, at the same number of shown links, recall was 34% for TF-IDF, 41% for embeddings and 52% for the hybrid with the Nemotron Super judge.
+5. Precision of shown links needs hand labels, which are prepared but not yet done (docs/EVALUATION.md).
 
 ## Repository layout
 

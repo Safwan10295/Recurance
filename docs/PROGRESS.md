@@ -62,6 +62,51 @@ Done:
 Pilots:
 1. Stage A: passed (D11, D12).
 2. Stage B: schema 100%, quotes 95%, $0.000109 per response.
-3. Stage C: the first pilot failed at 85% (B4), was fixed (D16), and the re-pilot passed with 20 of 20 verified at $0.00078 per pair.
+3. Stage C: the first pilot failed at 85% (B3), was fixed (D16), and the re-pilot passed with 20 of 20 verified at $0.00078 per pair.
 
 Spend at the end of Phase 2: $1.08 total. Stage A $0.77, Stage B $0.19, dev $0.06, embeddings $0.01, Stage C $0.04 (pilot and systemic clusters).
+
+## Phase 3: full LLM runs and evaluation v1 (finished 2026-10-15 06:30)
+
+Done:
+1. Stage C judged all 4,061 candidate pairs with Nemotron Super (low-effort reasoning): 473 identical, 940 closely related, 1,341 related, 1,307 different. 3,999 verdicts (98.5%) have both report quotes verified. No call failed.
+2. Shown links: 1,217 (identical or closely related, confidence at least 0.70, both quotes verified, wording check passed).
+3. Chains: 619, joined through shared concerns so each follows one hazard (D19). 146 chains span three or more reports.
+4. Systemic clusters: 19 found by similarity across different organisations, 10 shown after judging.
+5. Evaluation on 29 coroner-acknowledged pairs, blind, at an equal budget of 1,217 shown links per system. Recall: TF-IDF 34%, embeddings 41%, hybrid plus Nemotron Super 52%. Full detail in docs/EVALUATION.md.
+6. Lost memory among the 1,217 shown links: a different coroner in 84%, a different coroner area in 79%, and no citation of the earlier report in 99%. All three held for 73%.
+
+Verified:
+1. All four candidate demo chains from the handoff were found and verified independently: smart motorways, unbarriered platform ends, paraffin emollient fires, and online pharmacy self-certification. Pennine Care formed no chain, as expected (data/exports/demo_chains.json).
+2. Cost per verified chain: $0.0066 analysis spend per chain (Stages A to C, embeddings and pilots).
+
+Changes to the plan:
+1. The first evaluation showed most missed recurrences were at national bodies, capped at 30 pairs each. The cap now scales with organisation size (D17, D18), which added 735 judged pairs for $0.53 and lifted the Nemotron system from 48% to 52% recall, ahead of both baselines.
+2. Precision needs hand labels and is pending.
+
+Spend at the end of Phase 3: Stage C $3.02 of $4.00. Total $4.07 (before dossiers and follow-ups).
+
+## Phase 4: web app, dossiers, follow-ups and live brief (finished 2026-10-15 07:00)
+
+Done:
+1. Stage D: 24 flagship dossiers drafted with Nemotron Ultra, all unreviewed and hidden. One failed its schema and was not retried. data/exports/dossiers_for_review.md has them for reading; python -m pipeline.cli review approves them.
+2. Stage F: 82 promises in chains checked with Tavily (250 of 250 credits), flagship chains first: 8 with evidence found, 1 contradicting, 73 no evidence found.
+3. Web app (Next.js): Home, Chains (with systemic clusters), Chain detail, Organisations, Organisation detail, Brief, Methodology and Evaluation. 1,609 static pages built from web/data, with no LLM calls at render.
+4. Live brief: TypeScript twin of the wrapper with a response cache, ledger, cost ceiling, 40-per-day and 5-per-IP limits, and a polite paused state with precomputed examples.
+
+Verified:
+1. Production build passes. Every page returned 200 on a local production server, and unknown pages return 404.
+2. Live brief end to end on a local server: a known report URL in 5 seconds and pasted draft concerns in 3.4 seconds, both with matches. A repeat was served from cache. Cost $0.0028, recorded in the ledger (D15).
+3. Without a live key the brief pauses gracefully with examples.
+4. A scan of all 1,217 exported links found no banned wording and no unredacted titled staff names. No dossier is shown.
+
+Not tested:
+1. Deployment to Vercel and the Supabase store (no credentials; Pilot's job, docs/DEPLOY.md).
+2. Visual layout on a phone. The layout is responsive by construction but was not checked on a device.
+
+Spend at the end of Phase 4: $5.05 total (dev $0.07, embeddings $0.01, A $0.77, B $0.19, C $3.02, D $0.96, F $0.01). Remaining before the $20 hard stop: $14.95. The $5 live reserve and $9.50 margin were never touched.
+
+## Phase 5: polish and stretch (2026-10-15)
+
+1. Methodology and Evaluation pages are live in the build.
+2. The NTSB stretch was not built. Spend was under $12 and Phases 0 to 4 were complete, but CAROL has no documented public API for recommendations; its exports run through the web interface, which an unattended run cannot use reliably. The video uses the systemic clusters for that slot instead.

@@ -330,17 +330,6 @@
   "days_apart": 972
  },
  {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/paul-hardy/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/richard-hill-2/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [],
-  "in_scope": false,
-  "later_prior_flag": 0,
-  "days_apart": 1380
- },
- {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/john-hill/",
   "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/richard-hill-2/",
   "evidence": [
@@ -350,6 +339,17 @@
   "in_scope": false,
   "later_prior_flag": 0,
   "days_apart": 143
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/paul-hardy/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/richard-hill-2/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [],
+  "in_scope": false,
+  "later_prior_flag": 0,
+  "days_apart": 1380
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/christopher-williams/",
@@ -1113,6 +1113,17 @@
   "days_apart": 3361
  },
  {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/william-davies/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rickie-poon-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [],
+  "in_scope": false,
+  "later_prior_flag": 0,
+  "days_apart": 4078
+ },
+ {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/robert-ginn/",
   "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rickie-poon-prevention-of-future-deaths-report/",
   "evidence": [
@@ -1122,6 +1133,17 @@
   "in_scope": false,
   "later_prior_flag": 0,
   "days_apart": 2258
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rodney-blair/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rickie-poon-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [],
+  "in_scope": false,
+  "later_prior_flag": 0,
+  "days_apart": 3517
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/tedros-kahssay/",
@@ -1144,28 +1166,6 @@
   "in_scope": false,
   "later_prior_flag": 0,
   "days_apart": 3763
- },
- {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/william-davies/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rickie-poon-prevention-of-future-deaths-report/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [],
-  "in_scope": false,
-  "later_prior_flag": 0,
-  "days_apart": 4078
- },
- {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rodney-blair/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/rickie-poon-prevention-of-future-deaths-report/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [],
-  "in_scope": false,
-  "later_prior_flag": 0,
-  "days_apart": 3517
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/gareth-jones/",
@@ -1278,17 +1278,6 @@
   "days_apart": 2131
  },
  {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/averil-hart/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/karen-graham-prevention-of-future-deaths-report/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [],
-  "in_scope": false,
-  "later_prior_flag": 0,
-  "days_apart": 1976
- },
- {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/nichola-lomax-prevention-of-future-deaths-report/",
   "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/karen-graham-prevention-of-future-deaths-report/",
   "evidence": [
@@ -1298,6 +1287,17 @@
   "in_scope": false,
   "later_prior_flag": 0,
   "days_apart": 1687
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/averil-hart/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/karen-graham-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [],
+  "in_scope": false,
+  "later_prior_flag": 0,
+  "days_apart": 1976
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/joseph-nihill/",
@@ -1610,17 +1610,6 @@
   "days_apart": 883
  },
  {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/jeanette-robinson/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/kim-robinson-prevention-of-future-deaths-report/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [],
-  "in_scope": false,
-  "later_prior_flag": 0,
-  "days_apart": 2069
- },
- {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/deborah-headspeath/",
   "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/kim-robinson-prevention-of-future-deaths-report/",
   "evidence": [
@@ -1632,6 +1621,17 @@
   "in_scope": true,
   "later_prior_flag": 0,
   "days_apart": 1901
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/jeanette-robinson/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/kim-robinson-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [],
+  "in_scope": false,
+  "later_prior_flag": 0,
+  "days_apart": 2069
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/ian-taylor-prevention-of-future-deaths-report/",
@@ -1684,19 +1684,6 @@
   "days_apart": 136
  },
  {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/freeda-glausiusz-prevention-of-future-deaths-report/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/heather-findlay-prevention-of-future-deaths-report/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [
-   3807
-  ],
-  "in_scope": true,
-  "later_prior_flag": 1,
-  "days_apart": 600
- },
- {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/andrew-largin-prevention-of-future-deaths-report/",
   "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/heather-findlay-prevention-of-future-deaths-report/",
   "evidence": [
@@ -1708,6 +1695,19 @@
   "in_scope": true,
   "later_prior_flag": 1,
   "days_apart": 138
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/freeda-glausiusz-prevention-of-future-deaths-report/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/heather-findlay-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   3807
+  ],
+  "in_scope": true,
+  "later_prior_flag": 1,
+  "days_apart": 600
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/louis-thorold-prevention-of-future-deaths-report/",
@@ -2281,17 +2281,6 @@
   "days_apart": 2447
  },
  {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/grazyna-walczak/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/emmanuel-ladapo-prevention-of-future-deaths-report/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [],
-  "in_scope": false,
-  "later_prior_flag": 0,
-  "days_apart": 1146
- },
- {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/ben-ohara/",
   "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/emmanuel-ladapo-prevention-of-future-deaths-report/",
   "evidence": [
@@ -2314,6 +2303,17 @@
   "in_scope": true,
   "later_prior_flag": 0,
   "days_apart": 3282
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/grazyna-walczak/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/emmanuel-ladapo-prevention-of-future-deaths-report/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [],
+  "in_scope": false,
+  "later_prior_flag": 0,
+  "days_apart": 1146
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/christopher-williams/",

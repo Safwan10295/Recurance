@@ -45,3 +45,8 @@ Thumbs.db
 
 # Logs
 data/logs/
+
+# Unredacted or unreviewed text: kept local, never published
+data/exports/hand_labels.csv
+data/exports/dossiers_for_review.md
+data/exports/systemic.json

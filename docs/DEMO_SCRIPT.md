@@ -21,7 +21,7 @@ Say:
 
 ## 0:20 to 1:10. One flagship chain
 
-On screen: the chain page for the lead chain (smart motorways if verified, otherwise the strongest verified chain).
+On screen: the chain page for the lead chain. The pipeline verified the smart motorways chain on its own: /chains/7d7b41f91717dc72 (Jamil Ahmed 2019, Zoltan Torok 2022, David Levett 2023; three coroners). Chain keys change if the data is rebuilt; data/exports/demo_chains.json always has the current keys.
 
 Say:
 
@@ -53,7 +53,7 @@ Say:
 
 ## 2:20 to 2:45. Beyond one archive
 
-If the NTSB adapter was built, show its chain. Otherwise show a systemic hazard raised with several different organisations.
+The NTSB adapter was not built. Show "The same hazard, raised with different organisations" at the bottom of /chains instead.
 
 ## 2:45 to 3:00. Close
 

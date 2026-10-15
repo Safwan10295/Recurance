@@ -80,6 +80,7 @@ MIN_DAYS_APART = 182
 TFIDF_MIN = 0.25
 EMBED_MIN = 0.62
 MAX_PAIRS_PER_ORG = 30
+PAIRS_PER_REPORT = 0.5  # larger organisations may keep up to half as many pairs as they have reports (D18)
 NATIONAL_TOP_K = 10  # widened from 5 after the blind test (D17)
 
 # Known unique-report figure from prior research (section 3).

@@ -137,3 +137,10 @@ Each entry: date, question, answer, source. Newest phase at the bottom.
 - Question: Can NTSB safety recommendations be exported for the stretch adapter?
 - Answer: CAROL holds over 15,000 safety recommendations. Its help page says "You may download a CSV or JSON file containing all query records" from the search interface. No public API is documented for recommendations; a 2020 press release mentions APIs for partner agencies. NTSB material is a US federal government work. An unattended build would need browser-driven exports, so the adapter is deferred unless Phases 0 to 4 finish early.
 - Sources: https://www.ntsb.gov/Pages/CAROL.aspx ; https://www-s.ntsb.gov/news/press-releases/Pages/NR20201013.aspx
+
+### Listing cross-check
+
+- Date: 2026-10-15
+- Question: Do the listing pages and sitemaps agree?
+- Answer: The 651 listing pages gave 6,507 report URLs; the sitemaps gave 6,484. Every sitemap URL is on the listing pages; 23 recent reports were on the listing pages only. They were added, for 6,507 pages and 6,454 unique reports (0.1% above the handoff's 6,449).
+- Source: data/cache/urls_listing.json, data/cache/urls_sitemap.json.

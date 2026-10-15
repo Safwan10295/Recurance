@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-15T04:39:32+00:00",
+ "generated_at": "2026-10-15T05:23:24+00:00",
  "acknowledged": {
   "total": 227,
   "in_scope": 42,
@@ -13,52 +13,54 @@
  "systems": [
   {
    "name": "TF-IDF only",
-   "description": "Report-level cosine, shown if at least 0.170 (equal-budget threshold)",
-   "recall_at_threshold": 0.27586206896551724,
+   "description": "Report-level cosine, shown if at least 0.137 (equal-budget threshold)",
+   "recall_at_threshold": 0.3448275862068966,
    "recall_at_5": 0.7586206896551724,
-   "shown_pairs": 752,
+   "shown_pairs": 1217,
    "precision": null
   },
   {
    "name": "Embeddings only",
-   "description": "Best concern pair cosine, shown if at least 0.719 (equal-budget threshold)",
-   "recall_at_threshold": 0.5172413793103449,
+   "description": "Best concern pair cosine, shown if at least 0.726 (equal-budget threshold)",
+   "recall_at_threshold": 0.41379310344827586,
    "recall_at_5": 0.6896551724137931,
-   "shown_pairs": 752,
+   "shown_pairs": 1217,
    "precision": null
   },
   {
    "name": "Hybrid + Nemotron Super judge",
    "description": "Candidate rule, then judged; shown if identical or closely related, confident, quotes verified",
-   "recall_at_threshold": 0.4827586206896552,
-   "recall_at_5": 0.6551724137931034,
-   "shown_pairs": 752,
+   "recall_at_threshold": 0.5172413793103449,
+   "recall_at_5": 0.6896551724137931,
+   "shown_pairs": 1217,
    "precision": null
   }
  ],
  "thresholds": {
-  "tfidf_equal_budget": 0.17008163481212235,
-  "embedding_equal_budget": 0.7186168432235718
+  "tfidf_equal_budget": 0.13707133693801365,
+  "embedding_equal_budget": 0.7262049913406372
  },
  "lost_memory": {
-  "links": 752,
-  "diff_coroner": 0.785904255319149,
-  "diff_area": 0.7021276595744681,
-  "not_cited": 0.9813829787234043,
-  "all_three": 0.6289893617021277
+  "links": 1217,
+  "diff_coroner": 0.8356614626129828,
+  "diff_area": 0.7871815940838126,
+  "not_cited": 0.9876746096959738,
+  "all_three": 0.7280197206244864
  },
  "cost": {
-  "total": 3.4929586599999998,
+  "total": 4.76355449,
   "by_stage": {
-   "A": 0.7701594599999999,
+   "A": 0.77293152,
    "B": 0.19433567999999998,
-   "C": 2.4513800999999997,
-   "dev": 0.06537269999999999,
-   "embed": 0.01171072
+   "C": 3.0226623,
+   "D": 0.680214,
+   "F": 0.013508339999999999,
+   "dev": 0.06815718,
+   "embed": 0.011745470000000001
   },
-  "analysis_cost": 3.4929586599999993,
-  "per_chain": 0.009096246510416664,
-  "chains": 384
+  "analysis_cost": 4.06983215,
+  "per_chain": 0.00657485,
+  "chains": 619
  },
  "hand_labels": {
   "status": "pending: no labels filled in yet",

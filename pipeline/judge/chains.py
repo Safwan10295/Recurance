@@ -16,7 +16,8 @@ DEFAULT_MIN_CONFIDENCE = 0.7
 
 def shown_verdicts(conn, min_conf: float = DEFAULT_MIN_CONFIDENCE) -> list:
     return conn.execute(
-        f"""SELECT v.*, p.organisation_id, ce.report_url AS e_url, cl.report_url AS l_url, ce.hazard AS e_hazard,
+        f"""SELECT v.*, p.organisation_id, p.earlier_concern_id AS e_cid, p.later_concern_id AS l_cid,
+                   ce.report_url AS e_url, cl.report_url AS l_url, ce.hazard AS e_hazard,
                    re.report_date AS e_date, rl.report_date AS l_date
             FROM recurrence_verdicts v JOIN candidate_pairs p ON p.id = v.pair_id
             JOIN concerns ce ON ce.id = p.earlier_concern_id JOIN concerns cl ON cl.id = p.later_concern_id
@@ -37,9 +38,11 @@ def build(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         by_org[r["organisation_id"]].append(r)
     n_chains = 0
     for org, vs in by_org.items():
-        parent: dict[str, str] = {}
+        # Join links through shared concerns, not shared reports: one report can raise several
+        # hazards, and joining on the report would merge unrelated hazards into one chain (D19).
+        parent: dict[int, int] = {}
 
-        def find(x: str) -> str:
+        def find(x: int) -> int:
             parent.setdefault(x, x)
             while parent[x] != x:
                 parent[x] = parent[parent[x]]
@@ -47,12 +50,12 @@ def build(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
             return x
 
         for v in vs:
-            a, b = find(v["e_url"]), find(v["l_url"])
+            a, b = find(v["e_cid"]), find(v["l_cid"])
             if a != b:
                 parent[b] = a
-        groups: dict[str, list] = defaultdict(list)
+        groups: dict[int, list] = defaultdict(list)
         for v in vs:
-            groups[find(v["e_url"])].append(v)
+            groups[find(v["e_cid"])].append(v)
         for members in groups.values():
             members.sort(key=lambda v: (v["e_date"], v["l_date"]))
             dates = sorted({v["e_date"] for v in members} | {v["l_date"] for v in members})
@@ -60,7 +63,8 @@ def build(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
             rel = "identical" if all(v["relation"] == "identical" for v in members) else "closely_related"
             # Organisation ids are reassigned when normalisation reruns, so the key uses the name.
             oname = conn.execute("SELECT canonical_name FROM organisations WHERE id=?", (org,)).fetchone()
-            ckey = hashlib.sha1(f"{oname[0] if oname else org}|{'|'.join(sorted(reports))}".encode()).hexdigest()[:16]
+            cids = sorted({v["e_cid"] for v in members} | {v["l_cid"] for v in members})
+            ckey = hashlib.sha1(f"{oname[0] if oname else org}|{'|'.join(sorted(reports))}|{cids}".encode()).hexdigest()[:16]
             cur = conn.execute(
                 "INSERT INTO chains (chain_key, organisation_id, hazard_label, kind, first_date, last_date, n_reports, "
                 "min_confidence, relation) VALUES (?,?,?,?,?,?,?,?,?)",

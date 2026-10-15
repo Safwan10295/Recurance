@@ -46,26 +46,28 @@
     "a": "jamil-ahmed-2",
     "b": "zoltan-torok-prevention-of-future-deaths-report",
     "id": 799,
-    "hybrid_score": 0.6403496233751026,
+    "hybrid_score": 0.6403191316957988,
     "embed_score": 0.7945054173469543,
-    "tfidf_score": 0.409115932417325,
-    "relation": null,
-    "confidence": null,
-    "quotes_verified": null
+    "tfidf_score": 0.4090397032190655,
+    "relation": "closely_related",
+    "confidence": 0.85,
+    "quotes_verified": 1
    },
    {
     "a": "zoltan-torok-prevention-of-future-deaths-report",
     "b": "david-levett-prevention-of-future-deaths-report",
     "id": 822,
-    "hybrid_score": 0.5496569345101029,
+    "hybrid_score": 0.5495939259248308,
     "embed_score": 0.8124263882637024,
-    "tfidf_score": 0.1555027538797037,
-    "relation": null,
-    "confidence": null,
-    "quotes_verified": null
+    "tfidf_score": 0.15534523241652332,
+    "relation": "identical",
+    "confidence": 0.9,
+    "quotes_verified": 1
    }
   ],
-  "chain_keys": []
+  "chain_keys": [
+   "7d7b41f91717dc72"
+  ]
  },
  "Unbarriered platform ends (Network Rail)": {
   "reports": [
@@ -116,37 +118,39 @@
     "a": "taiyah-grace-peebles",
     "b": "jordan-aira",
     "id": 313,
-    "hybrid_score": 0.6028202766757629,
+    "hybrid_score": 0.6029757559439362,
     "embed_score": 0.856330931186676,
-    "tfidf_score": 0.22255429490939319,
-    "relation": null,
-    "confidence": null,
-    "quotes_verified": null
+    "tfidf_score": 0.22294299307982615,
+    "relation": "identical",
+    "confidence": 0.95,
+    "quotes_verified": 1
    },
    {
     "a": "taiyah-grace-peebles",
     "b": "callum-evans",
     "id": 319,
-    "hybrid_score": 0.5814097082580316,
+    "hybrid_score": 0.5814561277955257,
     "embed_score": 0.8014878630638123,
-    "tfidf_score": 0.2512924760493608,
-    "relation": null,
-    "confidence": null,
-    "quotes_verified": null
+    "tfidf_score": 0.25140852489309573,
+    "relation": "closely_related",
+    "confidence": 0.86,
+    "quotes_verified": 1
    },
    {
     "a": "jordan-aira",
     "b": "callum-evans",
     "id": 316,
-    "hybrid_score": 0.5928537891189359,
+    "hybrid_score": 0.5929207311193858,
     "embed_score": 0.7848117351531982,
-    "tfidf_score": 0.30491687006754253,
-    "relation": null,
-    "confidence": null,
-    "quotes_verified": null
+    "tfidf_score": 0.30508422506866717,
+    "relation": "identical",
+    "confidence": 0.9,
+    "quotes_verified": 1
    }
   ],
-  "chain_keys": []
+  "chain_keys": [
+   "a143de11546f74db"
+  ]
  },
  "Paraffin emollient fires": {
   "reports": [
@@ -195,15 +199,18 @@
     "a": "pauline-taylor-2",
     "b": "brian-bicat",
     "id": 34,
-    "hybrid_score": 0.9217529285430168,
+    "hybrid_score": 0.9217485430835128,
     "embed_score": 0.9788403511047363,
-    "tfidf_score": 0.8361217947004375,
-    "relation": null,
-    "confidence": null,
-    "quotes_verified": null
+    "tfidf_score": 0.8361108310516776,
+    "relation": "identical",
+    "confidence": 0.9,
+    "quotes_verified": 1
    }
   ],
-  "chain_keys": []
+  "chain_keys": [
+   "045c7a18a0e1a96a",
+   "53682d1a4d4b37e2"
+  ]
  },
  "Online pharmacy self-certification (NHS England)": {
   "reports": [
@@ -239,15 +246,18 @@
     "a": "karl-willis",
     "b": "joseph-gingell",
     "id": 70,
-    "hybrid_score": 0.7039587351635507,
+    "hybrid_score": 0.7039472109608058,
     "embed_score": 0.702012836933136,
-    "tfidf_score": 0.7068775825091728,
-    "relation": null,
-    "confidence": null,
-    "quotes_verified": null
+    "tfidf_score": 0.7068487720023104,
+    "relation": "identical",
+    "confidence": 0.96,
+    "quotes_verified": 1
    }
   ],
-  "chain_keys": []
+  "chain_keys": [
+   "4a5435d9ca4fcea9",
+   "0681e0ed4edf1aa7"
+  ]
  },
  "Pennine Care (related, not identical)": {
   "reports": [
