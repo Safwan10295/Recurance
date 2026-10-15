@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-15T03:25:13+00:00",
+ "generated_at": "2026-10-15T04:39:32+00:00",
  "acknowledged": {
   "total": 227,
   "in_scope": 42,
@@ -13,54 +13,55 @@
  "systems": [
   {
    "name": "TF-IDF only",
-   "description": "Report-level cosine, shown if at least 1.000 (equal-budget threshold)",
-   "recall_at_threshold": 0.0,
+   "description": "Report-level cosine, shown if at least 0.170 (equal-budget threshold)",
+   "recall_at_threshold": 0.27586206896551724,
    "recall_at_5": 0.7586206896551724,
-   "shown_pairs": 1,
+   "shown_pairs": 752,
    "precision": null
   },
   {
    "name": "Embeddings only",
-   "description": "Best concern pair cosine, shown if at least 0.994 (equal-budget threshold)",
-   "recall_at_threshold": 0.0,
+   "description": "Best concern pair cosine, shown if at least 0.719 (equal-budget threshold)",
+   "recall_at_threshold": 0.5172413793103449,
    "recall_at_5": 0.6896551724137931,
-   "shown_pairs": 1,
+   "shown_pairs": 752,
    "precision": null
   },
   {
    "name": "Hybrid + Nemotron Super judge",
    "description": "Candidate rule, then judged; shown if identical or closely related, confident, quotes verified",
-   "recall_at_threshold": 0.4482758620689655,
+   "recall_at_threshold": 0.4827586206896552,
    "recall_at_5": 0.6551724137931034,
-   "shown_pairs": 0,
+   "shown_pairs": 752,
    "precision": null
   }
  ],
  "thresholds": {
-  "tfidf_equal_budget": 1.0000000000000009,
-  "embedding_equal_budget": 0.9937298893928528
+  "tfidf_equal_budget": 0.17008163481212235,
+  "embedding_equal_budget": 0.7186168432235718
  },
  "lost_memory": {
-  "links": 0,
-  "diff_coroner": 0.0,
-  "diff_area": 0.0,
-  "not_cited": 0.0,
-  "all_three": 0.0
+  "links": 752,
+  "diff_coroner": 0.785904255319149,
+  "diff_area": 0.7021276595744681,
+  "not_cited": 0.9813829787234043,
+  "all_three": 0.6289893617021277
  },
  "cost": {
-  "total": 0.8574062199999998,
+  "total": 3.4929586599999998,
   "by_stage": {
    "A": 0.7701594599999999,
-   "C": 0.0384486,
-   "dev": 0.03708744,
+   "B": 0.19433567999999998,
+   "C": 2.4513800999999997,
+   "dev": 0.06537269999999999,
    "embed": 0.01171072
   },
-  "analysis_cost": 0.8574062199999999,
-  "per_chain": null,
-  "chains": 0
+  "analysis_cost": 3.4929586599999993,
+  "per_chain": 0.009096246510416664,
+  "chains": 384
  },
  "hand_labels": {
-  "status": "pending: Pilot has not labelled the candidate file yet",
+  "status": "pending: no labels filled in yet",
   "n_labelled": 0
  },
  "notes": []

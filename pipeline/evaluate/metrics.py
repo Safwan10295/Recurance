@@ -167,27 +167,47 @@ def evaluate(llm: LLM, judge: bool = True, max_judge: int = 400) -> dict:
     # ---------- System 3: hybrid candidate rule + judge, blind ----------
     judged = []
     if judge:
+        # Faithful candidate gate: run the pipeline's own candidate builder with every test later
+        # report's concerns masked (all of its acknowledged earlier reports removed at once).
+        from ..link.candidates import build as build_candidates
+
+        earlier_of = defaultdict(list)
+        for pp in per_pair:
+            if not pp.get("skipped"):
+                earlier_of[pp["later_url"]].append(rep[pp["earlier_url"]])
+        text_override: dict[int, str] = {}
+        emb_override_ids: dict[int, np.ndarray] = {}
+        to_embed, ids = [], []
+        for l_url, earliers in earlier_of.items():
+            for c in cons.get(l_url, []):
+                t = concern_text(c)
+                for E in earliers:
+                    t = mask_text(t, E)
+                if t != concern_text(c):
+                    text_override[c["id"]] = t or "."
+                    to_embed.append(t or ".")
+                    ids.append(c["id"])
+        if to_embed:
+            for cid, v in zip(ids, embed_texts(llm, to_embed)):
+                emb_override_ids[cid] = v
+        masked = build_candidates(write=False, text_override=text_override, emb_override=emb_override_ids)["_pairs"]
+        concern_report = {c["id"]: u for u, cs in cons.items() for c in cs}
+        best_pair = {}
+        for p in masked:
+            key = (concern_report.get(p["earlier_concern_id"]), concern_report.get(p["later_concern_id"]))
+            if key not in best_pair or p["hybrid_score"] > best_pair[key]["hybrid_score"]:
+                best_pair[key] = p
         jobs = []
         for pp in per_pair:
             if pp.get("skipped"):
                 continue
             e, l = pp["earlier_url"], pp["later_url"]
-            # Best concern pair under the hybrid score, masked.
-            L = later_matrix(e, l)
-            ecs, lcs = cons.get(e, []), cons.get(l, [])
-            if not ecs or L is None:
-                continue
-            Em = np.vstack([from_blob(c["embedding"]) for c in ecs])
-            S = Em @ L.T
-            i, j = np.unravel_index(int(np.argmax(S)), S.shape)
-            hybrid = 0.6 * float(S[i, j]) + 0.4 * pp["tfidf"]
-            passes = float(S[i, j]) >= config.EMBED_MIN or pp["tfidf"] >= config.TFIDF_MIN
-            pp["hybrid"] = hybrid
-            pp["hybrid_candidate"] = bool(passes and pp["emb_rank"] <= max(config.NATIONAL_TOP_K, 5))
-            if pp["hybrid_candidate"]:
-                org = sorted(set(pp["shared_orgs"]))[0]
-                d = C.pair_dict(conn, ecs[i]["id"], lcs[j]["id"], org, None)
-                d["id"] = f"eval:{ecs[i]['id']}:{lcs[j]['id']}"
+            bp = best_pair.get((e, l))
+            pp["hybrid_candidate"] = bp is not None
+            pp["hybrid"] = bp["hybrid_score"] if bp else None
+            if bp:
+                d = C.pair_dict(conn, bp["earlier_concern_id"], bp["later_concern_id"], bp["organisation_id"], None)
+                d["id"] = f"eval:{bp['earlier_concern_id']}:{bp['later_concern_id']}"
                 d["l_concerns"] = masked_report[(e, l)]
                 d["l_quote"] = mask_text(d["l_quote"], rep[e]) or d["l_quote"]
                 jobs.append((pp, d))

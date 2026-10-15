@@ -1,32 +1,5 @@
 [
  {
-  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/tamara-mills/",
-  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sophie-holman/",
-  "evidence": [
-   "name"
-  ],
-  "shared_orgs": [
-   1176
-  ],
-  "in_scope": true,
-  "later_prior_flag": 1,
-  "days_apart": 1188,
-  "n_candidates": 301,
-  "tfidf": 0.2806412623850528,
-  "tfidf_rank": 2,
-  "emb": 0.9264315962791443,
-  "emb_rank": 1,
-  "hybrid": 0.6681154627215077,
-  "hybrid_candidate": true,
-  "judge": {
-   "relation": "identical",
-   "confidence": 0.92,
-   "quotes_verified": 1,
-   "error": null
-  },
-  "judge_shown": true
- },
- {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/michael-uriely-2/",
   "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sophie-holman/",
   "evidence": [
@@ -44,6 +17,33 @@
   "emb": 0.8652220368385315,
   "emb_rank": 2,
   "hybrid": 0.6501429408668421,
+  "hybrid_candidate": true,
+  "judge": {
+   "relation": "identical",
+   "confidence": 0.96,
+   "quotes_verified": 1,
+   "error": null
+  },
+  "judge_shown": true
+ },
+ {
+  "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/tamara-mills/",
+  "later_url": "https://www.judiciary.uk/prevention-of-future-death-reports/sophie-holman/",
+  "evidence": [
+   "name"
+  ],
+  "shared_orgs": [
+   1176
+  ],
+  "in_scope": true,
+  "later_prior_flag": 1,
+  "days_apart": 1188,
+  "n_candidates": 301,
+  "tfidf": 0.2806412623850528,
+  "tfidf_rank": 2,
+  "emb": 0.9264315962791443,
+  "emb_rank": 1,
+  "hybrid": 0.6681154627215077,
   "hybrid_candidate": true,
   "judge": {
    "relation": "identical",
@@ -73,7 +73,7 @@
   "hybrid": 0.4872544314044855,
   "hybrid_candidate": true,
   "judge": {
-   "relation": "identical",
+   "relation": "closely_related",
    "confidence": 0.9,
    "quotes_verified": 1,
    "error": null
@@ -140,7 +140,7 @@
   "hybrid": 0.48383915338583106,
   "hybrid_candidate": true,
   "judge": {
-   "relation": "closely_related",
+   "relation": "identical",
    "confidence": 0.9,
    "quotes_verified": 1,
    "error": null
@@ -167,8 +167,8 @@
   "hybrid": 0.5283612242623663,
   "hybrid_candidate": true,
   "judge": {
-   "relation": "identical",
-   "confidence": 0.9,
+   "relation": "closely_related",
+   "confidence": 0.85,
    "quotes_verified": 1,
    "error": null
   },
@@ -379,7 +379,7 @@
   "hybrid_candidate": true,
   "judge": {
    "relation": "closely_related",
-   "confidence": 0.8,
+   "confidence": 0.85,
    "quotes_verified": 1,
    "error": null
   },
@@ -497,8 +497,8 @@
   "hybrid": 0.42421390018960803,
   "hybrid_candidate": true,
   "judge": {
-   "relation": "different",
-   "confidence": 0.95,
+   "relation": "related",
+   "confidence": 0.78,
    "quotes_verified": 1,
    "error": null
   },
@@ -572,12 +572,12 @@
   "hybrid": 0.4888496034088285,
   "hybrid_candidate": true,
   "judge": {
-   "relation": "related",
+   "relation": "closely_related",
    "confidence": 0.8,
    "quotes_verified": 1,
    "error": null
   },
-  "judge_shown": false
+  "judge_shown": true
  },
  {
   "earlier_url": "https://www.judiciary.uk/prevention-of-future-death-reports/tamara-mills/",

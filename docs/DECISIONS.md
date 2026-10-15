@@ -98,3 +98,10 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 3. Now a link counts as verified when both report quotes verify. An unverified promise quote is never shown; the link may still be.
 4. Stage B had also captured some coroner template lines that responses quote back (for example "You are under a duty to respond"). Ten such non-promises were removed, and the extractor now filters them.
 5. Re-checked with no model calls, the same pilot verified 19 of 20 (95%).
+
+## D17. Wider retrieval for national bodies (top 5 to top 10)
+
+1. In the first blind test, 10 of 29 coroner-acknowledged pairs never reached the judge. Most were national-body pairs whose earlier report ranked 6th to 12th among that body's earlier concerns, while retrieval sent only the top 5 for national bodies.
+2. The evaluation's candidate gate was also made exact: it now runs the pipeline's own candidate builder on the masked texts, instead of approximating it with a rank cut-off.
+3. Retrieval for national bodies was widened to the top 10. Only the new pairs were judged, with the c2 prompt that had already passed its pilot, at the measured $0.00074 per pair, and inside the Stage C cap with the evaluation reserve kept.
+4. Chains that grew got new chain keys. Their earlier dossiers were removed and redrafted, so no more than 25 current chains have a dossier.
