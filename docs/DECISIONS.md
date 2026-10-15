@@ -83,3 +83,10 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 3. Thresholds were set to embedding 0.62 or TF-IDF 0.25, with at most 30 pairs per organisation. This keeps every acknowledged pair seen so far and roughly halves the candidates.
 4. If the full corpus still gives more pairs than the Stage C budget covers, the highest hybrid scores are judged first and the rest are left unjudged and logged.
 5. Many acknowledged pairs are less than six months apart (7 of 12). The six-month rule from the handoff stays; the evaluation reports both sets.
+
+## D15. Local live-brief test with the pipeline key
+
+1. The live brief was tested once, end to end, on a local production server.
+2. No deployed-app key exists yet, so the local server process was given the pipeline key as NEBIUS_LIVE_API_KEY, server side only. It is never sent to a browser, and nothing was deployed.
+3. The test's cost ceiling was $0.05, and its spend was copied into the pipeline ledger under dev, so the accounting is complete.
+4. The deployed app must still use its own key (docs/DEPLOY.md).

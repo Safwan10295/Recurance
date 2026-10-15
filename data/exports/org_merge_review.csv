@@ -31,6 +31,7 @@ central manchester university hospital,central manchester university hospital nh
 leicester nhs trust,leicestershire nhs trust,88.37209302325581,False
 wrexham county council,durham county council,88.37209302325581,False
 eryc highways department,highways department,88.37209302325581,False
+acorn lodge care home,ashton lodge care home,88.37209302325581,False
 lancashire county council,lincolnshire county council,88.46153846153845,False
 royal cornwall hospital trust,royal cornwall hospital,88.46153846153845,False
 denbighshire county council,derbyshire county council,88.46153846153845,False
@@ -47,13 +48,15 @@ halton clinical commissioning group,oldham clinical commissioning group,88.57142
 bradford metropolitan borough council,bury metropolitan borough council,88.57142857142857,False
 wigan metropolitan borough council,walsall metropolitan borough council,88.57142857142857,False
 se london integrated care board,south west london integrated care board,88.57142857142857,False
+enfield clinical commissioning group,devon clinical commissioning group,88.57142857142857,False
 nhs swale clinical commissioning group,nhs somerset clinical commissioning group,88.60759493670886,False
 hm prison wealstun and ministry of justice,ministry of justice and hm prison usk,88.60759493670886,False
 brighton and sussex university hospital,brighton and sussex university hospital nhs trust,88.63636363636364,False
-university hospital of derby and burton nhs trust,university hospital of derby and burton,88.63636363636364,False
+university hospital of derby and burton,university hospital of derby and burton nhs trust,88.63636363636364,False
 norfolk and norwich university hospital nhs trust,norfolk and norwich university hospital,88.63636363636364,False
 university hospital of northamptonshire,university hospital of northamptonshire nhs group,88.63636363636364,False
 nottinghamshire clinical commissioning group,nottingham city clinical commissioning group,88.63636363636364,False
+luton and dunstable university hospital nhs trust,luton and dunstable university hospital,88.63636363636364,False
 oxfordshire county council,staffordshire county council,88.88888888888889,False
 pennine acute nhs trust,pennine care nhs trust,88.88888888888889,False
 south staffordshire and shropshire healthcare nhs trust,south staffordshire and shropshire nhs trust,88.88888888888889,False
@@ -66,6 +69,7 @@ evergreen surgery,esher green surgery,88.88888888888889,False
 sherwood hospitals nhs trust,sherwood forest hospitals nhs trust,88.88888888888889,False
 wirral clinical commissioning group,clinical commissioning group,88.88888888888889,False
 barking havering and redbridge nhs trust,havering and redbridge nhs trust,88.88888888888889,False
+national trust for isle of wight,national trust on isle of wight,88.88888888888889,False
 university hospital of north midlands nhs trust,north middlesex university hospital nhs trust,89.13043478260869,False
 south western ambulance nhs trust,south western ambulance service nhs trust,89.1891891891892,False
 hertfordshire county council,staffordshire county council,89.28571428571429,False
@@ -91,6 +95,7 @@ military of defence,ministry of defence,89.47368421052632,False
 royal college of pathologists,royal college of radiologists,89.65517241379311,False
 plymouth hospitals nhs trust,portsmouth hospitals nhs trust,89.65517241379311,False
 national trading standards board,national trading standards,89.65517241379311,False
+minister for health and social services of wales,minister for health and social services,89.65517241379311,False
 north yorkshire clinical commissioning group,north somerset clinical commissioning group,89.65517241379311,False
 hca healthcare,healthcare care,89.65517241379311,False
 east of england ambulance nhs trust,east of england ambulance service nhs trust,89.74358974358975,False
@@ -131,6 +136,7 @@ association of manufacturers of domestic appliances,association of manufacturers
 south east ambulance service,south east coast ambulance service,90.32258064516128,False
 banes clinical commissioning group,clinical commissioning group,90.32258064516128,False
 community mental health team,hafod community mental health team,90.32258064516128,False
+prembrokeshire county council,pembrokeshire county council hall,90.32258064516128,False
 office of product safety standards,office for product safety and standards,90.41095890410959,False
 oldham metropolitan borough council,rotherham metropolitan borough council,90.41095890410959,False
 walsall metropolitan borough council,sandwell metropolitan borough council,90.41095890410959,False
@@ -167,12 +173,14 @@ northamptonshire county council,northampton county council,91.22807017543859,Fal
 british transplant society,british transplantation society,91.22807017543859,False
 royal college of psychiatry,royal college of psychiatrists,91.22807017543859,False
 north east lincolnshire council,north lincolnshire council,91.22807017543859,False
-welsh ambulance nhs trust,welsh ambulance trust,91.30434782608697,False
+welsh ambulance trust,welsh ambulance nhs trust,91.30434782608697,False
 royal college of obstetrics and gynaecology,royal college of obstetricians and gynaecologists,91.30434782608697,False
 sheffield teaching hospital trust nhs trust,sheffield teaching hospitals nhs trust,91.35802469135803,False
+surrey downs clinical commissioning group,east surrey clinical commissioning group,91.35802469135803,False
 college of general practitioners,royal college of general practitioners,91.42857142857143,False
 croydon clinical commissioning group,devon clinical commissioning group,91.42857142857143,False
 southend hospital,southmead hospital,91.42857142857143,False
+metropolitan police service and college of policing,college of policing and metropolitan police,91.48936170212765,False
 gloucestershire county council,worcestershire county council,91.52542372881356,False
 leicestershire county council,gloucestershire county council,91.52542372881356,False
 nhs england nhs improvements,nhs england and nhs improvement,91.52542372881356,False
@@ -182,6 +190,8 @@ hmp woddhill,hmp woodhill,91.66666666666666,False
 british association of dermatologists,association of british neurologists,91.66666666666666,False
 hywel dda university local health board,hywel dda university health board,91.66666666666666,False
 communities,incommunities,91.66666666666666,False
+bristol clinical commissioning group,bromley clinical commissioning group,91.66666666666666,False
+heywood and middleton clinical commissioning group,rochdale heywood and middleton clinical commissioning group,91.74311926605505,False
 university hospital morecambe bay trust,university hospital of morecambe bay nhs trust,91.76470588235294,False
 derbyshire healthcare nhs trust,berkshire healthcare nhs trust,91.80327868852459,False
 clinical commissioning group,bury clinical commissioning group,91.80327868852459,False
@@ -253,6 +263,7 @@ british healthcare trades association,british health trades association,94.28571
 essex university partnership trust,essex partnership university nhs trust,94.44444444444444,True
 essex partnership university trust,essex partnership university nhs trust,94.44444444444444,True
 nhs greater manchester integrated care,greater manchester integrated care,94.44444444444444,True
+northampton general hospital trust,northampton general hospital nhs trust,94.44444444444444,True
 sandwell and west birmingham hospital trust,sandwell and west birmingham hospitals nhs trust,94.5054945054945,True
 central north west london nhs trust,central and north west london nhs trust,94.5945945945946,True
 nhs kernow clinical commissioning group,kernow clinical commissioning group,94.5945945945946,True
