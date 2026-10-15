@@ -181,6 +181,28 @@ NO_ACTION_RX = re.compile(
     r"\bno\s+(?:further\s+)?(?:action|changes?)\s+(?:is|are|was|will\s+be)?\s*(?:required|needed|necessary|proposed|planned)", re.I)
 
 
+# Coroner's report template lines that responses often quote back; they are not promises.
+TEMPLATE_RX = re.compile(
+    r"under\s+a\s+duty\s+to\s+respond|within\s+56\s+days|your\s+response\s+must\s+contain|"
+    r"duty\s+to\s+send\s+a\s+copy\s+of\s+your\s+response|the\s+coroner,?\s+may\s+extend|"
+    r"paragraph\s+7,?\s+schedule\s+5|regulations?\s+28\s+and\s+29|setting\s+out\s+the\s+timetable\s+for\s+action", re.I)
+
+
+def is_not_a_promise(quote: str | None) -> bool:
+    return bool(NO_ACTION_RX.search(quote or "") or TEMPLATE_RX.search(quote or ""))
+
+
+def drop_non_promises(conn) -> int:
+    """Remove stored promises that are template text or statements that no action is needed."""
+    ids = [r[0] for r in conn.execute("SELECT id, action_quote FROM promises").fetchall() if is_not_a_promise(r[1])]
+    for i in ids:
+        conn.execute("UPDATE recurrence_verdicts SET promise_id=NULL, promise_quote=NULL, after_promise=NULL WHERE promise_id=?", (i,))
+        conn.execute("DELETE FROM followups WHERE promise_id=?", (i,))
+        conn.execute("DELETE FROM promises WHERE id=?", (i,))
+    conn.commit()
+    return len(ids)
+
+
 def _none(v: str | None) -> str | None:
     v = (v or "").strip()
     return None if v.lower() in ("", "null", "none", "n/a", "na", "not stated", "unknown") else v
@@ -219,8 +241,8 @@ def extract_one(llm: LLM, resp_row, concerns: list[dict], stage: str = STAGE) ->
         return out
     source = text[:MAX_RESPONSE_CHARS]
     for p in parsed.promises:
-        if NO_ACTION_RX.search(p.action_quote or ""):
-            continue  # a statement that no action is needed is not a promise
+        if is_not_a_promise(p.action_quote):
+            continue  # template text, or a statement that no action is needed, is not a promise
         status, q = check_quote(p.action_quote, source)
         out["quotes"] += 1
         out["verified"] += status != UNVERIFIED

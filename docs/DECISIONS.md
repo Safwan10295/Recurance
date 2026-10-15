@@ -90,3 +90,11 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 2. No deployed-app key exists yet, so the local server process was given the pipeline key as NEBIUS_LIVE_API_KEY, server side only. It is never sent to a browser, and nothing was deployed.
 3. The test's cost ceiling was $0.05, and its spend was copied into the pipeline ledger under dev, so the accounting is complete.
 4. The deployed app must still use its own key (docs/DEPLOY.md).
+
+## D16. What "quotes verified" means for a judged link
+
+1. The handoff requires verbatim quotes from both documents for every shown link. Those are the earlier and later quotes.
+2. The first Stage C pilot also failed a verdict whenever the optional promise quote did not match, which gave 85%.
+3. Now a link counts as verified when both report quotes verify. An unverified promise quote is never shown; the link may still be.
+4. Stage B had also captured some coroner template lines that responses quote back (for example "You are under a duty to respond"). Ten such non-promises were removed, and the extractor now filters them.
+5. Re-checked with no model calls, the same pilot verified 19 of 20 (95%).

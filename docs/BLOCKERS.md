@@ -29,3 +29,14 @@
 - Effect: Stage B found nothing to do, Stage C did not run, and later steps ran on empty inputs. Spend was negligible ($0.04, mostly cached work).
 - Fix: corrupt PDFs now give empty text instead of an error, response text is committed as it goes, connections have a 30-second busy timeout, and a failed step's connections are released.
 - Result: the orchestrator was re-run from the responses step. Fetched PDFs and earlier model calls were reused from cache.
+
+## B4. Stage C pilot did not pass
+
+- When: 2026-10-15T03:54+00:00
+- pilot C: schema 100%, quotes verified 85%, cost/item $0.000528, projected $1.7227 for 3265 items, stage remaining $3.9616
+- Stage C full run skipped.
+
+## B4 (resolved). Stage C pilot at 85% quote verification
+
+- Cause and fix: DECISIONS D16. The promise quote is optional and no longer fails a verdict; template text is no longer treated as a promise.
+- After the fix the pilot verified 19 of 20. Stage C was re-run from its pilot.

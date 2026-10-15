@@ -179,11 +179,34 @@ def judge_one(llm: LLM, d: dict, stage: str = STAGE) -> dict:
         "ok": True, "relation": v.relation, "confidence": max(0.0, min(1.0, float(v.confidence))),
         "explanation": explanation if is_clean(explanation) else None,
         "earlier_quote": e_q if e_status else v.earlier_quote, "later_quote": l_q if l_status else v.later_quote,
+        # A shown link needs verified quotes from both reports. The promise quote is optional:
+        # if it does not verify it is simply not shown (p_q stays None), the link still can be.
         "promise_quote": p_q, "promise_id": p_id, "after_promise": after,
-        "quotes_verified": int(bool(e_status and l_status and (p_status or not v.promise_quote))),
+        "quotes_verified": int(bool(e_status and l_status)),
         "reasoning_summary": (r.reasoning or "")[:600] or None,
     })
     return out
+
+
+def reverify(conn=None) -> dict:
+    """Re-check stored verdict quotes against the report texts. No model calls."""
+    own = conn is None
+    conn = conn or db.connect()
+    rows = conn.execute("SELECT pair_id, earlier_quote, later_quote, quotes_verified FROM recurrence_verdicts").fetchall()
+    changed = 0
+    for r in rows:
+        d = pair_dict(conn, *conn.execute(
+            "SELECT earlier_concern_id, later_concern_id, organisation_id FROM candidate_pairs WHERE id=?",
+            (r["pair_id"],)).fetchone(), r["pair_id"])
+        ok = int(bool(check_quote(r["earlier_quote"], d["e_concerns"] or "")[0]
+                      and check_quote(r["later_quote"], d["l_concerns"] or "")[0]))
+        if ok != r["quotes_verified"]:
+            conn.execute("UPDATE recurrence_verdicts SET quotes_verified=? WHERE pair_id=?", (ok, r["pair_id"]))
+            changed += 1
+    conn.commit()
+    if own:
+        conn.close()
+    return {"verdicts": len(rows), "changed": changed}
 
 
 def save(conn, res: dict, model_id: str) -> None:
