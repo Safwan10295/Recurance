@@ -130,9 +130,34 @@ def step_responses(st: dict, llm: LLM) -> None:
     conn.close()
 
 
+LISTING: dict = {}
+
+
+def start_listing_crawl() -> None:
+    """The listing cross-check needs only judiciary.uk requests, so it overlaps the model-only stages."""
+    import threading
+
+    from pipeline.scrape.http import Fetcher
+    from pipeline.scrape.run import crawl_listing
+
+    def run():
+        try:
+            LISTING["urls"] = len(crawl_listing(Fetcher()))
+        except Exception as e:  # a cross-check must not stop the pipeline
+            LISTING["error"] = str(e)
+
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    LISTING["thread"] = t
+
+
 def step_stage_b(st: dict, llm: LLM) -> None:
     from pipeline.extract import promises as B
     from pipeline.llm import confirm_full_run
+
+    if not (config.CACHE / "urls_listing.json").exists() and "thread" not in LISTING:
+        log("listing cross-check crawl started in the background")
+        start_listing_crawl()
 
     conn = db.connect()
     rows = B.pending_responses(conn, list(B.scope_report_orgs(conn)))
@@ -303,6 +328,11 @@ def main() -> None:
         save_state(st)
         log(f"=== {name} done in {time.time() - t0:.0f}s")
         log(spend_report(Ledger()).replace("\n", " | "))
+    if "thread" in LISTING:
+        LISTING["thread"].join(timeout=1800)
+        log(f"listing cross-check: {LISTING.get('urls')} URLs {LISTING.get('error', '')}")
+        step_ingest_checks(st)
+        save_state(st)
 
 
 if __name__ == "__main__":
