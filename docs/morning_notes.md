@@ -1,47 +1,38 @@
 ## Where things stand
 
-1. The site reads PostgreSQL and works as a tool. To open it on this PC, double-click start_site.cmd, then go to http://localhost:3000.
-2. New on 16 Oct, latest round:
-   - Check a report is a tool-calling agent: Nemotron Super chooses each tool, and every call is shown;
-   - 269 promises have Tavily follow-up checks;
-   - the evaluation shows 95% ranges and explains every miss;
-   - a read-only API, backup and smoke-test scripts, and a December runbook;
-   - submission writing in docs/DEVPOST_DRAFT.md, docs/VIDEO_SHOT_LIST.md and docs/SUBMISSION_CHECKLIST.md.
-3. Earlier on 16 Oct:
-   - the guided tour, You be the judge and the map replay;
-   - the Promises, Hazard map and How Nemotron did the work pages;
-   - a command palette and a light and dark toggle.
-4. Quotes name the deceased by report title only, and staff and family names are redacted, including in web sources.
-5. The smart motorways chain is /chains/c52cded99f756309.
+1. The site reads PostgreSQL and works as a tool. To open it on this PC, double-click start_site.cmd, then go to http://localhost:3000. Without a live key, Check a report replays recorded and archive briefs instead of running live.
+2. The repo is private on GitHub, and this round is pushed to it.
+
+## What changed this round
+
+1. Check a report always gives an answer. Archive reports show their own saved brief, the three example chips run instantly from recorded agent runs, and other input gets labelled examples (D32).
+2. Start here has the animated smart motorway timeline, four ways in for a coroner, a solicitor or lawyer, a family and a safety team, and a built-with strip.
+3. Each link's quotes can be seen highlighted inside their source reports ("Verified word for word", D34).
+4. Featured chains pass a quality gate, and the VTE chain is never featured (D31, docs/FEATURED.md).
+5. A second candidate route added 143 shown links. It did not change the blind-test result, and the Evaluation page shows it apart as post-hoc (D30).
+6. The chains page has a Start here row, filter chips and dot timelines. Evaluation has a chart with ranges. Briefs and chains print on one page.
+7. A stricter redaction pass caught 10 quotes with a first name, and titles no longer say "causing" (D34, D35).
+8. Lighthouse before and after, and the full audit, are in docs/GAP_ANALYSIS.md. Every audited page now scores 95 or more for performance and 100 for accessibility.
+
+## Tavily
+
+No Tavily credits were used this round. Stage F's earlier use is in the spend section above.
 
 ## Blockers this round
 
-1. The roughly $25 of Tavily credit Pilot mentioned does not show on the key in .env: it reports the free 1,000-a-month plan, and pay-as-you-go is unused. The budget was therefore set from that plan's balance (D28). If the paid credit is on another key, swap the key in .env.
-2. The Token Factory credit expiry cannot be read from the API. It has to be checked in the console.
+None. Ontario was skipped as agreed (D33).
 
 ## Verified
 
-1. The whole pipeline ran on the real archive: scrape, parse, OCR, normalise, Stages A, B, C, D and F, chains, evaluation and publish.
-2. 56 Python tests and 15 TypeScript tests pass. They run offline, apart from one publish test that uses a throwaway schema in the local PostgreSQL.
-3. Every paid stage passed its 20-item pilot before its full run.
-4. In the Docker test:
-   - every route answered;
-   - search, redirects and the paused brief behaved;
-   - the web app's database role could not change published data.
-5. Every main page at phone width, light and dark, with no sideways scrolling.
-6. Secret scans (gitleaks plus a check against the .env values) ran before every commit. No env file was ever committed.
+1. 67 Python tests and 15 TypeScript tests pass offline.
+2. With no live key, all 28 demo-chain reports and the chip reports replay their recorded briefs, other linked archive reports give archive briefs, and free text gets labelled examples. The pause reason appears in the server log.
+3. 76 screenshots: every route, desktop and phone, light and dark, with no sideways scrolling and no browser errors.
+4. All 2,720 shown quotes were found in their source for the new context panel, and a leak check on the context windows found no recorded names.
+5. Secret scans ran before every commit.
 
 ## Not tested
 
-1. The stack on a real Nebius VM with a real certificate. That needs your VM.
-2. The hosted brief with its own key, and the per-visitor limit behind the real proxy.
+1. The live agent with a visitor-facing key. The site was run locally without one, as you asked.
+2. The stack on a real Nebius VM with a real certificate.
 3. Precision of shown links, which waits on your labels.
-4. The NTSB stretch, which was not built (Phase 5 in docs/PROGRESS.md).
-
-## What changed from the plan
-
-1. The Batch API was unavailable all night (403), so everything ran in real time.
-2. PostgreSQL on our own server replaced Vercel and Supabase (D21, D23).
-3. Nano needed bounded JSON schemas to stop repetition loops (D11).
-4. Candidate pairs per organisation scale with its size, and chains join through shared concerns (D18, D19).
-5. A blind test of 29 coroner-acknowledged pairs is the main evaluation. Hand-label metrics are pending.
+4. The post-hoc route on held-out pairs, as no second test set exists.

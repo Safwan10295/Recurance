@@ -6,7 +6,7 @@ Status as of 16 Oct 2026. "Pilot" marks steps only Pilot can do.
 
 | Step | Status |
 |---|---|
-| 1. Repo public, MIT licence in About, secret scan clean, .env never committed | Scans clean on every commit; .env never committed. Public repo and About: Pilot, after the purge below |
+| 1. Repo public, MIT licence in About, secret scan clean, .env never committed | Scans clean on every commit; .env never committed; private files purged from history. Making it public: Pilot, below |
 | 2. README: what, why, setup, pipeline, Nemotron routing and ledger, Tavily, prior art, limitations | Done |
 | 3. Demo URL live, live brief limits in place, graceful degradation tested | Limits and fallback tested locally and in Docker. Server and URL: Pilot (deploy/README.md) |
 | 4. YouTube video public, under 3 minutes | Shot list ready (docs/VIDEO_SHOT_LIST.md). Recording and upload: Pilot |
@@ -17,35 +17,29 @@ Status as of 16 Oct 2026. "Pilot" marks steps only Pilot can do.
 
 | Item | Status |
 |---|---|
-| At least 3 human-reviewed chains with quotes, promises and follow-up | Pilot: read data/exports/review_pack.md, then run `.venv\Scripts\python -m pipeline.cli review --featured` |
+| At least 3 human-reviewed chains with quotes, promises and follow-up | 2 approved (smart motorways, emollients). Pilot: run `.venv\Scripts\python -m pipeline.cli dossiers-export`, read data/exports/dossiers_for_review.md, then run `.venv\Scripts\python -m pipeline.cli review --featured` |
 | Live brief works on a real new report within limits | Done, with the tool-calling agent and the fixed pipeline as fallback |
 | Evaluation shows the Nemotron stage beating the baselines, with numbers | Done, with 95% intervals and every miss explained. Precision waits on hand labels (optional) |
 | Total Nebius spend under $20, live reserve untouched | Done |
 
-## Before making the repo public (Pilot, in this order)
+## Making the repo public (Pilot, when you submit)
 
-Run these from the recurrence-watch folder in Git Bash. The first rewrites local history, so nothing should have been pushed yet.
+The three private files were purged from history on 16 Oct, and the repo was pushed to GitHub as private. They stay git-ignored.
 
-1. Remove the three files with unredacted or unreviewed text from every past commit:
-
-```
-bash scripts/purge_private_exports.sh
-```
-
-2. Check that they are gone. This should print nothing:
+1. Check that they are still absent from history. This should print nothing:
 
 ```
 git log --all --oneline -- data/exports/hand_labels.csv data/exports/systemic.json data/exports/dossiers_for_review.md
 ```
 
-3. Scan the whole history for secrets. It should say "no leaks found":
+2. Scan the whole history for secrets. It should say "no leaks found":
 
 ```
 gitleaks detect --config .gitleaks.toml
 ```
 
-4. Create the GitHub repository, push, then make it public.
-5. In the repository's About panel, check that the licence shows as MIT.
+3. On GitHub, open Settings, then change the visibility to public.
+4. In the repository's About panel, check that the licence shows as MIT.
 
 ## Before submitting (Pilot)
 

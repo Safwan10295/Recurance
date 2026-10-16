@@ -268,10 +268,15 @@ def cmd_review(a):
     keys = None
     if a.featured:
         # The demo chains named in pipeline/publish/featured.yaml, as they resolve now.
+        from .publish import featured
+
+        spec = featured.load()
+        named = FEATURED_KEYS + [e["key"] for sec in ("featured", "start_here") for e in spec[sec] if e.get("key")]
         conn = db.connect()
-        have = {r[0] for r in conn.execute("SELECT chain_key FROM dossiers")}
-        keys = [k for k in FEATURED_KEYS if k in have]
+        todo = {r[0] for r in conn.execute("SELECT chain_key FROM dossiers WHERE reviewed_by_human IS NOT 1")}
+        keys = [k for k in dict.fromkeys(named) if k in todo]  # in order, each once, only those not yet approved
         conn.close()
+        print(f"{len(keys)} featured dossiers waiting: {', '.join(keys) or 'none'}")
     n = review.interactive(keys)
     if n and os.environ.get("DATABASE_URL"):
         print(f"{n} approved. Publishing so the site shows them (about 3 minutes)...")

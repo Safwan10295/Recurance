@@ -54,7 +54,7 @@ On screen: How Nemotron did the work, then Evaluation.
 
 Say:
 
-1. The funnel: 6,454 reports, 15,366 concerns, 4,061 pairs judged, 1,217 links shown, for about $5 on Token Factory. Nano reads, Super judges, Ultra drafts dossiers.
+1. The funnel: 6,454 reports, 15,366 concerns, 4,543 pairs judged, 1,360 links shown, for about $5 on Token Factory. Nano reads, Super judges, Ultra drafts dossiers.
 2. The blind test: at the same number of shown links, TF-IDF found 34%, embeddings 41%, and the hybrid with the Nemotron judge 52% of the recurrences coroners themselves flagged.
 
 ## 2:45 to 3:00. Close

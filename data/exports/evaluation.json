@@ -74,26 +74,26 @@
   "embedding_equal_budget": 0.7262049913406372
  },
  "lost_memory": {
-  "links": 1217,
-  "diff_coroner": 0.8356614626129828,
-  "diff_area": 0.7871815940838126,
-  "not_cited": 0.9876746096959738,
-  "all_three": 0.7280197206244864
+  "links": 1360,
+  "diff_coroner": 0.8470588235294118,
+  "diff_area": 0.8029411764705883,
+  "not_cited": 0.9889705882352942,
+  "all_three": 0.7485294117647059
  },
  "cost": {
-  "total": 5.5068,
+  "total": 5.6516,
   "by_stage": {
    "A": 0.7729,
    "B": 0.2321,
    "C": 3.367,
    "D": 0.966,
    "F": 0.0451,
-   "dev": 0.112,
+   "dev": 0.2568,
    "embed": 0.0117
   },
   "analysis_cost": 4.3838,
   "chains": 666,
-  "per_chain": 0.00827,
+  "per_chain": 0.00849,
   "per_chain_analysis": 0.00658
  },
  "hand_labels": {
@@ -362,11 +362,11 @@
  "models": [
   {
    "model": "nvidia/nemotron-3-super-120b-a12b",
-   "calls": 4749,
-   "input_tokens": 5492008,
-   "output_tokens": 2130299,
-   "reasoning_tokens": 1281159,
-   "cost": 3.4574
+   "calls": 4986,
+   "input_tokens": 5836630,
+   "output_tokens": 2194920,
+   "reasoning_tokens": 1286819,
+   "cost": 3.6022
   },
   {
    "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
@@ -386,13 +386,13 @@
   },
   {
    "model": "Qwen/Qwen3-Embedding-8B",
-   "calls": 318,
-   "input_tokens": 1187784,
+   "calls": 350,
+   "input_tokens": 1188122,
    "output_tokens": 0,
    "reasoning_tokens": 0,
-   "cost": 0.0117
+   "cost": 0.0118
   }
  ],
- "report_generated_at": "2026-10-16T18:43:03+00:00",
+ "report_generated_at": "2026-10-16T22:52:56+00:00",
  "post_hoc_note": "Post-hoc: the report route was added after seeing that most misses never reached the judge, so its result is not an independent test. It finds 15 of 29 (52%): 0 more than before, 0 fewer. It shows 1360 links; at that larger budget the baselines find tf-idf only 45%, embeddings only 52%. No other test set of coroner-acknowledged pairs exists, so it has not been validated on held-out pairs."
 }

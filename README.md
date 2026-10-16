@@ -79,21 +79,21 @@ Tavily checks what happened after an organisation stated an action. For each pro
 |---|---|---|---|
 | A, concerns from 6,196 reports | Nano | 6,780 | $0.77 |
 | B, promises from responses, including one incremental refresh | Nano | 1,751 | $0.23 |
-| C, 4,061 report pairs judged, plus evaluation and systemic clusters | Super | 4,122 | $3.02 |
+| C, 4,543 report pairs judged, plus evaluation and systemic clusters | Super | 4,608 | $3.37 |
 | D, flagship dossiers | Ultra | 76 | $0.97 |
 | F, follow-up classification | Nano | 266 | $0.05 |
 | Embeddings | Qwen3-Embedding-8B | 310 | $0.01 |
-| Pilots, development, chain titles and live tests | mixed | 868 | $0.11 |
-| Total | | 14,173 | $5.16 |
+| Pilots, development, chain titles, live tests and 28 precomputed briefs | mixed | 1,217 | $0.26 |
+| Total | | 15,008 | $5.65 |
 
-Every call is in the llm_calls ledger (14,371 rows, including 197 free cache hits). One row is a local attempt made before the key was loaded; it sent nothing and cost nothing. Stage F used 801 Tavily credits by the ledger's count, every call logged in tavily_calls.
+Every call is in the llm_calls ledger (15,267 rows, including 258 free cache hits). One row is a local attempt made before the key was loaded; it sent nothing and cost nothing. Stage F used 801 Tavily credits by the ledger's count, every call logged in tavily_calls.
 
 ## Results
 
 1. 6,454 unique reports ingested, 15,366 concerns extracted, 98% with quotes verified against the source.
-2. 1,217 links shown, in 618 chains, each with verbatim quotes from both reports, a relation and a confidence.
-3. In 84% of shown links the later report came from a different coroner, and in 99% it did not cite the earlier report.
-4. On a blind test of 29 pairs that coroners themselves acknowledged, at the same number of shown links, recall was 34% for TF-IDF, 41% for embeddings and 52% for the hybrid with the Nemotron Super judge.
+2. 1,360 links shown, in 666 chains, each with verbatim quotes from both reports, a relation and a confidence.
+3. In 85% of shown links the later report came from a different coroner, and in 99% it did not cite the earlier report.
+4. On a blind test of 29 pairs that coroners themselves acknowledged, at the same number of shown links, recall was 34% for TF-IDF, 41% for embeddings and 52% for the hybrid with the Nemotron Super judge. A second candidate route added afterwards (D30) left recall at 52% and is reported separately as post-hoc.
 5. Precision of shown links needs hand labels, which are prepared but not yet done (docs/EVALUATION.md).
 
 ## Repository layout

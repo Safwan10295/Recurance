@@ -38,6 +38,7 @@ counts = {
     "promises": q("SELECT COUNT(*) FROM promises WHERE quote_verified>0"),
     "chains": q("SELECT COUNT(*) FROM chains"),
     "dossiers": q("SELECT COUNT(*) FROM dossiers"),
+    "approved": q("SELECT COUNT(*) FROM dossiers WHERE reviewed_by_human=1"),
     "followups": q("SELECT COUNT(*) FROM followups"),
 }
 rel = dict(conn.execute("SELECT relation, COUNT(*) FROM recurrence_verdicts GROUP BY 1").fetchall())
@@ -56,14 +57,14 @@ L += [f"1. Report pages parsed: {counts['reports']} ({counts['unique']} unique a
       f"3. Organisations after normalisation: {counts['orgs']}.",
       f"4. Candidate pairs: {counts['pairs']}. Judged by Nemotron Super: {counts['judged']} ({', '.join(f'{k} {v}' for k, v in sorted(rel.items(), key=lambda x: str(x[0])))}).",
       f"5. Response documents read: {counts['responses']}. Promises with verified quotes: {counts['promises']}.",
-      f"6. Verified chains: {counts['chains']}. Dossiers drafted (all unreviewed): {counts['dossiers']}. Follow-up checks: {counts['followups']}.", ""]
+      f"6. Verified chains: {counts['chains']}. Dossiers drafted: {counts['dossiers']}, of which you have approved {counts['approved']}. Follow-up checks: {counts['followups']}.", ""]
 diff = (counts["unique"] - config.EXPECTED_UNIQUE_REPORTS) / config.EXPECTED_UNIQUE_REPORTS
 L += [f"Unique reports vs the expected 6,449: {counts['unique']} ({diff:+.1%}). The listing pages and sitemaps were cross-checked (docs/RESEARCH_LOG.md).", ""]
 if ev:
     L += ["## Evaluation headline", ""]
     for s in ev["systems"]:
         r = s["recall_at_threshold"]
-        L.append(f"- {s['name']}: blind-test recall {'pending' if r is None else f'{r:.0%}'}, links shown {s['shown_pairs']}.")
+        L.append(f"- {s['name']}{' (post-hoc, D30)' if s.get('post_hoc') else ''}: blind-test recall {'pending' if r is None else f'{r:.0%}'}, links shown {s['shown_pairs']}.")
     L += [f"- Test set: {ev['acknowledged']['in_scope_6m']} coroner-acknowledged pairs (same organisation, six months or more apart).",
           f"- Precision: {ev['hand_labels']['status']}.", "", "Full detail: docs/EVALUATION.md.", ""]
 if notes_file.exists():
@@ -74,11 +75,14 @@ if blk.exists():
     L += ["- " + ln[3:] for ln in blk.read_text(encoding="utf-8").splitlines() if ln.startswith("## ")] + [""]
 L += ["## Things only you can do", "",
       "Each step is written out in docs/SUBMISSION_CHECKLIST.md.", "",
-      "1. Check the credit expiry date in the Token Factory console, if you can find it. It cannot be read from the API.",
-      "2. Create the server (deploy/README.md) and a separate Token Factory key for it.",
-      "3. Approve at least 3 dossiers: read data/exports/review_pack.md, then run .venv\Scripts\python -m pipeline.cli review --featured.",
+      "1. Approve the featured dossiers that are waiting. Platform ends is among them again because its chain key changed when the second route added links.",
+      "   - Run .venv\Scripts\python -m pipeline.cli dossiers-export.",
+      "   - Read data/exports/dossiers_for_review.md.",
+      "   - Run .venv\Scripts\python -m pipeline.cli review --featured. It offers the four waiting, platform ends first.",
+      "2. Check the credit expiry date in the Token Factory console. It cannot be read from the API.",
+      "3. Create the server (deploy/README.md) and a separate Token Factory key for it.",
       "4. Optional: label the 80 test pairs (.venv\Scripts\python -m pipeline.cli label) to fill in precision.",
-      "5. Purge the private files from git history, scan it, then make the repo public (the commands are in the checklist).",
+      "5. Make the repo public when you submit. Its history was already purged; run the scan in the checklist first.",
       "6. Record the video from docs/VIDEO_SHOT_LIST.md and make it public on YouTube.",
       "7. Submit on Devpost with docs/DEVPOST_DRAFT.md and docs/FEEDBACK.md.",
       "8. After the hackathon, rotate the keys that were pasted into a chat.", ""]

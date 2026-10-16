@@ -224,3 +224,28 @@ Verified:
 - The live agent was tested in a browser under a $0.05 ceiling.
 
 Spend by stage: A $0.77, B $0.23, C $3.02, D $0.97, F $0.05, dev $0.11, embeddings $0.01. Total $5.16 of $20. The $5 live reserve and the $9.50 margin are untouched.
+
+## Phase 10: judge-facing polish, brief fallback, featured gate, post-hoc route (2026-10-16)
+
+1. Check a report is never a dead end without a live key (D32):
+   - archive reports show their own saved brief with the steps replayed;
+   - other input gets the closest recorded examples, labelled as not the visitor's report;
+   - the pause reason is written to the server log.
+   Tested on all 28 reports of the four demo chains plus the chip reports: every one replays its recorded brief in about 7 seconds. Four other linked archive reports gave archive briefs.
+2. The three example chips and four audience cards run from 28 recorded agent briefs ($0.148).
+3. A quality gate for featured chains (D31). docs/FEATURED.md lists each decision. The VTE chain and one sharing its earlier report are never featured.
+4. A second candidate route by whole-report wording (D30):
+   - 482 pairs judged for $0.341;
+   - 153 identical or closely related, 99% with quotes verified;
+   - shown links rose from 1,217 to 1,360, and chains from 618 to 666;
+   - blind-test recall unchanged at 15 of 29, reported as a separate post-hoc row.
+5. Home page: the animated smart motorway timeline, the audience cards and a built-with strip. Chains page: Start here row, filter chips, dot timelines and coroner counts. Evaluation: a bar chart with 95% ranges. Printable one-page brief and chain.
+6. Verified word for word: each shown quote highlighted in a short redacted window of its source (D34). A stricter first-name redaction pass now runs on every quote and model sentence, and changed 10 published quotes.
+7. Titles say "leading to", never "causing" (D35).
+8. Lighthouse: chain page performance from 83 to 95 and accessibility from 93 to 100. Every audited page now scores 95 or more for performance and 100 for accessibility (docs/GAP_ANALYSIS.md).
+
+Verified:
+- 67 Python and 15 TypeScript tests pass offline, including new tests for the featured gate, the context window, the first-name pass and title wording.
+- 76 screenshots across every route, desktop and phone, light and dark, with no sideways scrolling and no browser errors.
+
+Spend by stage: A $0.77, B $0.23, C $3.37, D $0.97, F $0.05, dev $0.26, embeddings $0.01. Total $5.65 of $20. This round used $0.49 of its $4. The $5 live reserve and the $9.50 margin are untouched.

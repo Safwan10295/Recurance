@@ -40,6 +40,7 @@ def main() -> None:
     shutil.copy(PRE_PAIRS, PAIRS)
     ev = json.loads(EV.read_text(encoding="utf-8"))
     ev["systems"] = [s for s in ev["systems"] if not s.get("post_hoc")]
+    ev["lost_memory"] = post.get("lost_memory", ev.get("lost_memory"))  # describes the links shown now, not the test
     hybrid = post["systems"][-1]
     n = len(post_pairs)
     k = sum(bool(p.get("judge_shown")) for p in post_pairs)

@@ -19,10 +19,12 @@ In England and Wales, when a death reveals a risk to others, the coroner writes 
 Recurrence Watch reads every report and response published since 2013 and links later concerns to earlier warnings sent to the same organisation. Each link shows the exact words from both reports, checked by code, with a relation and a confidence.
 
 - Check a report: an agent built on NVIDIA Nemotron takes any report, new or old. Nemotron Super decides which tools to use: search the organisation's earlier warnings, judge each candidate, read what was promised, look up the chain, check the web with Tavily. It then submits a brief with verified quotes. Every tool call is shown as it happens, with tokens, time and cost.
-- Recurrence chains: 618 hazards raised again and again with one organisation, told report by report.
-- Promises, then the same concern: 508 cases where a response stated an action and a later coroner raised the same concern.
+- Recurrence chains: 666 hazards raised again and again with one organisation, told report by report.
+- Promises, then the same concern: 563 cases where a response stated an action and a later coroner raised the same concern.
 - Hazard map: 15,044 concerns placed by meaning, with the recurrences drawn between them and a replay year by year.
 - You be the judge: decide whether two concerns are the same hazard, then compare your call with Nemotron Super's.
+- Verified word for word: open any link to see both quotes highlighted inside the text of their source reports.
+- Ways in for a coroner, a solicitor, a family and a safety team, each opening a real report in the agent. Every brief also prints as one page.
 
 The data refreshes itself every week from judiciary.uk.
 
@@ -41,11 +43,11 @@ The agent's model never writes the quotes we show. Verdicts come from a judge to
 
 Tavily checks what happened after a promise. 269 stated actions in the chains were checked, starting with the demo chains and those with a dossier. Nano classified the sources, quoting them word for word: evidence found for 28, contradicting for 2, and nothing either way for 239. We never present that last group as "did not happen". The live agent can run its own Tavily checks within a daily cap.
 
-The full archive cost $5.16 on Token Factory: 6,454 reports, 15,366 concerns, 4,061 pairs judged. A live agent run costs about half a cent.
+The full archive cost $5.65 on Token Factory: 6,454 reports, 15,366 concerns, 4,543 pairs judged. A live agent run costs about half a cent.
 
 ## Evaluation
 
-We needed ground truth that did not come from the model, so we used the coroners themselves. Where a later report names an earlier one, we removed that citation and asked each system to find the earlier report. At the same number of links shown, TF-IDF found 34%, embeddings 41%, and the hybrid with the Nemotron Super judge 52% (15 of 29). With 29 pairs the 95% ranges overlap, and the evaluation page says so. It also lists every miss: 9 of the 14 never reached the judge, which tells us the next improvement is in retrieval for large national bodies, not in the judge.
+We needed ground truth that did not come from the model, so we used the coroners themselves. Where a later report names an earlier one, we removed that citation and asked each system to find the earlier report. At the same number of links shown, TF-IDF found 34%, embeddings 41%, and the hybrid with the Nemotron Super judge 52% (15 of 29). With 29 pairs the 95% ranges overlap, and the evaluation page says so. It also lists every miss: 9 of the 14 never reached the judge, which tells us the next improvement is in retrieval for large national bodies, not in the judge. We then tried a second candidate route by whole-report wording. It found many new verified links across the archive but no extra test pairs, and the evaluation page shows it as a separate post-hoc result rather than folding it into the comparison.
 
 ## Responsible use
 

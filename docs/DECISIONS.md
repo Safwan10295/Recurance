@@ -222,3 +222,27 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 ## D33. Ontario skipped
 
 1. The optional Ontario extension was skipped, as agreed in round 3. Its data terms are uncertain and its response duty differs. The time went to the brief fallback and the judge-facing pages instead.
+
+## D34. Verified word for word, and a stricter redaction pass
+
+1. Each shown link now carries a short window of source text either side of both quotes, up to 220 characters, cut at whole words. On the chain page the quote is highlighted inside it. All 2,720 shown quotes were found in their source.
+2. Only the window is published, never the whole report.
+3. Text in a window has not been through a quote check, so it gets a stricter pass on top of the usual redaction:
+   - every part of the deceased's name and of each person recorded in the report, with and without accents;
+   - any first name known anywhere in the archive, with the capitalised words after it;
+   - any name after Mr, Mrs, Ms, Dr or Baby.
+   A first name followed by a place word ("John Radcliffe Hospital", "Clare's Law") is kept.
+4. The first-name list drops words that report text uses more often in lower case ("home", "will"), and rare entries that are also part of a coroner area or organisation name ("Surrey").
+5. Checking the published quotes against this pass found 10 with a first name the earlier redaction missed (for example "In Chris' case"). The first-name pass now runs on every quote and model sentence. It changed those 10 and nothing else.
+6. Pages fetched fresh by the live brief still use the TypeScript redaction, which has no first-name list. The live brief is paused for visitors without a key, so this path is not shown publicly at present.
+
+## D35. Hazard titles say "leading to", never "causing"
+
+1. 48 model-written chain titles used "causing" for a hazard's mechanism ("No hard shoulder on smart motorways causing unsafe stops").
+2. The wording rule forbids "caused", so titles are rewritten in code: "causing" becomes "leading to", and "caused by" becomes "from". Nouns such as "root cause" are left alone.
+
+## D36. Example reports for the chips and audience cards
+
+1. The examples must run instantly and show a real result, so they come from the 28 precomputed briefs.
+2. The ambulance report first chosen found no earlier warnings in its precomputed run: the agent picked the Department of Health and Social Care as its organisation. It was replaced by a 2026 young driver report that finds 4.
+3. The examples are a smart motorway report (coroner), a young driver report (solicitor or lawyer), a railway platform report (family) and a prison first aid report (safety team).

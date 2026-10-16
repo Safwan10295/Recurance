@@ -37,7 +37,7 @@ lines = [
     "| System | Recall on the blind test | Earlier report in the top 5 | Links shown | Precision |",
     "|---|---|---|---|---|",
 ]
-for s in ev["systems"]:
+for s in [s for s in ev["systems"] if not s.get("post_hoc")]:
     lines.append(f"| {s['name']} | {pct(s['recall_at_threshold'])} | {pct(s['recall_at_5'])} | {s['shown_pairs']} | {pct(s['precision'])} |")
 lines += [
     "",
@@ -47,11 +47,19 @@ lines += [
     "",
 ]
 lines += ["95% Wilson intervals on recall, with only these pairs:", ""]
-for s_ in ev["systems"]:
+for s_ in [s for s in ev["systems"] if not s.get("post_hoc")]:
     if s_.get("recall_ci95"):
         lo, hi = s_["recall_ci95"]
         lines.append(f"- {s_['name']}: {s_.get('hits')} of {s_.get('n')}, from {pct(lo)} to {pct(hi)}.")
 lines += ["", "The intervals overlap. The ordering is consistent, but the gap is not yet statistically settled.", ""]
+post = [s for s in ev["systems"] if s.get("post_hoc")]
+if post:
+    lines += ["## A change made after seeing the misses", "", "This is not part of the comparison above, and it is not an independent test.", ""]
+    for s_ in post:
+        lo, hi = s_["recall_ci95"]
+        lines.append(f"- {s_['name']}: {s_['description']}. {s_.get('hits')} of {s_.get('n')} ({pct(s_['recall_at_threshold'])}, "
+                     f"from {pct(lo)} to {pct(hi)}), with {s_['shown_pairs']} links shown.")
+    lines += ["", ev.get("post_hoc_note", ""), ""]
 misses = ev.get("misses") or []
 if misses:
     lines += ["## Where it fails", "",

@@ -31,6 +31,14 @@ For the hybrid system, the top-5 column means the pair passed the candidate rule
 
 The intervals overlap. The ordering is consistent, but the gap is not yet statistically settled.
 
+## A change made after seeing the misses
+
+This is not part of the comparison above, and it is not an independent test.
+
+- Hybrid + report route + Nemotron Super judge: Adds a second candidate route: each later report's top 3 earlier reports by whole-report wording. Added after seeing the misses. 15 of 29 (52%, from 34% to 69%), with 1360 links shown.
+
+Post-hoc: the report route was added after seeing that most misses never reached the judge, so its result is not an independent test. It finds 15 of 29 (52%): 0 more than before, 0 fewer. It shows 1360 links; at that larger budget the baselines find tf-idf only 45%, embeddings only 52%. No other test set of coroner-acknowledged pairs exists, so it has not been validated on held-out pairs.
+
 ## Where it fails
 
 The hybrid + Nemotron system missed 14 pairs: 9 not candidate, 5 judge rejected.
@@ -60,18 +68,18 @@ Status: pending: no labels filled in yet. Labelled pairs: 0.
 
 ## Lost memory among shown links
 
-1. Links shown: 1217.
-2. Later report from a different coroner: 84%.
-3. From a different coroner area: 79%.
+1. Links shown: 1360.
+2. Later report from a different coroner: 85%.
+3. From a different coroner area: 80%.
 4. Later report does not cite the earlier one: 99%.
-5. All three at once: 73%.
+5. All three at once: 75%.
 
 ## Cost
 
-1. Total Token Factory spend so far: $5.1515.
-2. Analysis cost (development, embeddings, Stages A to C): $4.0395.
-3. Verified chains: 618. Cost per verified chain: $0.0083.
-4. By stage: A $0.7729, B $0.2321, C $3.0227, D $0.9660, F $0.0352, dev $0.1108, embed $0.0117.
+1. Total Token Factory spend so far: $5.6516.
+2. Analysis cost (development, embeddings, Stages A to C): $4.3838.
+3. Verified chains: 666. Cost per verified chain: $0.0085.
+4. By stage: A $0.7729, B $0.2321, C $3.3670, D $0.9660, F $0.0451, dev $0.2568, embed $0.0117.
 
 ## Weak spots
 
