@@ -23,6 +23,17 @@ export function verifyQuote(quote: string | null | undefined, source: string): b
   return normForMatch(source).includes(q);
 }
 
+// A quote that matches the source apart from letter case (models often change "THERE WAS" to "There was")
+// is replaced by the source's own text, so what is shown is still word for word from the source.
+export function snapQuote(quote: string | null | undefined, source: string): string | null {
+  const q = normForMatch(quote ?? "");
+  if (q.length < 20) return null;
+  const src = normForMatch(source);
+  if (src.includes(q)) return q;
+  const i = src.toLowerCase().indexOf(q.toLowerCase());
+  return i >= 0 ? src.slice(i, i + q.length) : null;
+}
+
 export function tidy(s: string): string {
   return unify(s)
     .replace(/\r\n?/g, "\n")

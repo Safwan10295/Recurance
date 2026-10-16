@@ -16,6 +16,7 @@ type Match = {
   later_quote: string;
   promises: { id: number; quote: string; timescale: string | null }[];
   chains: ({ key: string; hazard: string } | string)[];
+  followups?: { promise: string; classification: "evidence_found" | "not_found" | "contradicting"; source_url?: string; quote?: string }[];
 };
 type Result = {
   organisation: { id: number; name: string } | null;
@@ -26,6 +27,7 @@ type Result = {
   searched?: number;
   cost?: number;
   notes: string[];
+  mode?: "agent" | "fixed";
 };
 type Example = { title: string; input: Record<string, string>; result: Result };
 type Suggestion = { url: string; slug: string; title: string; date: string };
@@ -156,7 +158,11 @@ export default function BriefTool({
             else if (ev.type === "step")
               setSteps((s) => {
                 const at = s.findIndex((x) => x.id === ev.step.id);
-                if (at < 0) return [...s, ev.step];
+                if (at < 0) {
+                  // The agent's rounds and tool calls go before the final "Write the brief" step.
+                  const end = s.findIndex((x) => x.id === "brief");
+                  return end >= 0 && ev.step.id !== "brief" ? [...s.slice(0, end), ev.step, ...s.slice(end)] : [...s, ev.step];
+                }
                 const next = [...s];
                 next[at] = ev.step;
                 return next;
@@ -453,6 +459,13 @@ function BriefView({ r }: { r: Result }) {
             Organisation: <Link href={`/organisations/${r.organisation.id}`}>{r.organisation.name}</Link>
             {r.searched ? ` · ${r.searched.toLocaleString("en-GB")} earlier concerns searched` : ""}
           </p>
+          {r.mode && (
+            <p className="text-xs text-muted">
+              {r.mode === "agent"
+                ? "Found by the tool-calling agent: Nemotron Super chose which searches to run, and every quote was then checked in code."
+                : "Found by the fixed pipeline (the agent was unavailable or stopped at a limit). Every quote was checked in code."}
+            </p>
+          )}
           {r.matches.length === 0 && (
             <p className="text-sm text-muted">
               That does not mean none exists; it means none of the closest earlier concerns was judged the same hazard.
@@ -488,6 +501,36 @@ function BriefView({ r }: { r: Result }) {
             </div>
           ) : (
             <p className="text-xs text-muted">No published stated action was found for the earlier report.</p>
+          )}
+          {(m.followups ?? []).length > 0 && (
+            <div className="space-y-2 rounded-lg border border-rule p-3">
+              <p className="eyebrow">What happened next: the agent&apos;s web check (Tavily)</p>
+              {m.followups!.map((f, k) => (
+                <div key={k} className="space-y-1 text-sm">
+                  <p className="text-ink-2">
+                    <span className={f.classification === "evidence_found" ? "text-accent" : f.classification === "contradicting" ? "text-sand" : "text-muted"}>
+                      {f.classification === "evidence_found"
+                        ? "Evidence found that the action was carried out"
+                        : f.classification === "contradicting"
+                          ? "A source suggests the action was not carried out as stated"
+                          : "No evidence found either way"}
+                    </span>{" "}
+                    for: &ldquo;{f.promise.length > 140 ? f.promise.slice(0, 139) + "…" : f.promise}&rdquo;
+                  </p>
+                  {f.quote && f.source_url && (
+                    <figure className="pl-3">
+                      <blockquote className="quote text-sm">&ldquo;{f.quote}&rdquo;</blockquote>
+                      <figcaption className="pl-4 text-xs">
+                        <a href={f.source_url} target="_blank" rel="noopener noreferrer">
+                          {f.source_url.replace(/^https?:\/\/(www\.)?/, "").slice(0, 60)} ↗
+                        </a>
+                      </figcaption>
+                    </figure>
+                  )}
+                  {f.classification === "not_found" && <p className="text-xs text-muted">No evidence found does not mean the action did not happen.</p>}
+                </div>
+              ))}
+            </div>
           )}
           {m.chains.length > 0 && (
             <div className="flex flex-wrap gap-2">

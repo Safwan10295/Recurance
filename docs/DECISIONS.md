@@ -170,3 +170,25 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 
 1. The schema step uses ALTER TABLE, which takes an exclusive lock. Inside the data transaction it blocked every page read for the whole publish.
 2. The schema now runs in its own short transaction, and the data load follows in a second one. Readers see the old rows until the new ones commit.
+
+## D28. Tavily budget from the real balance
+
+1. The earlier cap of 250 credits rested on an unconfirmed assumption. The usage endpoint showed 788 credits left this month (RESEARCH_LOG, 16 Oct).
+2. Stage F may use 70% of that: 551 credits. The cumulative ledger cap is now 801 (the first 250 plus 551). The ledger counts extracts conservatively, so it binds before Tavily's own count does.
+3. At least 30% (237 credits) stays for the live agent until 15 Dec. The agent also has its own caps: 8 credits a day and 230 in total, counted in the database. The plan resets to 1,000 credits each month.
+4. Order of checks: the 4 demo chains, then the 25 chains with a dossier, then the chains with the most recurrences. Each chosen promise and the reason it was chosen are written to data/exports/followup_selection.csv.
+
+## D29. The live brief is a tool-calling agent, with the fixed pipeline as fallback
+
+1. Nemotron Super chooses among five tools through native tool calling on Token Factory:
+   - search_earlier_concerns (pgvector);
+   - judge_candidate (the same structured judge as the fixed pipeline, with quotes checked in code);
+   - get_response_promises;
+   - get_chain;
+   - tavily_check (reuses the Stage F result when there is one).
+   It ends by calling submit_findings.
+2. Limits: 5 rounds and $0.015 per run, with tool costs included. The last round forces submit_findings. The per-run limit is above the first estimate of $0.01 because judging five candidates plus four model rounds came close to it in testing, and hitting it would trigger the costlier fallback.
+3. The model never writes the quotes that are shown. Verdicts come from judge_candidate, and a quote that matches the source apart from letter case is shown in the source's own words. Web evidence is shown only with a quote found in a source the agent was given.
+4. If the loop fails, gives no tool call or hits a limit, the fixed pipeline runs instead, so a brief is always produced. LIVE_AGENT=off switches the agent off.
+5. The loop and checks are in web/lib/agent-core.ts, with no database or network imports, and are tested offline with a scripted fake model.
+6. In testing, the archive report for David Levett gave 4 verified earlier warnings in 5 rounds and 4 tool calls, for $0.0056. The fixed pipeline found 2 for the same report.

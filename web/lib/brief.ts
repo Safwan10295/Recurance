@@ -1,5 +1,7 @@
 import "server-only";
 import { cached, q, q1 } from "./db";
+import { runAgent } from "./agent";
+import { JUDGE_SCHEMA, JUDGE_SYSTEM } from "./judge-prompt";
 import { chat, embed } from "./llm";
 import {
   htmlToText,
@@ -55,6 +57,8 @@ export interface BriefMatch {
   later_quote: string;
   promises: { id: number; quote: string; timescale: string | null }[];
   chains: { key: string; hazard: string }[];
+  // From the agent's web check (Tavily): shown only with a verified quote; "not_found" never means "did not happen".
+  followups?: { promise: string; classification: "evidence_found" | "not_found" | "contradicting"; source_url?: string; quote?: string }[];
 }
 
 export interface BriefResult {
@@ -66,6 +70,7 @@ export interface BriefResult {
   searched: number;
   cost: number;
   notes: string[];
+  mode?: "agent" | "fixed";
 }
 
 const toVec = (v: ArrayLike<number>) => "[" + Array.from(v, (x) => x.toFixed(5)).join(",") + "]";
@@ -122,37 +127,6 @@ const EXTRACT_SCHEMA = {
   },
 };
 
-const JUDGE_SCHEMA = {
-  type: "json_schema",
-  json_schema: {
-    name: "brief_verdict",
-    strict: true,
-    schema: {
-      type: "object",
-      properties: {
-        relation: { type: "string", enum: ["identical", "closely_related", "related", "different"] },
-        same_hazard_explanation: { type: "string", maxLength: 400 },
-        earlier_quote: { type: "string", maxLength: 500 },
-        later_quote: { type: "string", maxLength: 500 },
-        confidence: { type: "number" },
-      },
-      required: ["relation", "same_hazard_explanation", "earlier_quote", "later_quote", "confidence"],
-      additionalProperties: false,
-    },
-  },
-};
-
-const JUDGE_SYSTEM =
-  "You compare a concern from an earlier coroner's Prevention of Future Deaths report with new concerns about the same " +
-  "organisation, and decide whether the new concerns raise the same hazard. Output one compact JSON object.\n" +
-  "relation: identical (same specific hazard and mechanism), closely_related (same specific hazard, different setting, " +
-  "channel or emphasis), related (same broad area, different specific hazard), different.\n" +
-  "Shared generic words are not enough for identical or closely_related.\n" +
-  "same_hazard_explanation: two short neutral sentences. Never say an organisation ignored, caused, failed, neglected, " +
-  "is responsible or is to blame.\n" +
-  "earlier_quote: copy 10 to 45 words character for character from EARLIER CONCERN. later_quote: copy 10 to 45 words " +
-  "character for character from NEW CONCERNS.\nconfidence: 0 to 1. Keep reasoning short.";
-
 async function fetchReport(url: string): Promise<{ title: string; date: string | null; sentTo: string | null; concerns: string } | null> {
   if (!/^https:\/\/www\.judiciary\.uk\/prevention-of-future-death-reports\/[a-z0-9-]+\/?$/.test(url)) return null;
   const contact = process.env.SCRAPER_CONTACT_EMAIL ?? "";
@@ -183,6 +157,7 @@ interface Candidate {
 }
 
 const LABELS: Record<string, string> = {
+  agent: "Investigate with tools",
   fetch: "Read the report",
   org: "Identify the organisation",
   extract: "Extract the concerns",
@@ -191,6 +166,7 @@ const LABELS: Record<string, string> = {
   brief: "Write the brief",
 };
 const TOOLS: Record<string, string> = {
+  agent: "Nemotron Super, tool calling",
   fetch: "Archive or judiciary.uk",
   org: "Organisation index",
   extract: "Nemotron Nano",
@@ -224,7 +200,9 @@ export async function runBrief(
     if (r) url = r.url;
   }
   // Show the whole plan first, so the steps light up as the agent works through them.
-  for (const id of [...(url ? ["fetch"] : []), "org", "extract", "retrieve", "judge", "brief"]) step(id, "pending");
+  const agentOn = process.env.LIVE_AGENT !== "off";
+  const plan = agentOn ? ["org", "extract", "agent", "brief"] : ["org", "extract", "retrieve", "judge", "brief"];
+  for (const id of [...(url ? ["fetch"] : []), ...plan]) step(id, "pending");
 
   if (url) {
     step("fetch", "running");
@@ -327,13 +305,33 @@ export async function runBrief(
   }
   result.concerns = newConcerns.map(({ quote, hazard }) => ({ quote, hazard }));
 
-  // 4. Nearest earlier concerns for this organisation (pgvector).
-  step("retrieve", "running");
   const missing = newConcerns.filter((c) => !c.vec);
   if (missing.length) {
     const vecs = await embed("brief-embed", missing.map((c) => `${c.hazard}. ${c.quote}`), DIM);
     missing.forEach((c, i) => (c.vec = Float32Array.from(vecs[i])));
   }
+
+  // 4a. The agent: Nemotron Super chooses tools until it submits (web/lib/agent.ts). If it fails or hits a
+  // limit, the fixed steps below run instead, so a brief is always produced.
+  if (agentOn) {
+    const out = await runAgent({ org, url, reportDate, concerns: newConcerns, concernsText }, emit).catch(() => null);
+    if (out) {
+      result.mode = "agent";
+      result.matches = out.matches;
+      result.other_earlier = out.other_earlier;
+      result.searched = out.searched;
+      result.cost += out.cost;
+      step("brief", "running");
+      step("brief", "done", {
+        detail: `${result.matches.length} earlier warning${result.matches.length === 1 ? "" : "s"} with verified quotes · cost $${result.cost.toFixed(4)}`,
+      });
+      return result;
+    }
+  }
+  result.mode = "fixed";
+
+  // 4b. Fixed pipeline: nearest earlier concerns for this organisation (pgvector).
+  step("retrieve", "running");
   const total = await q1<{ n: number }>("SELECT COUNT(*)::int n FROM pub_brief_concerns WHERE org_id = $1", [org.id]);
   result.searched = total?.n ?? 0;
   const best = new Map<string, Candidate>();

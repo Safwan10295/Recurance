@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Brain,
   Building2,
   Check,
   CircleSlash,
@@ -10,7 +11,9 @@ import {
   Gavel,
   ListChecks,
   Send,
+  ShieldCheck,
   Sparkles,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -38,8 +41,12 @@ const ICON: Record<string, LucideIcon> = {
   judge: Gavel,
   brief: ListChecks,
   cache: FileSearch,
+  agent: Brain,
+  verify: ShieldCheck,
 };
-const MODEL_STEP = new Set(["extract", "judge"]);
+const iconFor = (id: string): LucideIcon => ICON[id] ?? (id.startsWith("think") ? Sparkles : id.startsWith("tool") ? Wrench : ListChecks);
+const MODEL_STEP = new Set(["extract", "judge", "agent"]);
+const isModel = (id: string) => MODEL_STEP.has(id) || id.startsWith("think");
 
 const n = (x: number) => x.toLocaleString("en-GB");
 const secs = (ms: number) => (ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`);
@@ -51,7 +58,7 @@ function Metrics({ s }: { s: Step }) {
   if (s.tokensOut) parts.push(`${n(s.tokensOut)} out`);
   if (s.reasoningTokens) parts.push(`${n(s.reasoningTokens)} reasoning`);
   if (s.cost !== undefined && s.cost > 0) parts.push(s.cost < 0.0001 ? "<$0.0001" : `$${s.cost.toFixed(4)}`);
-  if (s.cached) parts.push(MODEL_STEP.has(s.id) && !s.tokensIn ? "reused from the archive" : "cached");
+  if (s.cached) parts.push(s.id === "extract" && !s.tokensIn ? "reused from the archive" : "cached");
   if (!parts.length) return null;
   return <p className="text-[11px] text-muted num">{parts.join(" · ")}</p>;
 }
@@ -111,7 +118,7 @@ export default function AgentTrace({ steps, elapsed, replay }: { steps: Step[]; 
       </div>
       <ol className="list-none p-0">
         {steps.map((s, i) => {
-          const Icon = ICON[s.id] ?? ListChecks;
+          const Icon = iconFor(s.id);
           const last = i === steps.length - 1;
           const running = s.status === "running";
           const isDone = s.status === "done";
@@ -138,7 +145,7 @@ export default function AgentTrace({ steps, elapsed, replay }: { steps: Step[]; 
                   {s.tool && (
                     <span
                       className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                        MODEL_STEP.has(s.id) ? "bg-accent-soft text-accent" : "bg-paper-2 text-muted"
+                        isModel(s.id) ? "bg-accent-soft text-accent" : "bg-paper-2 text-muted"
                       }`}
                     >
                       {s.tool}

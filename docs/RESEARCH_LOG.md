@@ -144,3 +144,18 @@ Each entry: date, question, answer, source. Newest phase at the bottom.
 - Question: Do the listing pages and sitemaps agree?
 - Answer: The 651 listing pages gave 6,507 report URLs; the sitemaps gave 6,484. Every sitemap URL is on the listing pages; 23 recent reports were on the listing pages only. They were added, for 6,507 pages and 6,454 unique reports (0.1% above the handoff's 6,449).
 - Source: data/cache/urls_listing.json, data/cache/urls_sitemap.json.
+
+- Date: 2026-10-16
+- Question: How much Tavily credit is left?
+- Answer: The usage endpoint (GET https://api.tavily.com/usage) reports the Researcher plan: 1,000 credits a month, 212 used this month before Stage F resumed, so 788 left. Pay-as-you-go shows no usage and no limit, so the roughly $25 of credit Pilot mentioned is not visible on this key. After the extended Stage F run the endpoint reported 463 used. Our own ledger counts extract calls more conservatively than Tavily does (599 ledger credits for Stage F against about 463 by Tavily's count).
+- Source: the usage endpoint, read on 16 Oct 2026; ledger table tavily_calls.
+
+- Date: 2026-10-16
+- Question: Can the Token Factory credit balance or expiry date be read programmatically?
+- Answer: No. GET /v1/models works. GET /v1/billing, /v1/balance, /v1/credits, /v1/usage, /v1/account, /v1/organization and /v1/dashboard/billing/credit_grants all return 404. Chat responses carry rate-limit headers only (x-ratelimit-*), with nothing about credit. The issue date has to be read in the console.
+- Source: probes on 16 Oct 2026.
+
+- Date: 2026-10-16
+- Question: Does Token Factory support native tool calling for Nemotron 3 Super?
+- Answer: Yes. With an OpenAI-style tools list and tool_choice auto, Super (reasoning on, low effort) returned finish_reason tool_calls with a well-formed search call, then a final answer once given the tool result. Two calls cost $0.0007. A forced tool_choice naming one function also works.
+- Source: pilot in the dev bucket, ledger item ids tools-pilot-1 and tools-pilot-2.

@@ -173,17 +173,23 @@ def cmd_dossiers(a):
 
 
 def cmd_followup(a):
-    from .followup.tavily import Tavily, follow_up
+    from .followup.tavily import Tavily, follow_up, select_promises
 
     conn = db.connect()
-    rows = conn.execute(
-        """SELECT DISTINCT v.promise_id FROM recurrence_verdicts v JOIN chain_members m ON m.pair_id = v.pair_id
-           WHERE v.promise_id IS NOT NULL"""
-    ).fetchall()
+    picked = select_promises(conn)
+    done = {r[0] for r in conn.execute("SELECT promise_id FROM followups")}
     conn.close()
-    ids = [r[0] for r in rows][: a.n]
-    print(json.dumps(follow_up(_llm(), Tavily(), ids), indent=1, default=str))
+    todo = [p for p in picked if p[0] not in done][: a.n]
+    # Record which promises were chosen and why, before any credit is spent.
+    import csv
 
+    with (config.EXPORTS / "followup_selection.csv").open("w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["promise_id", "chain_key", "reason", "already_checked"])
+        for pid, key, reason in picked:
+            w.writerow([pid, key, reason, int(pid in done)])
+    print(f"{len(picked)} promises in priority order; {len(done)} already checked; checking up to {len(todo)} now.")
+    print(json.dumps(follow_up(_llm(), Tavily(), [p[0] for p in todo]), indent=1, default=str))
 
 def cmd_evaluate(a):
     from .evaluate import metrics
@@ -221,8 +227,7 @@ def cmd_dossiers_export(a):
     print(review.export_markdown())
 
 
-# The demo chains (smart motorways, platform ends, emollient fires). Keys are stable across rebuilds.
-FEATURED_KEYS = ["c52cded99f756309", "ede39b33e85d5106", "38aced9ab658b30c", "12c95ba862edb687"]
+FEATURED_KEYS = config.FEATURED_CHAIN_KEYS
 
 
 def cmd_review(a):

@@ -24,9 +24,21 @@ export class LiveUnavailable extends Error {}
 
 // Shape of the OpenAI-compatible responses we read.
 interface ApiResponse {
-  choices?: { message?: { content?: string }; finish_reason?: string | null }[];
+  choices?: { message?: { content?: string; tool_calls?: RawToolCall[] }; finish_reason?: string | null }[];
   usage?: { prompt_tokens?: number; completion_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
   data?: { index: number; embedding: number[] }[];
+}
+
+interface RawToolCall {
+  id: string;
+  type?: string;
+  function: { name: string; arguments: string };
+}
+
+export interface ToolCall {
+  id: string;
+  name: string;
+  args: Record<string, unknown>;
 }
 
 export interface ChatResult {
@@ -41,6 +53,9 @@ export interface ChatResult {
   tokensOut: number;
   reasoningTokens: number;
   ms: number;
+  // Native tool calling: the calls the model chose, and its message to send back with the results.
+  toolCalls: ToolCall[];
+  assistant: Record<string, unknown>;
 }
 
 function estimateTokens(s: string) {
@@ -120,11 +135,13 @@ async function post(path: string, body: unknown): Promise<{ status: number; data
 export async function chat(opts: {
   stage: string;
   model: "nano" | "super";
-  messages: { role: string; content: string }[];
+  messages: Record<string, unknown>[];
   maxTokens: number;
   responseFormat?: unknown;
   thinking?: boolean;
   lowEffort?: boolean;
+  tools?: unknown[];
+  toolChoice?: unknown;
 }): Promise<ChatResult> {
   if (!Number.isInteger(opts.maxTokens) || opts.maxTokens <= 0) throw new Error("max_tokens is required");
   const m = MODELS[opts.model];
@@ -136,6 +153,10 @@ export async function chat(opts: {
     chat_template_kwargs: opts.thinking ? { enable_thinking: true, ...(opts.lowEffort ? { low_effort: true } : {}) } : { enable_thinking: false },
   };
   if (opts.responseFormat) body.response_format = opts.responseFormat;
+  if (opts.tools) {
+    body.tools = opts.tools;
+    body.tool_choice = opts.toolChoice ?? "auto";
+  }
   const hash = await sha256(stableStringify(body));
   const store = getStore();
   const t0 = Date.now();
@@ -170,6 +191,16 @@ export async function chat(opts: {
 function toResult(m: { id: string; inPrice: number; outPrice: number }, data: ApiResponse, cacheHit: boolean, ms: number): ChatResult {
   const choice = data?.choices?.[0] ?? {};
   const content: string = choice?.message?.content ?? "";
+  const rawCalls = choice?.message?.tool_calls ?? [];
+  const toolCalls: ToolCall[] = rawCalls.map((c) => {
+    let args: Record<string, unknown> = {};
+    try {
+      args = JSON.parse(c.function?.arguments || "{}");
+    } catch {
+      args = {};
+    }
+    return { id: c.id, name: c.function?.name ?? "", args };
+  });
   const u = data?.usage ?? {};
   const cost = cacheHit ? 0 : (u.prompt_tokens ?? 0) * m.inPrice + (u.completion_tokens ?? 0) * m.outPrice;
   return {
@@ -183,6 +214,8 @@ function toResult(m: { id: string; inPrice: number; outPrice: number }, data: Ap
     tokensOut: u.completion_tokens ?? 0,
     reasoningTokens: u.completion_tokens_details?.reasoning_tokens ?? 0,
     ms,
+    toolCalls,
+    assistant: { role: "assistant", content, ...(rawCalls.length ? { tool_calls: rawCalls } : {}) },
   };
 }
 

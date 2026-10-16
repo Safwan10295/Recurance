@@ -1,0 +1,909 @@
+promise_id,chain_key,reason,already_checked
+1404,ede39b33e85d5106,demo chain,1
+1246,ede39b33e85d5106,demo chain,1
+1247,ede39b33e85d5106,demo chain,1
+1248,ede39b33e85d5106,demo chain,1
+828,ede39b33e85d5106,demo chain,1
+488,ede39b33e85d5106,demo chain,1
+620,ede39b33e85d5106,demo chain,1
+1673,ede39b33e85d5106,demo chain,1
+1189,ede39b33e85d5106,demo chain,1
+111,c52cded99f756309,demo chain,1
+1733,c52cded99f756309,demo chain,1
+1045,c52cded99f756309,demo chain,1
+141,c52cded99f756309,demo chain,1
+520,12c95ba862edb687,demo chain,1
+195,38aced9ab658b30c,demo chain,1
+1522,38aced9ab658b30c,demo chain,1
+1836,683e10aca8e63df8,chain with a dossier,1
+1989,683e10aca8e63df8,chain with a dossier,1
+2309,683e10aca8e63df8,chain with a dossier,1
+2153,683e10aca8e63df8,chain with a dossier,1
+2214,683e10aca8e63df8,chain with a dossier,1
+2137,683e10aca8e63df8,chain with a dossier,1
+2224,683e10aca8e63df8,chain with a dossier,1
+2182,683e10aca8e63df8,chain with a dossier,1
+2123,683e10aca8e63df8,chain with a dossier,1
+2389,683e10aca8e63df8,chain with a dossier,1
+2105,683e10aca8e63df8,chain with a dossier,1
+2097,683e10aca8e63df8,chain with a dossier,1
+2267,683e10aca8e63df8,chain with a dossier,1
+2268,683e10aca8e63df8,chain with a dossier,1
+2269,683e10aca8e63df8,chain with a dossier,1
+2211,683e10aca8e63df8,chain with a dossier,1
+1892,683e10aca8e63df8,chain with a dossier,1
+2213,683e10aca8e63df8,chain with a dossier,1
+2371,683e10aca8e63df8,chain with a dossier,1
+2201,683e10aca8e63df8,chain with a dossier,1
+2273,683e10aca8e63df8,chain with a dossier,1
+2165,683e10aca8e63df8,chain with a dossier,1
+1223,ca1b93b2e70f233c,chain with a dossier,1
+1678,ca1b93b2e70f233c,chain with a dossier,1
+2142,ca1b93b2e70f233c,chain with a dossier,1
+2261,ca1b93b2e70f233c,chain with a dossier,1
+2209,ca1b93b2e70f233c,chain with a dossier,1
+511,ca1b93b2e70f233c,chain with a dossier,1
+2003,ca1b93b2e70f233c,chain with a dossier,1
+2364,ca1b93b2e70f233c,chain with a dossier,1
+2365,ca1b93b2e70f233c,chain with a dossier,1
+2367,ca1b93b2e70f233c,chain with a dossier,1
+2369,ca1b93b2e70f233c,chain with a dossier,1
+2266,ca1b93b2e70f233c,chain with a dossier,1
+2286,ca1b93b2e70f233c,chain with a dossier,1
+2287,ca1b93b2e70f233c,chain with a dossier,1
+2219,ca1b93b2e70f233c,chain with a dossier,1
+2101,ca1b93b2e70f233c,chain with a dossier,1
+2102,ca1b93b2e70f233c,chain with a dossier,1
+2103,ca1b93b2e70f233c,chain with a dossier,1
+2406,ca1b93b2e70f233c,chain with a dossier,1
+255,3377ee07b8d5831d,chain with a dossier,1
+256,3377ee07b8d5831d,chain with a dossier,1
+257,3377ee07b8d5831d,chain with a dossier,1
+258,3377ee07b8d5831d,chain with a dossier,1
+259,3377ee07b8d5831d,chain with a dossier,1
+260,3377ee07b8d5831d,chain with a dossier,1
+230,3377ee07b8d5831d,chain with a dossier,1
+171,3377ee07b8d5831d,chain with a dossier,1
+1171,3377ee07b8d5831d,chain with a dossier,1
+2099,3377ee07b8d5831d,chain with a dossier,1
+265,3377ee07b8d5831d,chain with a dossier,1
+2221,3377ee07b8d5831d,chain with a dossier,1
+1158,3377ee07b8d5831d,chain with a dossier,1
+1686,3377ee07b8d5831d,chain with a dossier,1
+1981,3377ee07b8d5831d,chain with a dossier,1
+262,3377ee07b8d5831d,chain with a dossier,1
+660,5c4307daebcd314d,chain with a dossier,1
+1796,5c4307daebcd314d,chain with a dossier,1
+2226,5c4307daebcd314d,chain with a dossier,1
+2318,5c4307daebcd314d,chain with a dossier,1
+2319,5c4307daebcd314d,chain with a dossier,1
+2394,5c4307daebcd314d,chain with a dossier,1
+2407,5c4307daebcd314d,chain with a dossier,1
+518,5c4307daebcd314d,chain with a dossier,1
+1591,5c4307daebcd314d,chain with a dossier,1
+2167,5c4307daebcd314d,chain with a dossier,1
+2091,5c4307daebcd314d,chain with a dossier,1
+2423,5c4307daebcd314d,chain with a dossier,1
+2433,5c4307daebcd314d,chain with a dossier,1
+2434,5c4307daebcd314d,chain with a dossier,1
+2435,5c4307daebcd314d,chain with a dossier,1
+2436,5c4307daebcd314d,chain with a dossier,1
+2437,5c4307daebcd314d,chain with a dossier,1
+2438,5c4307daebcd314d,chain with a dossier,1
+2168,5c4307daebcd314d,chain with a dossier,1
+858,3ddc5218eb1ac846,chain with a dossier,1
+531,3ddc5218eb1ac846,chain with a dossier,1
+1237,3ddc5218eb1ac846,chain with a dossier,1
+208,3ddc5218eb1ac846,chain with a dossier,1
+594,f0592eb87950e493,chain with a dossier,1
+1042,f0592eb87950e493,chain with a dossier,1
+1114,f0592eb87950e493,chain with a dossier,1
+442,f0592eb87950e493,chain with a dossier,1
+2390,f0592eb87950e493,chain with a dossier,1
+2096,f0592eb87950e493,chain with a dossier,1
+963,796a35eb0277ed1d,chain with a dossier,1
+1121,796a35eb0277ed1d,chain with a dossier,1
+1586,796a35eb0277ed1d,chain with a dossier,1
+1587,796a35eb0277ed1d,chain with a dossier,1
+1588,796a35eb0277ed1d,chain with a dossier,1
+1141,796a35eb0277ed1d,chain with a dossier,1
+1612,bdd006622f92a83e,chain with a dossier,1
+837,bdd006622f92a83e,chain with a dossier,1
+1848,bdd006622f92a83e,chain with a dossier,1
+784,bdd006622f92a83e,chain with a dossier,1
+1193,bdd006622f92a83e,chain with a dossier,1
+770,bdd006622f92a83e,chain with a dossier,1
+2148,bdd006622f92a83e,chain with a dossier,1
+394,9147a7308ae9d32b,chain with a dossier,1
+1479,9147a7308ae9d32b,chain with a dossier,1
+1395,9147a7308ae9d32b,chain with a dossier,1
+2128,9147a7308ae9d32b,chain with a dossier,1
+2132,9147a7308ae9d32b,chain with a dossier,1
+2150,9147a7308ae9d32b,chain with a dossier,1
+2400,9147a7308ae9d32b,chain with a dossier,1
+2401,9147a7308ae9d32b,chain with a dossier,1
+2278,35284f4376225ced,chain with a dossier,1
+2279,35284f4376225ced,chain with a dossier,1
+2280,35284f4376225ced,chain with a dossier,1
+2281,35284f4376225ced,chain with a dossier,1
+2282,35284f4376225ced,chain with a dossier,1
+2283,35284f4376225ced,chain with a dossier,1
+154,35284f4376225ced,chain with a dossier,1
+155,35284f4376225ced,chain with a dossier,1
+156,35284f4376225ced,chain with a dossier,1
+157,35284f4376225ced,chain with a dossier,1
+158,35284f4376225ced,chain with a dossier,1
+33,35284f4376225ced,chain with a dossier,1
+75,c417186e4dd770e1,chain with a dossier,1
+76,c417186e4dd770e1,chain with a dossier,1
+77,c417186e4dd770e1,chain with a dossier,1
+78,c417186e4dd770e1,chain with a dossier,1
+588,c417186e4dd770e1,chain with a dossier,1
+573,c417186e4dd770e1,chain with a dossier,1
+392,c417186e4dd770e1,chain with a dossier,1
+799,c417186e4dd770e1,chain with a dossier,1
+26,c417186e4dd770e1,chain with a dossier,1
+715,c417186e4dd770e1,chain with a dossier,1
+716,c417186e4dd770e1,chain with a dossier,1
+717,c417186e4dd770e1,chain with a dossier,1
+718,c417186e4dd770e1,chain with a dossier,1
+719,c417186e4dd770e1,chain with a dossier,1
+720,c417186e4dd770e1,chain with a dossier,0
+2223,c417186e4dd770e1,chain with a dossier,1
+2125,03bf54e212a5b5c1,chain with a dossier,0
+2265,03bf54e212a5b5c1,chain with a dossier,0
+2317,03bf54e212a5b5c1,chain with a dossier,0
+2149,6897b6ad5699fc37,chain with a dossier,0
+2109,7a247329069c4623,chain with a dossier,0
+2110,7a247329069c4623,chain with a dossier,0
+2111,7a247329069c4623,chain with a dossier,0
+2358,7a247329069c4623,chain with a dossier,0
+2359,7a247329069c4623,chain with a dossier,0
+1799,02c56ba0f73fca5c,chain with a dossier,0
+879,02c56ba0f73fca5c,chain with a dossier,0
+880,02c56ba0f73fca5c,chain with a dossier,0
+881,02c56ba0f73fca5c,chain with a dossier,0
+882,02c56ba0f73fca5c,chain with a dossier,0
+883,02c56ba0f73fca5c,chain with a dossier,0
+884,02c56ba0f73fca5c,chain with a dossier,0
+1740,02c56ba0f73fca5c,chain with a dossier,0
+953,02c56ba0f73fca5c,chain with a dossier,0
+601,04ec9711ba8c31aa,chain with a dossier,0
+855,04ec9711ba8c31aa,chain with a dossier,0
+1684,04ec9711ba8c31aa,chain with a dossier,0
+2002,04ec9711ba8c31aa,chain with a dossier,0
+534,04ec9711ba8c31aa,chain with a dossier,0
+1304,04ec9711ba8c31aa,chain with a dossier,0
+1898,04ec9711ba8c31aa,chain with a dossier,0
+907,5c8d7d42977aeedb,chain with a dossier,1
+2071,5c8d7d42977aeedb,chain with a dossier,0
+2072,5c8d7d42977aeedb,chain with a dossier,0
+1079,84526687656ab7a8,chain with a dossier,1
+1080,84526687656ab7a8,chain with a dossier,0
+1082,84526687656ab7a8,chain with a dossier,0
+1083,84526687656ab7a8,chain with a dossier,0
+1711,84526687656ab7a8,chain with a dossier,0
+1812,84526687656ab7a8,chain with a dossier,0
+2432,84526687656ab7a8,chain with a dossier,0
+2092,84526687656ab7a8,chain with a dossier,0
+856,a7165747d6c7031a,chain with a dossier,1
+561,a7165747d6c7031a,chain with a dossier,1
+2185,a7165747d6c7031a,chain with a dossier,0
+2233,e0f115a8cdac8df0,chain with a dossier,0
+2240,e0f115a8cdac8df0,chain with a dossier,0
+494,0e8b72c401b6b084,chain with the most recurrences,0
+1880,0e8b72c401b6b084,chain with the most recurrences,0
+1863,0e8b72c401b6b084,chain with the most recurrences,0
+606,0e8b72c401b6b084,chain with the most recurrences,0
+1831,0e8b72c401b6b084,chain with the most recurrences,0
+1832,0e8b72c401b6b084,chain with the most recurrences,0
+1833,0e8b72c401b6b084,chain with the most recurrences,0
+2155,3f41f30cbf659e48,chain with the most recurrences,0
+1638,5d7cb596674009e9,chain with the most recurrences,0
+798,5d7cb596674009e9,chain with the most recurrences,0
+674,9423d6cab75c2872,chain with the most recurrences,0
+840,b166eef69e2b1aca,chain with the most recurrences,0
+1905,b166eef69e2b1aca,chain with the most recurrences,0
+49,ba927018ddc81374,chain with the most recurrences,0
+1813,ba927018ddc81374,chain with the most recurrences,0
+50,ba927018ddc81374,chain with the most recurrences,0
+493,ba927018ddc81374,chain with the most recurrences,0
+940,ba927018ddc81374,chain with the most recurrences,0
+1558,ba927018ddc81374,chain with the most recurrences,0
+1747,c7ff78d1bf19d699,chain with the most recurrences,0
+1445,c7ff78d1bf19d699,chain with the most recurrences,0
+1324,c7ff78d1bf19d699,chain with the most recurrences,0
+1325,c7ff78d1bf19d699,chain with the most recurrences,0
+1326,c7ff78d1bf19d699,chain with the most recurrences,0
+1327,c7ff78d1bf19d699,chain with the most recurrences,0
+1328,c7ff78d1bf19d699,chain with the most recurrences,0
+1329,c7ff78d1bf19d699,chain with the most recurrences,0
+651,ec2623398ca8af14,chain with the most recurrences,0
+885,ec2623398ca8af14,chain with the most recurrences,0
+2263,061bb89607726dde,chain with the most recurrences,0
+2264,061bb89607726dde,chain with the most recurrences,0
+2323,061bb89607726dde,chain with the most recurrences,0
+751,061bb89607726dde,chain with the most recurrences,0
+752,061bb89607726dde,chain with the most recurrences,1
+753,061bb89607726dde,chain with the most recurrences,0
+754,061bb89607726dde,chain with the most recurrences,0
+755,061bb89607726dde,chain with the most recurrences,0
+2183,061bb89607726dde,chain with the most recurrences,0
+1313,075c2018da548ece,chain with the most recurrences,0
+1314,075c2018da548ece,chain with the most recurrences,0
+1315,075c2018da548ece,chain with the most recurrences,0
+1316,075c2018da548ece,chain with the most recurrences,0
+1317,075c2018da548ece,chain with the most recurrences,0
+1318,075c2018da548ece,chain with the most recurrences,0
+1658,075c2018da548ece,chain with the most recurrences,0
+1488,075c2018da548ece,chain with the most recurrences,0
+159,09d6f907e53093ab,chain with the most recurrences,0
+160,09d6f907e53093ab,chain with the most recurrences,0
+1044,09d6f907e53093ab,chain with the most recurrences,0
+2355,0b73c1de69b59634,chain with the most recurrences,0
+2356,0b73c1de69b59634,chain with the most recurrences,0
+2357,0b73c1de69b59634,chain with the most recurrences,0
+599,0e3b4a56bb99d973,chain with the most recurrences,0
+1122,0e3b4a56bb99d973,chain with the most recurrences,0
+747,0fde339d3c37c8b0,chain with the most recurrences,1
+280,0fde339d3c37c8b0,chain with the most recurrences,1
+2234,231b996d46969c65,chain with the most recurrences,0
+2235,231b996d46969c65,chain with the most recurrences,0
+2236,231b996d46969c65,chain with the most recurrences,0
+2237,231b996d46969c65,chain with the most recurrences,0
+2238,231b996d46969c65,chain with the most recurrences,0
+2239,231b996d46969c65,chain with the most recurrences,0
+1166,231b996d46969c65,chain with the most recurrences,1
+406,250eace3ae1e179c,chain with the most recurrences,0
+407,250eace3ae1e179c,chain with the most recurrences,0
+408,250eace3ae1e179c,chain with the most recurrences,0
+409,250eace3ae1e179c,chain with the most recurrences,0
+410,250eace3ae1e179c,chain with the most recurrences,0
+453,250eace3ae1e179c,chain with the most recurrences,0
+781,26cfc62a938c1088,chain with the most recurrences,0
+1139,3659d731d5159917,chain with the most recurrences,0
+2007,55ba64d603d789ef,chain with the most recurrences,0
+1495,55ba64d603d789ef,chain with the most recurrences,0
+1496,55ba64d603d789ef,chain with the most recurrences,0
+1449,5b4dc487b994a363,chain with the most recurrences,0
+137,5b4dc487b994a363,chain with the most recurrences,0
+1439,5b4dc487b994a363,chain with the most recurrences,0
+1950,5b4dc487b994a363,chain with the most recurrences,0
+25,6126f25c2e39549e,chain with the most recurrences,0
+908,6126f25c2e39549e,chain with the most recurrences,0
+1709,877de359ee78597f,chain with the most recurrences,1
+586,8cd76dadfcbeebe0,chain with the most recurrences,0
+580,8cd76dadfcbeebe0,chain with the most recurrences,0
+1613,956b89ad74588465,chain with the most recurrences,0
+2320,95e8b8214ac47e74,chain with the most recurrences,0
+2079,95e8b8214ac47e74,chain with the most recurrences,0
+204,9629e8bfba0b77b5,chain with the most recurrences,0
+1605,9629e8bfba0b77b5,chain with the most recurrences,0
+1010,992aeebc397eba93,chain with the most recurrences,0
+1399,992aeebc397eba93,chain with the most recurrences,0
+1400,992aeebc397eba93,chain with the most recurrences,0
+1401,992aeebc397eba93,chain with the most recurrences,0
+1402,992aeebc397eba93,chain with the most recurrences,0
+1403,992aeebc397eba93,chain with the most recurrences,0
+1457,992aeebc397eba93,chain with the most recurrences,0
+1458,992aeebc397eba93,chain with the most recurrences,0
+1459,992aeebc397eba93,chain with the most recurrences,0
+1460,992aeebc397eba93,chain with the most recurrences,0
+1461,992aeebc397eba93,chain with the most recurrences,0
+1201,99c2c0c580138b15,chain with the most recurrences,0
+2037,99c2c0c580138b15,chain with the most recurrences,0
+932,99c2c0c580138b15,chain with the most recurrences,1
+152,9bcf4d6cdd50789d,chain with the most recurrences,0
+2034,9bcf4d6cdd50789d,chain with the most recurrences,0
+2086,9bcf4d6cdd50789d,chain with the most recurrences,0
+667,a2163a7cbe9495d6,chain with the most recurrences,1
+1233,a8195dd528009df6,chain with the most recurrences,0
+1895,a8195dd528009df6,chain with the most recurrences,0
+848,a8195dd528009df6,chain with the most recurrences,0
+1548,a8195dd528009df6,chain with the most recurrences,0
+203,aa8ca13847b0eb81,chain with the most recurrences,0
+217,ac8ee6bbc4c78a10,chain with the most recurrences,0
+218,ac8ee6bbc4c78a10,chain with the most recurrences,0
+219,ac8ee6bbc4c78a10,chain with the most recurrences,0
+220,ac8ee6bbc4c78a10,chain with the most recurrences,0
+108,c35f45ce916884dd,chain with the most recurrences,0
+1906,c35f45ce916884dd,chain with the most recurrences,0
+563,c35f45ce916884dd,chain with the most recurrences,0
+2331,093a8fc8a1aef9b2,chain with the most recurrences,0
+2332,093a8fc8a1aef9b2,chain with the most recurrences,0
+2333,093a8fc8a1aef9b2,chain with the most recurrences,0
+2126,093a8fc8a1aef9b2,chain with the most recurrences,0
+778,0c3615a9b4b2abfc,chain with the most recurrences,0
+1965,15e797570c641604,chain with the most recurrences,0
+1966,15e797570c641604,chain with the most recurrences,0
+1967,15e797570c641604,chain with the most recurrences,0
+1968,15e797570c641604,chain with the most recurrences,0
+1969,15e797570c641604,chain with the most recurrences,0
+1970,15e797570c641604,chain with the most recurrences,0
+73,1811c1e05583953e,chain with the most recurrences,0
+1462,1811c1e05583953e,chain with the most recurrences,1
+1367,2290fa5e454e4fd2,chain with the most recurrences,0
+1255,29e0d95b592ea11e,chain with the most recurrences,0
+549,2c5442ba267a98db,chain with the most recurrences,0
+2075,2c5442ba267a98db,chain with the most recurrences,0
+985,32b82e0311cfaf56,chain with the most recurrences,0
+1030,32b82e0311cfaf56,chain with the most recurrences,0
+1498,32b82e0311cfaf56,chain with the most recurrences,1
+460,32b82e0311cfaf56,chain with the most recurrences,0
+582,32b82e0311cfaf56,chain with the most recurrences,0
+852,3573fbd5c038288d,chain with the most recurrences,0
+1541,3573fbd5c038288d,chain with the most recurrences,0
+38,360d0f93b71fd4c4,chain with the most recurrences,1
+1266,360d0f93b71fd4c4,chain with the most recurrences,0
+977,360d0f93b71fd4c4,chain with the most recurrences,0
+738,3acc7ec164a3aabe,chain with the most recurrences,0
+2258,4328b1128846d901,chain with the most recurrences,0
+2417,4328b1128846d901,chain with the most recurrences,0
+2418,4328b1128846d901,chain with the most recurrences,0
+1,4aef9ec8d70b68da,chain with the most recurrences,0
+1258,4f75a62ef7d9f386,chain with the most recurrences,0
+1259,4f75a62ef7d9f386,chain with the most recurrences,0
+1260,4f75a62ef7d9f386,chain with the most recurrences,0
+6,4f75a62ef7d9f386,chain with the most recurrences,0
+1754,54a871513498daaa,chain with the most recurrences,1
+357,558a78f14e51b49f,chain with the most recurrences,1
+358,558a78f14e51b49f,chain with the most recurrences,0
+359,558a78f14e51b49f,chain with the most recurrences,0
+360,558a78f14e51b49f,chain with the most recurrences,0
+361,558a78f14e51b49f,chain with the most recurrences,0
+362,558a78f14e51b49f,chain with the most recurrences,0
+2247,57bb55f92227fcd9,chain with the most recurrences,0
+2248,57bb55f92227fcd9,chain with the most recurrences,0
+2255,57bb55f92227fcd9,chain with the most recurrences,0
+479,5b3bc5f3af821f9f,chain with the most recurrences,1
+2329,5b3bc5f3af821f9f,chain with the most recurrences,0
+1790,669dcf6a78af2661,chain with the most recurrences,0
+801,7472678fedf00332,chain with the most recurrences,0
+1149,7472678fedf00332,chain with the most recurrences,0
+779,75550c8a73ff75fb,chain with the most recurrences,0
+1582,7c69bc70a7c0c8c9,chain with the most recurrences,0
+1779,7f93fe4009a1fea5,chain with the most recurrences,0
+657,7f93fe4009a1fea5,chain with the most recurrences,0
+1717,8038ea052e7b588c,chain with the most recurrences,0
+14,8038ea052e7b588c,chain with the most recurrences,0
+103,820434e1758862b1,chain with the most recurrences,0
+466,85626288f0b098d8,chain with the most recurrences,0
+467,85626288f0b098d8,chain with the most recurrences,0
+468,85626288f0b098d8,chain with the most recurrences,0
+469,85626288f0b098d8,chain with the most recurrences,0
+470,85626288f0b098d8,chain with the most recurrences,0
+471,85626288f0b098d8,chain with the most recurrences,0
+2018,962c96d49ad69594,chain with the most recurrences,1
+1393,a0fa3a516fa06d7b,chain with the most recurrences,0
+768,a0fa3a516fa06d7b,chain with the most recurrences,1
+844,a1ba21191340a7f2,chain with the most recurrences,0
+965,a1ba21191340a7f2,chain with the most recurrences,0
+966,a1ba21191340a7f2,chain with the most recurrences,0
+967,a1ba21191340a7f2,chain with the most recurrences,0
+968,a1ba21191340a7f2,chain with the most recurrences,0
+1744,a2c2e30bc0cf6ddd,chain with the most recurrences,0
+1427,a2c2e30bc0cf6ddd,chain with the most recurrences,0
+1562,a3e381cac661b8b9,chain with the most recurrences,0
+1911,a3e381cac661b8b9,chain with the most recurrences,0
+2307,a4281821c4cdb769,chain with the most recurrences,0
+465,a70a4c5a45bee0af,chain with the most recurrences,0
+266,a70a4c5a45bee0af,chain with the most recurrences,0
+2259,a88499fc92492aaa,chain with the most recurrences,0
+182,a88499fc92492aaa,chain with the most recurrences,0
+184,a88499fc92492aaa,chain with the most recurrences,0
+1236,ac8c1c805bc7356f,chain with the most recurrences,0
+1118,aed2cd911a23f1e2,chain with the most recurrences,0
+1172,b10c5985494b6fc4,chain with the most recurrences,1
+2156,b1fd9327695ebc14,chain with the most recurrences,0
+772,b1fd9327695ebc14,chain with the most recurrences,0
+1949,b1fd9327695ebc14,chain with the most recurrences,0
+1447,b89c4511e1e32d34,chain with the most recurrences,0
+221,ba0ba2e9b561b5b8,chain with the most recurrences,1
+40,ba5be8d8deaad31f,chain with the most recurrences,0
+589,ba5be8d8deaad31f,chain with the most recurrences,0
+595,ba5be8d8deaad31f,chain with the most recurrences,0
+1718,ba5be8d8deaad31f,chain with the most recurrences,0
+2370,ba5be8d8deaad31f,chain with the most recurrences,0
+1761,c41614d36a7bb235,chain with the most recurrences,0
+251,c41614d36a7bb235,chain with the most recurrences,0
+282,cc88cd32a08b1aac,chain with the most recurrences,1
+501,ce423685f0ae8fc1,chain with the most recurrences,0
+1606,d872602dcde8a426,chain with the most recurrences,0
+857,d872602dcde8a426,chain with the most recurrences,0
+2177,dc9a3e3509601507,chain with the most recurrences,0
+1964,e54bc29a70f10cc6,chain with the most recurrences,0
+131,e5c4a57fa33b9056,chain with the most recurrences,0
+542,e5c4a57fa33b9056,chain with the most recurrences,0
+1143,e5c4a57fa33b9056,chain with the most recurrences,1
+1012,e5c4a57fa33b9056,chain with the most recurrences,1
+1379,e5c4a57fa33b9056,chain with the most recurrences,1
+2424,eae6297d98c040cf,chain with the most recurrences,0
+2425,eae6297d98c040cf,chain with the most recurrences,0
+2426,eae6297d98c040cf,chain with the most recurrences,0
+2427,eae6297d98c040cf,chain with the most recurrences,0
+2428,eae6297d98c040cf,chain with the most recurrences,0
+2429,eae6297d98c040cf,chain with the most recurrences,0
+2200,eae6297d98c040cf,chain with the most recurrences,0
+866,f19d4f2ac1d3f01f,chain with the most recurrences,0
+867,f19d4f2ac1d3f01f,chain with the most recurrences,0
+868,f19d4f2ac1d3f01f,chain with the most recurrences,1
+869,f19d4f2ac1d3f01f,chain with the most recurrences,0
+870,f19d4f2ac1d3f01f,chain with the most recurrences,0
+871,f19d4f2ac1d3f01f,chain with the most recurrences,0
+393,f19d4f2ac1d3f01f,chain with the most recurrences,0
+448,f3110982522559fe,chain with the most recurrences,0
+449,f3110982522559fe,chain with the most recurrences,0
+450,f3110982522559fe,chain with the most recurrences,0
+1571,f3110982522559fe,chain with the most recurrences,0
+1974,f3110982522559fe,chain with the most recurrences,0
+1765,f39e2b2a3b478fe3,chain with the most recurrences,0
+7,fd86ca37a36ee5bd,chain with the most recurrences,0
+529,fd86ca37a36ee5bd,chain with the most recurrences,0
+1277,029474f87809a95d,chain with the most recurrences,0
+277,02a33019e107859b,chain with the most recurrences,0
+1345,02a33019e107859b,chain with the most recurrences,0
+2158,02db0c6a1abedf8e,chain with the most recurrences,0
+2163,02db0c6a1abedf8e,chain with the most recurrences,0
+2164,02db0c6a1abedf8e,chain with the most recurrences,0
+2118,0314e02cfde56b3e,chain with the most recurrences,0
+2385,031a385fa46b77ac,chain with the most recurrences,0
+1022,0397e0967314ed96,chain with the most recurrences,1
+1117,04db65ed3cd5c7cb,chain with the most recurrences,0
+1242,04db65ed3cd5c7cb,chain with the most recurrences,0
+584,0573c859f0af9a9f,chain with the most recurrences,0
+566,05790c944185229e,chain with the most recurrences,0
+567,05790c944185229e,chain with the most recurrences,0
+568,05790c944185229e,chain with the most recurrences,0
+569,05790c944185229e,chain with the most recurrences,0
+570,05790c944185229e,chain with the most recurrences,0
+571,05790c944185229e,chain with the most recurrences,0
+947,0631d5b4f8880aa5,chain with the most recurrences,0
+1225,06526dc05671775d,chain with the most recurrences,0
+1226,06526dc05671775d,chain with the most recurrences,0
+1227,06526dc05671775d,chain with the most recurrences,0
+824,0a662e3cbbc42ad7,chain with the most recurrences,0
+292,0bc67407dd588216,chain with the most recurrences,0
+1364,0bc67407dd588216,chain with the most recurrences,0
+1912,0bd029c1167bb10b,chain with the most recurrences,0
+2013,0d5fcc17f461c683,chain with the most recurrences,0
+1272,0df23cf7d5d05aa0,chain with the most recurrences,0
+2383,0f1322d9f89533f1,chain with the most recurrences,0
+376,0f6d75a6c76ed247,chain with the most recurrences,0
+2134,0fd5942277ba6032,chain with the most recurrences,0
+2135,0fd5942277ba6032,chain with the most recurrences,0
+2001,1082b8be23ddd639,chain with the most recurrences,0
+2292,10aeaffe670c3153,chain with the most recurrences,0
+2293,10aeaffe670c3153,chain with the most recurrences,0
+2294,10aeaffe670c3153,chain with the most recurrences,0
+2295,10aeaffe670c3153,chain with the most recurrences,0
+2296,10aeaffe670c3153,chain with the most recurrences,0
+2297,10aeaffe670c3153,chain with the most recurrences,0
+912,112e87765dc9308c,chain with the most recurrences,0
+913,112e87765dc9308c,chain with the most recurrences,0
+914,112e87765dc9308c,chain with the most recurrences,0
+915,112e87765dc9308c,chain with the most recurrences,0
+916,112e87765dc9308c,chain with the most recurrences,0
+917,112e87765dc9308c,chain with the most recurrences,0
+1676,115a83a804705112,chain with the most recurrences,0
+2193,11da2e264f885797,chain with the most recurrences,0
+2194,11da2e264f885797,chain with the most recurrences,0
+2195,11da2e264f885797,chain with the most recurrences,0
+2196,11da2e264f885797,chain with the most recurrences,0
+2197,11da2e264f885797,chain with the most recurrences,0
+2198,11da2e264f885797,chain with the most recurrences,0
+495,158d020574ffa462,chain with the most recurrences,0
+496,158d020574ffa462,chain with the most recurrences,0
+497,158d020574ffa462,chain with the most recurrences,0
+546,1638eb182ac1017a,chain with the most recurrences,0
+1150,167a0c8c537177f7,chain with the most recurrences,0
+1151,167a0c8c537177f7,chain with the most recurrences,0
+1152,167a0c8c537177f7,chain with the most recurrences,0
+1153,167a0c8c537177f7,chain with the most recurrences,0
+1154,167a0c8c537177f7,chain with the most recurrences,0
+1155,167a0c8c537177f7,chain with the most recurrences,0
+2215,18774f8ab184b391,chain with the most recurrences,0
+2343,18b7acfbe77267cc,chain with the most recurrences,0
+2398,194400b7394e29c9,chain with the most recurrences,0
+790,1ae1230ed40e4db3,chain with the most recurrences,0
+830,1ae1230ed40e4db3,chain with the most recurrences,0
+1530,1cdf5b0a80151c1f,chain with the most recurrences,0
+886,1d8a405818d635a8,chain with the most recurrences,0
+1828,1f9b3a3acddf982e,chain with the most recurrences,0
+1385,217b3aa21a476755,chain with the most recurrences,0
+1689,217b854d1ec1020a,chain with the most recurrences,0
+766,22aee3f53bebcb36,chain with the most recurrences,0
+2186,22e7b61f11ed3a4a,chain with the most recurrences,0
+2187,22e7b61f11ed3a4a,chain with the most recurrences,0
+2188,22e7b61f11ed3a4a,chain with the most recurrences,0
+2189,22e7b61f11ed3a4a,chain with the most recurrences,0
+2190,22e7b61f11ed3a4a,chain with the most recurrences,0
+2300,249c2f8987de9a92,chain with the most recurrences,0
+323,24af7a92ac9ce905,chain with the most recurrences,1
+2361,2522517e478549b5,chain with the most recurrences,0
+1429,2ac531efd3b4343c,chain with the most recurrences,0
+1430,2ac531efd3b4343c,chain with the most recurrences,0
+1431,2ac531efd3b4343c,chain with the most recurrences,0
+1432,2ac531efd3b4343c,chain with the most recurrences,0
+1433,2ac531efd3b4343c,chain with the most recurrences,0
+853,2ad37b982613813b,chain with the most recurrences,0
+1861,2cf739627f5ebd61,chain with the most recurrences,0
+2326,2cf739627f5ebd61,chain with the most recurrences,0
+583,2d0351337c1222e8,chain with the most recurrences,0
+2241,2d29a87bf6d9f536,chain with the most recurrences,0
+452,2da1bfe627df23af,chain with the most recurrences,0
+1623,2fae7dceaa8d26f4,chain with the most recurrences,0
+687,3086ae11fdc7d5f8,chain with the most recurrences,0
+1497,308818ee7bb0b6b9,chain with the most recurrences,0
+1046,32ae268cc004e254,chain with the most recurrences,0
+2106,32e73f80b99a5642,chain with the most recurrences,0
+2127,34aaefa331b65f44,chain with the most recurrences,0
+1590,3502af4c39dd0f25,chain with the most recurrences,0
+1691,354a68edea5f8e83,chain with the most recurrences,0
+1245,3589adbb59e3f8e8,chain with the most recurrences,0
+2430,361d5fc7a32b3339,chain with the most recurrences,0
+826,362b32e9e5ae8bd4,chain with the most recurrences,0
+1834,362b32e9e5ae8bd4,chain with the most recurrences,0
+670,36e6f5eca54f777c,chain with the most recurrences,0
+623,37197fc9122ff1b7,chain with the most recurrences,0
+624,37197fc9122ff1b7,chain with the most recurrences,0
+625,37197fc9122ff1b7,chain with the most recurrences,0
+626,37197fc9122ff1b7,chain with the most recurrences,0
+1366,3810ac4e4aa182c2,chain with the most recurrences,0
+245,3816a6ec7192c1e1,chain with the most recurrences,0
+246,3816a6ec7192c1e1,chain with the most recurrences,0
+247,3816a6ec7192c1e1,chain with the most recurrences,0
+248,3816a6ec7192c1e1,chain with the most recurrences,0
+249,3816a6ec7192c1e1,chain with the most recurrences,0
+463,3a2e4662d20c598f,chain with the most recurrences,0
+2272,3a73164baae1abb1,chain with the most recurrences,0
+683,3cc8bf6d53312d05,chain with the most recurrences,0
+887,3cd6654a804df9a0,chain with the most recurrences,1
+1343,3da82934c0fce7af,chain with the most recurrences,1
+289,3df6dbb9fe5e6824,chain with the most recurrences,0
+904,3df6dbb9fe5e6824,chain with the most recurrences,0
+1194,402624a365138e1f,chain with the most recurrences,0
+110,4055eb721882307c,chain with the most recurrences,0
+290,4055eb721882307c,chain with the most recurrences,0
+1262,4055eb721882307c,chain with the most recurrences,0
+231,4421f1ed42cbe4ae,chain with the most recurrences,0
+2336,44820bfbfd78214c,chain with the most recurrences,0
+2337,44820bfbfd78214c,chain with the most recurrences,0
+2338,44820bfbfd78214c,chain with the most recurrences,0
+2339,44820bfbfd78214c,chain with the most recurrences,0
+2340,44820bfbfd78214c,chain with the most recurrences,0
+2341,44820bfbfd78214c,chain with the most recurrences,0
+301,4576d3ae974585e6,chain with the most recurrences,0
+1177,45f4973bda893091,chain with the most recurrences,0
+1774,4671517d9e8d291d,chain with the most recurrences,0
+1017,471116b4485fda39,chain with the most recurrences,0
+2057,4a58d91c3e86b293,chain with the most recurrences,0
+2405,4aa0553c6438b75a,chain with the most recurrences,0
+1047,4f06450bc62c0c4e,chain with the most recurrences,1
+748,4fffed940d6e4e67,chain with the most recurrences,0
+1239,5087f0cea4396b9a,chain with the most recurrences,0
+1694,519d91f2ebeec9e4,chain with the most recurrences,0
+172,51caa01bc1b6866f,chain with the most recurrences,0
+173,51caa01bc1b6866f,chain with the most recurrences,0
+174,51caa01bc1b6866f,chain with the most recurrences,0
+1129,531062ed4733bcea,chain with the most recurrences,0
+1632,564f7d08a6a3571e,chain with the most recurrences,0
+2284,56755d804469a239,chain with the most recurrences,0
+2176,57a5c21fd215f6ab,chain with the most recurrences,0
+242,57d141c2e91269af,chain with the most recurrences,0
+429,57d141c2e91269af,chain with the most recurrences,0
+2403,58ae4387a302a55a,chain with the most recurrences,0
+2229,58d66d4b8c9593f8,chain with the most recurrences,0
+1607,59ada9563246c283,chain with the most recurrences,0
+1993,5a0a5058cf04d397,chain with the most recurrences,0
+1199,5a34d2df0a1de9e5,chain with the most recurrences,0
+1547,5ae6440600c514b5,chain with the most recurrences,0
+1712,5ae6440600c514b5,chain with the most recurrences,0
+803,5bf2727adc0ddac1,chain with the most recurrences,0
+412,5c0c724ca9a0d5ad,chain with the most recurrences,0
+1809,5c7ddd3646979238,chain with the most recurrences,0
+1810,5c7ddd3646979238,chain with the most recurrences,0
+1811,5c7ddd3646979238,chain with the most recurrences,0
+1267,5ce1a7984bacba9a,chain with the most recurrences,0
+1807,5ce1a7984bacba9a,chain with the most recurrences,0
+1244,5d11ed83175ea83e,chain with the most recurrences,0
+2308,5dfb6c6b4b148b28,chain with the most recurrences,0
+2310,5dfb6c6b4b148b28,chain with the most recurrences,0
+2311,5dfb6c6b4b148b28,chain with the most recurrences,0
+2312,5dfb6c6b4b148b28,chain with the most recurrences,0
+2313,5dfb6c6b4b148b28,chain with the most recurrences,0
+2314,5dfb6c6b4b148b28,chain with the most recurrences,0
+2315,5dfb6c6b4b148b28,chain with the most recurrences,0
+2316,5dfb6c6b4b148b28,chain with the most recurrences,0
+2276,5e8420c58eea90ae,chain with the most recurrences,0
+2277,5e8420c58eea90ae,chain with the most recurrences,0
+1130,5f3fe3672aa41720,chain with the most recurrences,0
+1131,5f3fe3672aa41720,chain with the most recurrences,0
+1132,5f3fe3672aa41720,chain with the most recurrences,0
+1133,5f3fe3672aa41720,chain with the most recurrences,0
+1134,5f3fe3672aa41720,chain with the most recurrences,0
+1135,5f3fe3672aa41720,chain with the most recurrences,0
+1580,60219240cd9ebfaa,chain with the most recurrences,0
+420,6069e19b3a424fc5,chain with the most recurrences,0
+1027,64e800a7378db06f,chain with the most recurrences,0
+1499,66c0536d572f10a9,chain with the most recurrences,0
+2415,677e15d566bf9b9e,chain with the most recurrences,0
+1674,682facee060eaeb7,chain with the most recurrences,0
+552,69b6283845ba8bf0,chain with the most recurrences,0
+553,69b6283845ba8bf0,chain with the most recurrences,0
+554,69b6283845ba8bf0,chain with the most recurrences,0
+555,69b6283845ba8bf0,chain with the most recurrences,0
+526,6c2dd490537fc897,chain with the most recurrences,0
+1720,6c2dd490537fc897,chain with the most recurrences,0
+1721,6c2dd490537fc897,chain with the most recurrences,0
+1722,6c2dd490537fc897,chain with the most recurrences,0
+1723,6c2dd490537fc897,chain with the most recurrences,0
+1724,6c2dd490537fc897,chain with the most recurrences,0
+1758,6cb29552a49fcfa9,chain with the most recurrences,0
+1888,6e7bfd2bf0c31764,chain with the most recurrences,1
+2087,6f7c0c921e2c58e3,chain with the most recurrences,0
+1219,6f80edc6fb231ae0,chain with the most recurrences,1
+1735,7057b9542f018144,chain with the most recurrences,0
+1736,7057b9542f018144,chain with the most recurrences,0
+1737,7057b9542f018144,chain with the most recurrences,0
+1738,7057b9542f018144,chain with the most recurrences,0
+1203,718b083d4c78fbcf,chain with the most recurrences,0
+1204,718b083d4c78fbcf,chain with the most recurrences,0
+1094,72871cbe40d0335b,chain with the most recurrences,0
+1480,72ec64cb2f4e6d8e,chain with the most recurrences,0
+2060,72ec64cb2f4e6d8e,chain with the most recurrences,0
+911,736f59c44d5863df,chain with the most recurrences,0
+1235,74ce405e926cad62,chain with the most recurrences,0
+564,7527d3bad8b7089c,chain with the most recurrences,0
+43,75baecffede11dd9,chain with the most recurrences,0
+44,75baecffede11dd9,chain with the most recurrences,0
+45,75baecffede11dd9,chain with the most recurrences,0
+46,75baecffede11dd9,chain with the most recurrences,0
+47,75baecffede11dd9,chain with the most recurrences,0
+1517,75ca0a4f46e4f4c3,chain with the most recurrences,0
+1519,75ca0a4f46e4f4c3,chain with the most recurrences,0
+1481,75f5dbb335ea792d,chain with the most recurrences,0
+2129,77e6fd8acc9d8bca,chain with the most recurrences,0
+2130,77e6fd8acc9d8bca,chain with the most recurrences,0
+2131,77e6fd8acc9d8bca,chain with the most recurrences,0
+1660,7892ba8a3d5628f2,chain with the most recurrences,0
+1661,7892ba8a3d5628f2,chain with the most recurrences,0
+1662,7892ba8a3d5628f2,chain with the most recurrences,0
+1663,7892ba8a3d5628f2,chain with the most recurrences,0
+1664,7892ba8a3d5628f2,chain with the most recurrences,0
+23,794b580d92213544,chain with the most recurrences,0
+1749,794b580d92213544,chain with the most recurrences,0
+196,79870247216c0729,chain with the most recurrences,0
+1850,7999a84cbe09ea33,chain with the most recurrences,0
+1851,7999a84cbe09ea33,chain with the most recurrences,0
+1852,7999a84cbe09ea33,chain with the most recurrences,0
+1853,7999a84cbe09ea33,chain with the most recurrences,0
+1855,7999a84cbe09ea33,chain with the most recurrences,0
+1849,7ac4a0848444cb3d,chain with the most recurrences,0
+243,7accf11318f34ae5,chain with the most recurrences,0
+788,7accf11318f34ae5,chain with the most recurrences,0
+48,7c66e38a3a80e71f,chain with the most recurrences,0
+579,7cf80fed20914522,chain with the most recurrences,0
+1207,7fc78eab78c1f1af,chain with the most recurrences,0
+2298,81065ed912fa87cb,chain with the most recurrences,0
+2299,81065ed912fa87cb,chain with the most recurrences,0
+1988,82eebe93f83c929b,chain with the most recurrences,0
+337,82fa786061ba6d37,chain with the most recurrences,0
+1056,82fa786061ba6d37,chain with the most recurrences,0
+1753,82fa786061ba6d37,chain with the most recurrences,0
+666,83cbe55ceb5ec49d,chain with the most recurrences,1
+699,8460acd88a8cec80,chain with the most recurrences,0
+700,8460acd88a8cec80,chain with the most recurrences,1
+701,8460acd88a8cec80,chain with the most recurrences,0
+702,8460acd88a8cec80,chain with the most recurrences,0
+703,8460acd88a8cec80,chain with the most recurrences,0
+704,8460acd88a8cec80,chain with the most recurrences,0
+2391,89259f5c244dcfa3,chain with the most recurrences,0
+291,8a490f710d409d45,chain with the most recurrences,0
+827,8af1d56f630534c2,chain with the most recurrences,0
+1742,8c4ddee75604269c,chain with the most recurrences,0
+2138,8cb278c0140c26ce,chain with the most recurrences,0
+2139,8cb278c0140c26ce,chain with the most recurrences,0
+2232,8d5ccc63b6f1071c,chain with the most recurrences,0
+1515,8edda5ca699b364d,chain with the most recurrences,0
+1546,8edda5ca699b364d,chain with the most recurrences,0
+959,90435243b070273f,chain with the most recurrences,0
+1503,9451019eb3f259ca,chain with the most recurrences,0
+1301,9545570fc917373e,chain with the most recurrences,0
+1302,9545570fc917373e,chain with the most recurrences,0
+1156,95b7dfc26b52697c,chain with the most recurrences,0
+1996,969298bdbcf82726,chain with the most recurrences,0
+1145,975f23659983d5bf,chain with the most recurrences,0
+239,97cd57989db0c196,chain with the most recurrences,0
+2274,9836079ba40ba095,chain with the most recurrences,0
+2275,9836079ba40ba095,chain with the most recurrences,0
+2154,9881abb7667c02bd,chain with the most recurrences,0
+862,989006a4ae467a43,chain with the most recurrences,0
+241,99fbd93df59403e2,chain with the most recurrences,0
+193,9ba720831db2bb8d,chain with the most recurrences,0
+1243,9bafdd622842cc4c,chain with the most recurrences,0
+1649,9cd5670bc12464cd,chain with the most recurrences,0
+1959,9cd5670bc12464cd,chain with the most recurrences,0
+2179,9e3bda75156b38ea,chain with the most recurrences,0
+2180,9e3bda75156b38ea,chain with the most recurrences,0
+1887,a1ecca958aeaf979,chain with the most recurrences,1
+356,a27fe5b7b53acd62,chain with the most recurrences,0
+1693,a27fe5b7b53acd62,chain with the most recurrences,0
+1004,a4600ebd862fbe67,chain with the most recurrences,0
+1057,a4600ebd862fbe67,chain with the most recurrences,0
+1058,a4600ebd862fbe67,chain with the most recurrences,0
+1059,a4600ebd862fbe67,chain with the most recurrences,0
+1060,a4600ebd862fbe67,chain with the most recurrences,0
+1061,a4600ebd862fbe67,chain with the most recurrences,0
+1062,a4600ebd862fbe67,chain with the most recurrences,0
+1814,a598874e9f1faeca,chain with the most recurrences,0
+112,a628b61cc56b81a1,chain with the most recurrences,0
+673,a628b61cc56b81a1,chain with the most recurrences,0
+194,a69016b25d77b8e5,chain with the most recurrences,0
+732,a78cf0522d279867,chain with the most recurrences,0
+733,a78cf0522d279867,chain with the most recurrences,0
+734,a78cf0522d279867,chain with the most recurrences,0
+735,a78cf0522d279867,chain with the most recurrences,0
+736,a78cf0522d279867,chain with the most recurrences,0
+2420,aadb7c1f0d07a1e0,chain with the most recurrences,0
+302,abcf400b1e13308e,chain with the most recurrences,0
+933,abcf400b1e13308e,chain with the most recurrences,0
+1256,abcf400b1e13308e,chain with the most recurrences,0
+581,ad0148408437fa37,chain with the most recurrences,0
+2146,adefd430698b71d0,chain with the most recurrences,0
+2147,adefd430698b71d0,chain with the most recurrences,0
+2170,aeb135beb85aa645,chain with the most recurrences,0
+2301,af4c3a77fa40f254,chain with the most recurrences,0
+2302,af4c3a77fa40f254,chain with the most recurrences,0
+2303,af4c3a77fa40f254,chain with the most recurrences,0
+2304,af4c3a77fa40f254,chain with the most recurrences,0
+2306,af4c3a77fa40f254,chain with the most recurrences,0
+957,af891e02cfbca9aa,chain with the most recurrences,1
+364,afdd9c441df4a8b5,chain with the most recurrences,0
+473,b14048ef186f7af2,chain with the most recurrences,0
+2192,b467db798726b361,chain with the most recurrences,0
+372,b6561036f8e98478,chain with the most recurrences,0
+1864,b6561036f8e98478,chain with the most recurrences,0
+2363,b72c8003e4a4aa8a,chain with the most recurrences,0
+70,b862d99004d602b7,chain with the most recurrences,1
+2210,b9dd37da7a868148,chain with the most recurrences,0
+2048,b9eafc6bf3021b5f,chain with the most recurrences,0
+2212,bab290513885df87,chain with the most recurrences,0
+1913,bc36895e27c82b48,chain with the most recurrences,0
+281,bd6ce8ffe322239b,chain with the most recurrences,0
+1584,bd6ce8ffe322239b,chain with the most recurrences,0
+2064,bd71092854a11d23,chain with the most recurrences,0
+854,c09edb43012cd4dd,chain with the most recurrences,0
+2325,c09edb43012cd4dd,chain with the most recurrences,0
+1287,c195306f042d79dd,chain with the most recurrences,0
+340,c25fe583719ec152,chain with the most recurrences,0
+502,c25fe583719ec152,chain with the most recurrences,0
+503,c25fe583719ec152,chain with the most recurrences,0
+504,c25fe583719ec152,chain with the most recurrences,0
+382,c386e78b90c7ba9e,chain with the most recurrences,0
+169,c452847e36591bdf,chain with the most recurrences,0
+654,c452847e36591bdf,chain with the most recurrences,0
+2243,c88e8f5c0e295651,chain with the most recurrences,0
+1176,ca8a7ab590e79faa,chain with the most recurrences,1
+1651,caa62e2a8ae8aa70,chain with the most recurrences,0
+661,cae4f02c9a53c751,chain with the most recurrences,0
+2090,cb3f851606de17b7,chain with the most recurrences,0
+1752,cb58ac9ad14aec38,chain with the most recurrences,0
+2081,cb87fe5c9d0c64be,chain with the most recurrences,0
+2082,cb87fe5c9d0c64be,chain with the most recurrences,0
+2083,cb87fe5c9d0c64be,chain with the most recurrences,0
+2084,cb87fe5c9d0c64be,chain with the most recurrences,0
+847,cc61f5868a33102c,chain with the most recurrences,0
+274,cc9c0e19e0358dc8,chain with the most recurrences,0
+2388,cc9c0e19e0358dc8,chain with the most recurrences,0
+1569,cd559b0183dcaac8,chain with the most recurrences,0
+1995,cd559b0183dcaac8,chain with the most recurrences,0
+2136,cdf0a83ed4a2cc0b,chain with the most recurrences,0
+1164,ce956cb4419187d7,chain with the most recurrences,0
+2093,cf71f9edc09d6e20,chain with the most recurrences,0
+2094,cf71f9edc09d6e20,chain with the most recurrences,0
+2328,d10a8f165f95cd72,chain with the most recurrences,0
+2330,d10a8f165f95cd72,chain with the most recurrences,0
+1994,d23a290c047e163a,chain with the most recurrences,0
+84,d3134cc0824aacb7,chain with the most recurrences,0
+1014,d4e87ed48cf4b500,chain with the most recurrences,0
+457,d53306a0db75b399,chain with the most recurrences,0
+1310,d53306a0db75b399,chain with the most recurrences,1
+1003,d69fd0fe319dfa0c,chain with the most recurrences,0
+1707,d77a3584ea4dce0f,chain with the most recurrences,0
+861,d7dfbf8c99cb46be,chain with the most recurrences,0
+451,d7e028355b9590a6,chain with the most recurrences,0
+2024,d7e028355b9590a6,chain with the most recurrences,0
+2119,d9daa00c294c9e7d,chain with the most recurrences,0
+2023,dafb72d605dc0bef,chain with the most recurrences,0
+61,db40d10bd8b6e5b7,chain with the most recurrences,0
+2344,db40d10bd8b6e5b7,chain with the most recurrences,0
+1435,db5ecd5a93111f2f,chain with the most recurrences,0
+1436,db5ecd5a93111f2f,chain with the most recurrences,0
+1437,db5ecd5a93111f2f,chain with the most recurrences,0
+1438,db5ecd5a93111f2f,chain with the most recurrences,0
+1510,db6e7cdb4a3e974f,chain with the most recurrences,0
+771,dbae160496a0157b,chain with the most recurrences,0
+2157,dc0bf9d0da719aeb,chain with the most recurrences,0
+2408,e021c613cb75881b,chain with the most recurrences,0
+2372,e0a65449f783fdfd,chain with the most recurrences,0
+2373,e0a65449f783fdfd,chain with the most recurrences,0
+2374,e0a65449f783fdfd,chain with the most recurrences,0
+1780,e3706aa35162ba75,chain with the most recurrences,0
+785,e4103ece57b148cd,chain with the most recurrences,0
+1835,e4572f43e993e1d0,chain with the most recurrences,0
+2342,e4a3587ae3f6fdc0,chain with the most recurrences,0
+2393,e500a3c546361707,chain with the most recurrences,0
+151,e5557194ebad0e3c,chain with the most recurrences,1
+1800,e5ddad8b5ea1f2da,chain with the most recurrences,0
+1330,e64dce8d5e4a6d88,chain with the most recurrences,1
+1371,e64dce8d5e4a6d88,chain with the most recurrences,0
+1372,e64dce8d5e4a6d88,chain with the most recurrences,0
+1373,e64dce8d5e4a6d88,chain with the most recurrences,0
+1374,e64dce8d5e4a6d88,chain with the most recurrences,0
+1375,e64dce8d5e4a6d88,chain with the most recurrences,0
+1376,e64dce8d5e4a6d88,chain with the most recurrences,0
+946,e68e998d3897b35f,chain with the most recurrences,0
+1971,e70bf7df45f6712c,chain with the most recurrences,0
+2375,e7f9dddf45730990,chain with the most recurrences,0
+17,e93785e476722288,chain with the most recurrences,0
+1657,e967d79ba1b9e019,chain with the most recurrences,0
+63,ea13294efbd494ea,chain with the most recurrences,0
+1178,ebc743004bb68d17,chain with the most recurrences,0
+1179,ebc743004bb68d17,chain with the most recurrences,0
+1180,ebc743004bb68d17,chain with the most recurrences,0
+1181,ebc743004bb68d17,chain with the most recurrences,0
+1182,ebc743004bb68d17,chain with the most recurrences,0
+1183,ebc743004bb68d17,chain with the most recurrences,0
+1839,ebc743004bb68d17,chain with the most recurrences,0
+1840,ebc743004bb68d17,chain with the most recurrences,0
+1841,ebc743004bb68d17,chain with the most recurrences,0
+1842,ebc743004bb68d17,chain with the most recurrences,0
+1843,ebc743004bb68d17,chain with the most recurrences,0
+1844,ebc743004bb68d17,chain with the most recurrences,0
+1232,ecdde268269343b4,chain with the most recurrences,0
+240,ed4d7bc622809dfd,chain with the most recurrences,0
+2108,ed5bf4dacb224627,chain with the most recurrences,0
+2114,ed5bf4dacb224627,chain with the most recurrences,0
+2115,ed5bf4dacb224627,chain with the most recurrences,0
+2116,ed5bf4dacb224627,chain with the most recurrences,0
+2245,ee3ad8eb40b9d7c6,chain with the most recurrences,0
+2348,ee5f78a5c4518f47,chain with the most recurrences,0
+2350,ee5f78a5c4518f47,chain with the most recurrences,0
+2351,ee5f78a5c4518f47,chain with the most recurrences,0
+1802,eebd7e1d78286e59,chain with the most recurrences,0
+1884,f01b017183e2fb6f,chain with the most recurrences,0
+1916,f01b017183e2fb6f,chain with the most recurrences,0
+1917,f01b017183e2fb6f,chain with the most recurrences,0
+1918,f01b017183e2fb6f,chain with the most recurrences,0
+1919,f01b017183e2fb6f,chain with the most recurrences,0
+1920,f01b017183e2fb6f,chain with the most recurrences,0
+1921,f01b017183e2fb6f,chain with the most recurrences,0
+15,f2e433931339dae8,chain with the most recurrences,0
+1614,f4667b9a1c3dd436,chain with the most recurrences,0
+261,f7679694f41a8126,chain with the most recurrences,0
+878,f8f86d2dc9eb670e,chain with the most recurrences,0
+1264,f8f86d2dc9eb670e,chain with the most recurrences,0
+889,f9b70aae1243d385,chain with the most recurrences,0
+1095,fa573f501404ad85,chain with the most recurrences,0
+2242,fa801c686822f34c,chain with the most recurrences,0
+2249,fa801c686822f34c,chain with the most recurrences,0
+2250,fa801c686822f34c,chain with the most recurrences,0
+2251,fa801c686822f34c,chain with the most recurrences,0
+2252,fa801c686822f34c,chain with the most recurrences,0
+2253,fa801c686822f34c,chain with the most recurrences,0
+2,fb174d7b6ac801f6,chain with the most recurrences,1
+765,fb174d7b6ac801f6,chain with the most recurrences,0
+1669,fb174d7b6ac801f6,chain with the most recurrences,0
+404,fb32bdf3394ab7d5,chain with the most recurrences,0
+814,fbdb676f7e6325d0,chain with the most recurrences,0
+1358,fbdb676f7e6325d0,chain with the most recurrences,0
+1469,fbdb676f7e6325d0,chain with the most recurrences,0
+1575,fbe9e170f36f4a71,chain with the most recurrences,0
+1576,fbe9e170f36f4a71,chain with the most recurrences,0
+1577,fbe9e170f36f4a71,chain with the most recurrences,0
+1578,fbe9e170f36f4a71,chain with the most recurrences,0
+1579,fbe9e170f36f4a71,chain with the most recurrences,0
+482,fc2ec298bdc6081c,chain with the most recurrences,0
+1138,fc89e700e1e81ddc,chain with the most recurrences,0
+1174,fe35a86e40a368c5,chain with the most recurrences,0
+478,ff6b4e52af8d520f,chain with the most recurrences,1

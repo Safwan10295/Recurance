@@ -69,7 +69,11 @@ MAX_TOKENS = {
 }
 
 # Tavily, section 6.5.
-TAVILY_STAGE_F_CAP_CREDITS = 250
+# Stage F's cumulative cap, in credits as counted by our own ledger (D28): the first 250, plus 70% of the
+# 788 credits the Tavily usage endpoint reported on 16 Oct 2026. The other 30% stays for the live agent.
+TAVILY_STAGE_F_CAP_CREDITS = 801
+# The demo chains (smart motorways, platform ends, emollient fires, online pharmacy). Keys are stable.
+FEATURED_CHAIN_KEYS = ["c52cded99f756309", "ede39b33e85d5106", "38aced9ab658b30c", "12c95ba862edb687"]
 
 # Scraper politeness.
 SCRAPE_DELAY_SECONDS = 1.0

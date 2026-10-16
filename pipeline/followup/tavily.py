@@ -153,6 +153,39 @@ def classify(llm: LLM, org: str, promise: dict, sources: list[dict]) -> dict:
     return {"ok": True, "classification": cls, "summary": summary, "evidence": ev, "cost": r.cost}
 
 
+def select_promises(conn) -> list[tuple[int, str, str]]:
+    """Promises to check, in priority order, as (promise_id, chain_key, reason).
+
+    Only stated actions in responses to the earlier reports of a chain (the last report's response
+    cannot be followed by a recurrence yet). Order: the demo chains, the chains with a dossier, then
+    the chains with the most recurrences.
+    """
+    chains = conn.execute(
+        """SELECT c.id, c.chain_key, c.organisation_id, c.n_reports FROM chains c ORDER BY c.n_reports DESC, c.chain_key"""
+    ).fetchall()
+    dossier_keys = {r[0] for r in conn.execute("SELECT chain_key FROM dossiers")}
+    tiers: list[tuple[str, list]] = [
+        ("demo chain", [c for c in chains if c["chain_key"] in config.FEATURED_CHAIN_KEYS]),
+        ("chain with a dossier", [c for c in chains if c["chain_key"] in dossier_keys]),
+        ("chain with the most recurrences", list(chains)),
+    ]
+    out, seen = [], set()
+    for reason, group in tiers:
+        for c in group:
+            urls = [r[0] for r in conn.execute(
+                """SELECT DISTINCT ce.report_url FROM chain_members m JOIN candidate_pairs p ON p.id = m.pair_id
+                   JOIN concerns ce ON ce.id = p.earlier_concern_id WHERE m.chain_id = ?""", (c["id"],))]
+            for u in urls:
+                for (pid,) in conn.execute(
+                    """SELECT pr.id FROM promises pr JOIN responses rs ON rs.id = pr.response_id
+                       WHERE rs.report_url = ? AND (rs.organisation_id = ? OR rs.organisation_id IS NULL)
+                         AND pr.quote_verified > 0 ORDER BY pr.id""", (u, c["organisation_id"])):
+                    if pid not in seen:
+                        seen.add(pid)
+                        out.append((pid, c["chain_key"], reason))
+    return out
+
+
 def follow_up(llm: LLM, tv: Tavily, promise_ids: list[int], searches_per_promise: int = 2) -> dict:
     conn = db.connect()
     agg = {"promises": 0, "ok": 0, "credits_before": tv.ledger.tavily_credits(STAGE), "errors": [],
