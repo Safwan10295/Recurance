@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 
 from . import config, db, env
@@ -220,11 +221,26 @@ def cmd_dossiers_export(a):
     print(review.export_markdown())
 
 
+# The demo chains (smart motorways, platform ends, emollient fires). Keys are stable across rebuilds.
+FEATURED_KEYS = ["c52cded99f756309", "ede39b33e85d5106", "38aced9ab658b30c", "12c95ba862edb687"]
+
+
 def cmd_review(a):
     from .dossier import review
 
-    review.interactive()
-
+    keys = None
+    if a.featured:
+        # The demo chains named in pipeline/publish/featured.yaml, as they resolve now.
+        conn = db.connect()
+        have = {r[0] for r in conn.execute("SELECT chain_key FROM dossiers")}
+        keys = [k for k in FEATURED_KEYS if k in have]
+        conn.close()
+    n = review.interactive(keys)
+    if n and os.environ.get("DATABASE_URL"):
+        print(f"{n} approved. Publishing so the site shows them (about 3 minutes)...")
+        cmd_publish(a)
+    elif n:
+        print("Run python -m pipeline.cli publish to update the site.")
 
 def cmd_export(a):
     from .export import web
@@ -289,7 +305,9 @@ def main(argv=None):
     sub.add_parser("publish", help="publish display-safe data to PostgreSQL (DATABASE_URL)").set_defaults(fn=cmd_publish)
     sub.add_parser("dossiers-export", help="write all dossiers to a Markdown file for reading").set_defaults(
         fn=cmd_dossiers_export)
-    sub.add_parser("review", help="Pilot only: approve or reject dossiers for publication").set_defaults(fn=cmd_review)
+    s = sub.add_parser("review", help="Pilot only: approve or reject dossiers for publication")
+    s.add_argument("--featured", action="store_true", help="only the demo chains' dossiers, then publish")
+    s.set_defaults(fn=cmd_review)
 
     a = p.parse_args(argv)
     a.fn(a)

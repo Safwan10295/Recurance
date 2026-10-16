@@ -42,9 +42,14 @@ def export_markdown() -> str:
     return f"wrote {len(rows)} dossiers to {OUT}"
 
 
-def interactive() -> None:
+def interactive(keys: list[str] | None = None) -> int:
+    """Returns how many dossiers were approved. keys limits the review to those chains, in that order."""
     conn = db.connect()
     rows = conn.execute("SELECT * FROM dossiers WHERE reviewed_by_human = 0 ORDER BY created_at").fetchall()
+    if keys:
+        by = {r["chain_key"]: r for r in rows}
+        rows = [by[k] for k in keys if k in by]
+    approved = 0
     print(f"{len(rows)} dossiers awaiting review.")
     for r in rows:
         print("\n" + "=" * 78)
@@ -55,10 +60,11 @@ def interactive() -> None:
         if ans == "approve":
             conn.execute("UPDATE dossiers SET reviewed_by_human = 1 WHERE chain_key = ?", (r["chain_key"],))
             conn.commit()
+            approved += 1
             print("approved")
         elif ans == "reject":
             conn.execute("UPDATE dossiers SET reviewed_by_human = 0 WHERE chain_key = ?", (r["chain_key"],))
             conn.commit()
             print("kept hidden")
     conn.close()
-    print("Run python -m pipeline.cli publish to update the site.")
+    return approved
