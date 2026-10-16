@@ -13,12 +13,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import AudienceCards from "@/components/AudienceCards";
+import HeroTimeline from "@/components/HeroTimeline";
 import { TourButton } from "@/components/shell/Tour";
 import { ChainCard, RecentCard } from "@/components/cards";
 import { InfoTip, Section, StatTile, btnPrimary, btnSecondary, formatDate, pct } from "@/components/ui";
 import { q1 } from "@/lib/db";
 import { GLOSSARY } from "@/lib/glossary";
 import { getChain, getFeatured, getMeta, listRecent } from "@/lib/queries";
+
+// The hero timeline: smart motorways, seven reports over five years (D31: shown here only, not featured).
+const HERO_CHAIN = "c52cded99f756309";
 
 async function counts() {
   return (
@@ -33,7 +38,10 @@ export default async function Home() {
   const [meta, featured, recent, c] = await Promise.all([getMeta(), getFeatured(), listRecent({ months: 12, size: 3, clearOnly: true }), counts()]);
   const s = meta.site;
   const lead = featured[0];
-  const leadChain = lead ? (await getChain(lead.key)).chain : null;
+  const [leadChain, heroChain] = await Promise.all([
+    lead ? getChain(lead.key).then((r) => r.chain) : null,
+    getChain(HERO_CHAIN).then((r) => r.chain).catch(() => null),
+  ]);
   const leadPromises = leadChain ? leadChain.reports.slice(0, -1).reduce((n, r) => n + r.responses.reduce((m, rs) => m + rs.promises.length, 0), 0) : 0;
 
   const problem: { icon: LucideIcon; title: string; body: string }[] = [
@@ -59,7 +67,10 @@ export default async function Home() {
     {
       icon: Unlink,
       title: "Nobody joins it up",
-      body: `In ${pct(s.share_not_cited)} of the links found, the later report does not cite the earlier one.`,
+      body:
+        leadChain && leadChain.links.length
+          ? `In ${leadChain.links.filter((l) => !l.later_cites_earlier).length} of the ${leadChain.links.length} links in this chain, the later report does not cite the earlier one.`
+          : "The later report rarely cites the earlier one.",
     },
   ];
 
@@ -108,53 +119,52 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="card p-5 sm:p-6 shadow-[var(--shadow-lg)]" data-tour="problem">
-          <div className="mb-4 flex items-baseline justify-between gap-2">
-            <p className="eyebrow">The problem, in a real case</p>
-            {lead && (
-              <Link href={`/chains/${lead.key}`} className="text-xs">
-                {lead.org.name} →
-              </Link>
-            )}
-          </div>
-          <ol className="list-none p-0">
-            {problem.map((p, i) => {
-              const Icon = p.icon;
-              const last = i === problem.length - 1;
-              return (
-                <li key={p.title} className="flex gap-3.5">
-                  <div className="flex flex-col items-center">
-                    <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                        last ? "bg-sand-soft text-sand" : i === 0 ? "bg-accent text-accent-ink" : "bg-accent-soft text-accent"
-                      }`}
-                      aria-hidden
-                    >
-                      <Icon size={17} />
-                    </span>
-                    {!last && <span className="w-px flex-1 min-h-5 bg-rule" aria-hidden />}
-                  </div>
-                  <div className={last ? "" : "pb-4"}>
-                    <p className="font-medium text-ink leading-snug pt-1.5">{p.title}</p>
-                    <p className="text-sm text-ink-2">{p.body}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+        {heroChain ? (
+          <HeroTimeline chain={heroChain} notCited={s.share_not_cited} diffCoroner={s.share_diff_coroner} nLinks={s.n_links} />
+        ) : (
+          <div data-tour="problem" />
+        )}
+      </section>
+
+      {/* The problem, step by step, in the lead featured chain */}
+      <section className="space-y-3" aria-labelledby="problem-heading">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="problem-heading" className="font-serif text-2xl">How a warning gets lost</h2>
           {lead && (
-            <p className="mt-4 border-t border-rule pt-3 text-sm text-ink-2">
-              <span className="text-ink">{lead.hazard}.</span> Recurrence Watch found this chain on its own.
-            </p>
+            <Link href={`/chains/${lead.key}`} className="text-sm">
+              {lead.hazard} →
+            </Link>
           )}
         </div>
+        <ol className="grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
+          {problem.map((p, i) => {
+            const Icon = p.icon;
+            const last = i === problem.length - 1;
+            return (
+              <li key={p.title} className="card flex flex-col gap-2 p-4">
+                <span
+                  className={`flex h-9 w-9 items-center justify-center rounded-full ${
+                    last ? "bg-sand-soft text-sand" : i === 0 ? "bg-accent text-accent-ink" : "bg-accent-soft text-accent"
+                  }`}
+                  aria-hidden
+                >
+                  <Icon size={17} />
+                </span>
+                <p className="font-medium leading-snug text-ink">{p.title}</p>
+                <p className="text-sm text-ink-2">{p.body}</p>
+              </li>
+            );
+          })}
+        </ol>
       </section>
+
+      <AudienceCards />
 
       {/* Headline figures */}
       <section className="space-y-3" data-tour="stats">
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatTile value={s.n_chains.toLocaleString("en-GB")} label="recurrence chains, every quote verified" href="/chains" />
-          <StatTile value={pct(s.share_diff_coroner)} label="of links where the later report came from a different coroner" href="/evaluation" />
+          <StatTile value={s.n_links.toLocaleString("en-GB")} label="links between reports, each with quotes from both" href="/recent" />
           <StatTile value={pct(s.share_no_response)} label="of links where no published response to the earlier report was found" href="/methodology" />
           <StatTile value={c.after_promise.toLocaleString("en-GB")} label="times a concern was raised again after a stated action" href="/promises" />
         </div>

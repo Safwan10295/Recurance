@@ -9,6 +9,15 @@ import { NAV } from "./nav";
 import ThemeToggle from "./ThemeToggle";
 import Tour, { startTour } from "./Tour";
 
+const BUILT_WITH: [string, string][] = [
+  ["NVIDIA Nemotron", "Nano, Super and Ultra"],
+  ["Nebius Token Factory", "inference"],
+  ["Qwen3 Embedding 8B", "on Token Factory"],
+  ["Tavily", "follow-up web search"],
+  ["Postgres and pgvector", "search"],
+  ["Next.js", "site"],
+];
+
 function isActive(path: string, href: string) {
   return href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
 }
@@ -238,14 +247,22 @@ export default function AppShell({ children, updated }: { children: React.ReactN
         </main>
         <footer className="border-t border-rule">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-muted space-y-1.5">
+            <ul className="mb-3 flex flex-wrap items-center gap-1.5 p-0" aria-label="Built with">
+              <li className="mr-1 eyebrow">Built with</li>
+              {BUILT_WITH.map(([name, role]) => (
+                <li key={name} className="rounded-full border border-rule bg-surface px-2.5 py-1">
+                  <span className="text-ink">{name}</span> <span>{role}</span>
+                </li>
+              ))}
+            </ul>
             <p>
               Source: Prevention of Future Deaths reports and responses published by the Courts and Tribunals Judiciary at
               judiciary.uk. Crown copyright, used under the Open Government Licence v3.0.
             </p>
             <p>
               A link shows that a similar concern was raised again, not why. It is not a finding about any organisation or
-              person. <Link href="/methodology">Methodology and responsible use</Link> ·{" "}
-              <Link href="/methodology#corrections">Report an error</Link>
+              person. <Link href="/methodology" className="underline underline-offset-2">Methodology and responsible use</Link> ·{" "}
+              <Link href="/methodology#corrections" className="underline underline-offset-2">Report an error</Link>
             </p>
           </div>
         </footer>

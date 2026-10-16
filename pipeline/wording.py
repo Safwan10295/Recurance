@@ -17,3 +17,14 @@ def violations(text: str | None) -> list[str]:
 
 def is_clean(text: str | None) -> bool:
     return not violations(text)
+
+
+_CAUSAL = [(re.compile(r"\bcausing\b", re.I), "leading to"), (re.compile(r"\bcaused by\b", re.I), "from"),
+           (re.compile(r"\bcauses\b(?!\s+of)", re.I), "leads to")]
+
+
+def neutral(text: str | None) -> str | None:
+    """Hazard titles describe a mechanism; say "leading to", never "causing", so no title reads as a finding of cause."""
+    for pat, rep in _CAUSAL:
+        text = pat.sub(rep, text) if text else text
+    return text

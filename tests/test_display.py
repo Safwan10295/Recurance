@@ -25,3 +25,11 @@ def test_map_layout_keeps_proportions():
     xy = _fit_square(np.array([[0.0, 0.0], [10.0, 2.0]], dtype=np.float32))
     assert xy.min() >= 0 and xy.max() <= 1
     assert abs((xy[1, 0] - xy[0, 0]) / (xy[1, 1] - xy[0, 1]) - 5.0) < 1e-4  # aspect ratio preserved
+
+
+def test_hazard_titles_never_say_causing():
+    from pipeline.wording import neutral
+    assert neutral("No hard shoulder on smart motorways causing unsafe stops") == "No hard shoulder on smart motorways leading to unsafe stops"
+    assert neutral("Fires caused by emollients") == "Fires from emollients"
+    assert neutral("Lack of root cause analysis") == "Lack of root cause analysis"
+    assert neutral("Causes of delay unclear") == "Causes of delay unclear"

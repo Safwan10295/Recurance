@@ -52,6 +52,14 @@ export interface ReportCard {
   concerns?: { quote: string; hazard: string }[];
 }
 
+export interface QuoteContext {
+  before: string;
+  after: string;
+  cut_start: boolean;
+  cut_end: boolean;
+  section: string;
+}
+
 export interface Link {
   earlier: string;
   later: string;
@@ -60,6 +68,8 @@ export interface Link {
   explanation: string;
   earlier_quote: string;
   later_quote: string;
+  earlier_context?: QuoteContext | null;
+  later_context?: QuoteContext | null;
   promise_quote: string | null;
   after_promise: number | null;
   promise_timescale?: string | null;

@@ -210,16 +210,19 @@ export function LinkTabs({ tabs }: { tabs: { href: string; label: React.ReactNod
 
 export function Breadcrumbs({ items }: { items: { href?: string; label: string }[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="eyebrow flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+    // One line at every width, so the heading below never moves when the web font arrives; the last crumb truncates.
+    <nav aria-label="Breadcrumb" className="eyebrow flex min-w-0 flex-nowrap items-center gap-x-1.5 overflow-hidden whitespace-nowrap">
       {items.map((it, i) => (
-        <span key={i} className="flex items-center gap-1.5">
+        <span key={i} className={`flex items-center gap-1.5 ${i === items.length - 1 ? "min-w-0 truncate" : "shrink-0"}`}>
           {i > 0 && <span aria-hidden className="text-rule">/</span>}
           {it.href ? (
             <Link href={it.href} className="text-muted hover:text-accent">
               {it.label}
             </Link>
           ) : (
-            <span aria-current="page">{it.label}</span>
+            <span aria-current="page" className="truncate">
+              {it.label}
+            </span>
           )}
         </span>
       ))}
@@ -289,7 +292,7 @@ export function ReportLink({
         {shortTitle(title)}
       </Link>
       {external && (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="ml-1.5 text-xs text-muted hover:text-accent" title="Original on judiciary.uk">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="ml-0.5 inline-flex min-h-6 min-w-6 items-center justify-center px-1 text-xs text-muted hover:text-accent" title="Original on judiciary.uk" aria-label="Original on judiciary.uk">
           ↗
         </a>
       )}

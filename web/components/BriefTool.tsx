@@ -39,7 +39,7 @@ type Mode = "pick" | "url" | "text";
 const EXAMPLES = [
   { label: "A smart motorway death, 2023", slug: "david-levett-prevention-of-future-deaths-report", title: "David Levett: Prevention of future deaths report", date: "2023-04-18" },
   { label: "A railway platform death, 2025", slug: "jody-robb-prevention-of-future-deaths-report", title: "Jody Robb: Prevention of Future Deaths Report", date: "2025-07-01" },
-  { label: "An ambulance delay, 2026", slug: "roman-barr-prevention-of-future-deaths-report-2", title: "Roman Barr: Prevention of future deaths report", date: "2026-04-03" },
+  { label: "A young driver crash, 2026", slug: "paul-green-prevention-of-future-deaths-report", title: "Paul Green: Prevention of future deaths report", date: "2026-03-12" },
 ];
 const REPLAY_LABEL: Record<Exclude<ReplaySource, null>, string> = {
   precomputed: "Agent trace, replayed from a recorded run (no cost)",

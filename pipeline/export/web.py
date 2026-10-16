@@ -13,6 +13,7 @@ from __future__ import annotations
 import base64
 import json
 import re
+import unicodedata
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -24,9 +25,10 @@ from ..judge.chains import DEFAULT_MIN_CONFIDENCE
 from ..judge.titles import title_for
 from ..llm import Ledger
 from ..normalise.orgs import key as org_key
+from ..parse.text import norm_for_match
 from ..publish.hazard_map import theme_of
 from ..redact import redact
-from ..wording import is_clean
+from ..wording import is_clean, neutral
 
 WEB_DATA = config.EXPORTS / "web_json"  # JSON export for offline use and tests; the site reads Postgres
 BRIEF_DIM = 256
@@ -40,6 +42,72 @@ def _write(path: Path, obj) -> None:
 
 def _people(conn, url: str) -> list[dict]:
     return [dict(r) for r in conn.execute("SELECT name, role FROM people_mentions WHERE report_url=?", (url,))]
+
+
+_HONORIFIC = re.compile(r"\b(Mr|Mrs|Ms|Miss|Mx|Dr|Baby|Master)\.?\s+(?!\[)[A-Z][\w'\u2019\-]+")
+# Words that appear in titles or name lists but are not names.
+_NOT_NAMES = {"Prevention", "Future", "Deaths", "Death", "Report", "Reports", "Regulation", "The", "And", "Inquest",
+              "Baby", "Mr", "Mrs", "Ms", "Miss", "Dr", "Sir", "Lady", "Master", "Saint", "Coroner", "Royal", "North",
+              "South", "East", "West", "New", "Great", "January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December", "Will", "Grace", "Hope", "Faith", "Unknown",
+              "Amber", "Red", "Green", "Rio"}
+# A first name followed by one of these is a place or service ("John Radcliffe Hospital"), not a person.
+_PLACE_WORDS = {"Hospital", "Hospitals", "Infirmary", "Ambulance", "Clinic", "Centre", "Center", "House", "Unit", "Ward",
+                "Road", "Street", "Lane", "Court", "Trust", "College", "School", "University", "Prison", "Report",
+                "Inquiry", "Review", "Act", "Building", "Medical", "Health", "Foundation", "Practice", "Surgery",
+                "Law", "Tower", "Park", "Way", "Close", "Avenue", "Bridge", "Station", "Syndrome", "Scale", "Score"}
+_NAME_WORD = r"[A-Z](?:[^\W\d_]|['\u2019\-])+"
+# Short forms that the archive records mostly in full ("Thomas", not "Tom").
+_SHORT_FORMS = {"Tom", "Tony", "Jim", "Jimmy", "Bob", "Bobby", "Mike", "Mick", "Dave", "Steve", "Chris", "Sam", "Ben", "Joe",
+                "Dan", "Danny", "Rob", "Robbie", "Andy", "Pete", "Nick", "Matt", "Alex", "Kate", "Katie", "Liz", "Sue",
+                "Jo", "Jen", "Jenny", "Becky", "Billy", "Charlie", "Freddie", "Alfie", "Ollie", "Josh", "Jake", "Abi", "Amer"}
+
+
+def _first_names(red: "Redactor") -> re.Pattern:
+    """First names from every recorded person and every report title in the archive, as one pattern.
+
+    The name lists hold some service names ("Home Treatment Team"), so a word is dropped when report text
+    uses it more often in lower case ("home", "will"), or when it is rare as a name and also part of a
+    coroner area or organisation name ("Surrey", "British").
+    """
+    if getattr(red, "_first_re", None) is None:
+        conn = red.conn
+        first: Counter = Counter()
+        for (n,) in conn.execute("SELECT name FROM people_mentions UNION ALL SELECT title FROM reports"):
+            w = re.findall(_NAME_WORD, re.split(r"\s*:\s*", n or "")[0])
+            if len(w) >= 2 and len(w[0]) >= 3:
+                first[w[0]] += 1
+        words: Counter = Counter()
+        for (t,) in conn.execute("SELECT concerns FROM reports WHERE concerns IS NOT NULL"):
+            words.update(re.findall(r"[^\W\d_]+", t))
+        places = set()
+        for (t,) in conn.execute("SELECT area FROM reports UNION SELECT canonical_name FROM organisations"):
+            places |= set(re.findall(_NAME_WORD, t or ""))
+        keep = {w for w, c in first.items()
+                if not (words[w.lower()] >= max(1, words[w]) and c < 20) and not (c < 3 and w in places)}
+        keep |= {unicodedata.normalize("NFKD", w).encode("ascii", "ignore").decode() for w in keep}
+        alt = "|".join(sorted(map(re.escape, (keep | _SHORT_FORMS) - _NOT_NAMES - {""}), key=len, reverse=True))
+        red._first_re = re.compile(rf"(?<!\bSt )(?<!\bSt\. )(?<!\bHMP )(?<!\bHMYOI )\b(?:{alt})\b(?:\s+{_NAME_WORD})*")
+    return red._first_re
+
+
+def first_name_pass(text: str | None, red: "Redactor") -> str | None:
+    """Remove a known first name and the capitalised words after it, unless it names a place or service
+    ("John Radcliffe Hospital", "Clare's Law") or a coroner. Applied to every quote and model sentence."""
+    if not text:
+        return text
+
+    def person(m: re.Match) -> str:
+        words = m.group(0).split()
+        nxt = re.match(r"(?:['’]s)?\s+(\w+)", text[m.end():])
+        if any(w in _PLACE_WORDS for w in words) or (nxt and nxt.group(1).capitalize() in _PLACE_WORDS):
+            return m.group(0)
+        if len(words) >= 2 and any(m.group(0) in (c or "") for c in red.coroners):  # a coroner's full name
+            return m.group(0)
+        return "[name redacted]"
+
+    out = _first_names(red).sub(person, text)
+    return re.sub(r"(\[name redacted\])(?:\s*\1)+", r"\1", out)
 
 
 class Redactor:
@@ -60,7 +128,69 @@ class Redactor:
             p, d = self._cache[u]
             people += p
             deceased |= d
-        return redact(text, people, self.coroners, deceased)
+        return first_name_pass(redact(text, people, self.coroners, deceased), self)
+
+
+CONTEXT_CHARS = 220  # shown either side of a verified quote, in the "Verified word for word" panel
+_SECTIONS = (("concerns", "the coroner's concerns"), ("circumstances", "the circumstances of the death"), ("body_text", "the report"))
+
+
+def _strict(text: str, conn, url: str, red: "Redactor") -> str:
+    """A second, stricter pass for context windows only, which show text no quote check has looked at.
+
+    Removes any part of the deceased's name or of a person recorded in the report, any first name known
+    from the archive with the capitalised words after it, and any name after an honorific. Over-redaction
+    is accepted here.
+    """
+    title = conn.execute("SELECT title FROM reports WHERE url=?", (url,)).fetchone()
+    deceased = re.split(r"\s*:\s*", (title[0] if title else "") or "")[0]
+    people = [r[0] for r in conn.execute("SELECT name FROM people_mentions WHERE report_url=?", (url,))]
+    for names, tag in (([deceased], "[the deceased]"), (people, "[name redacted]")):
+        parts = set()
+        for w in (w for nm in names for w in re.findall(r"[A-Z][\w'\u2019\-]{2,}", nm or "")):
+            for p in {w, *w.split("-")}:  # "Turay-Thomas" also as "Turay" and "Thomas", with and without accents
+                if len(p) >= 3:
+                    parts |= {p, unicodedata.normalize("NFKD", p).encode("ascii", "ignore").decode()}
+        for part in parts - _NOT_NAMES:
+            text = re.sub(rf"\b{re.escape(part)}\b(?:['\u2019]s\b)?", tag, text)
+
+    text = first_name_pass(text, red)
+    text = _HONORIFIC.sub(r"\1 [name redacted]", text)
+    return re.sub(r"(\[(?:name redacted|the deceased)\])(?:['\u2019]s)?(?:\s*\1)+", r"\1", text)
+
+
+def quote_context(conn, url: str, quote: str | None, red: Redactor, n: int = CONTEXT_CHARS) -> dict | None:
+    """The redacted text either side of a verified quote in its source report, or None.
+
+    Only a short window is published, never the whole report. The window is redacted as one piece (so a
+    name next to a role word in the quote is still caught), then split around the redacted quote.
+    """
+    q = norm_for_match(quote or "")
+    if len(q) < 20:
+        return None
+    row = conn.execute("SELECT concerns, circumstances, body_text FROM reports WHERE url=?", (url,)).fetchone()
+    for col, label in _SECTIONS:
+        src = norm_for_match((row[col] if row else "") or "")
+        i = src.find(q)
+        if i < 0:
+            continue
+        a, b = max(0, i - n), min(len(src), i + len(q) + n)
+        # Cut at whole words so no name is split; prefer to start at a sentence.
+        if a > 0:
+            dot = src.rfind(". ", a, i)
+            a = dot + 2 if dot >= 0 and i - dot < n else (src.find(" ", a, i) + 1 or a)
+        if b < len(src):
+            sp = src.rfind(" ", i + len(q), b)
+            b = sp if sp > i + len(q) else b
+        full, rq = red(src[a:b], url) or "", red(q, url) or ""
+        j = full.find(rq)
+        if j < 0 or not rq:
+            return None
+        tidy = lambda t: re.sub(r"\s*\|\s*", " ", t).strip()  # table rules left by PDF extraction
+        return {"before": tidy(_strict(full[:j], conn, url, red)), "after": tidy(_strict(full[j + len(rq):], conn, url, red)),
+                "cut_start": a > 0,
+                "cut_end": b < len(src), "section": label}
+    return None
 
 
 def report_card(conn, url: str) -> dict:
@@ -183,6 +313,8 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
                 "confidence": round(v["confidence"], 2),
                 "explanation": red(v["same_hazard_explanation"], v["e_url"], v["l_url"]),
                 "earlier_quote": red(v["earlier_quote"], v["e_url"]), "later_quote": red(v["later_quote"], v["l_url"]),
+                "earlier_context": quote_context(conn, v["e_url"], v["earlier_quote"], red),
+                "later_context": quote_context(conn, v["l_url"], v["later_quote"], red),
                 "promise_quote": red(v["promise_quote"], v["e_url"]) if v["promise_quote"] else None,
                 "after_promise": v["after_promise"],
                 "promise_timescale": prom[0] if prom else None, "promise_pdf": prom[1] if prom else None,
@@ -220,9 +352,9 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         summary = {
             "key": ch["chain_key"], "org": {"id": ch["organisation_id"], "name": ch["org"], "type": ch["org_type"],
                                             "national": bool(ch["is_national"])},
-            "hazard": restore_case(title_for(conn, ch["chain_key"]) or hazard_title(ch["hazard_label"]),
+            "hazard": neutral(restore_case(title_for(conn, ch["chain_key"]) or hazard_title(ch["hazard_label"]),
                                    [l["earlier_quote"] for l in links] + [l["later_quote"] for l in links]
-                                   + [c["quote"] for r in reports for c in r["concerns"]]),
+                                   + [c["quote"] for r in reports for c in r["concerns"]])),
             "relation": ch["relation"],
             "confidence": round(min(l["confidence"] for l in links), 2),
             "first_date": reports[0]["date"], "last_date": reports[-1]["date"], "n_reports": len(reports),
@@ -426,4 +558,4 @@ def hazard_title(label: str | None) -> str:
     t = (label or "").strip().rstrip(".")
     if not t or not is_clean(t):
         return "Recurring hazard (see the quoted concerns)"
-    return t[0].upper() + t[1:]
+    return neutral(t[0].upper() + t[1:])
