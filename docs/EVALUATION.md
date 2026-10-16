@@ -23,6 +23,33 @@ Thresholds used: TF-IDF 0.137, embedding 0.726.
 
 For the hybrid system, the top-5 column means the pair passed the candidate rule and reached the judge.
 
+95% Wilson intervals on recall, with only these pairs:
+
+- TF-IDF only: 10 of 29, from 20% to 53%.
+- Embeddings only: 12 of 29, from 26% to 59%.
+- Hybrid + Nemotron Super judge: 15 of 29, from 34% to 69%.
+
+The intervals overlap. The ordering is consistent, but the gap is not yet statistically settled.
+
+## Where it fails
+
+The hybrid + Nemotron system missed 14 pairs: 9 not candidate, 5 judge rejected.
+
+- Donna Williamson to Alex Malcolm (Department of Health and Social Care): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 2 by meaning and 1 by wording among 341 earlier reports to the organisation.
+- David Kirsch to Geoffrey Hutton (HMP Long Lartin): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 1 by meaning and 1 by wording among 2 earlier reports to the organisation.
+- Geoffrey Toase and Michael Midgley: Prevention of Future Deaths Report to Christopher Sampson: Prevention of future deaths report (Driver and Vehicle Licensing Agency): Judged related (confidence 0.70): a related but different hazard.
+- Leon Briggs: Prevention of future deaths report to Andrew McCleary: Prevention of future death report (Bedfordshire Police): Judged related (confidence 0.80): a related but different hazard.
+- Shona Campbell: Prevention of future deaths report to Ruairi Stewart: Prevention of future deaths report (Alternative Futures Group): Judged related (confidence 0.80): a related but different hazard.
+- Piotr Kierzkowski to Timothy De Boos: Prevention of Future Deaths Report (Department of Health and Social Care): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 7 by meaning and 2 by wording among 586 earlier reports to the organisation.
+- Nicola Rayner: Prevention of future deaths report to Timothy De Boos: Prevention of Future Deaths Report (Department of Health and Social Care): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 12 by meaning and 1 by wording among 586 earlier reports to the organisation.
+- Connor Wellsted: Prevention of future deaths report to Mia Gauci-Lamport: Prevention of Future Deaths Report (Care Quality Commission): Judged related (confidence 0.80): a related but different hazard.
+- Deborah Headspeath to Kim Robinson: Prevention of Future Deaths Report (Department of Health and Social Care): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 2 by meaning and 1 by wording among 607 earlier reports to the organisation.
+- Daniel Klosi: Prevention of Future Deaths Report to Billie Wicks: Prevention of Future Deaths Report (Royal College of Emergency Medicine): Judged related (confidence 0.80): a related but different hazard.
+- Freeda Glausiusz: Prevention of future deaths report to Heather Findlay: Prevention of future deaths report (East London NHS Foundation Trust): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 71 by meaning and 9 by wording among 312 earlier reports to the organisation.
+- Louis Thorold: Prevention of Future Deaths Report to Peter Westwell, Mary Cunningham, Grace Foulds, Anne Ferguson: Prevention of Future Deaths Report (Department for Transport): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 2 by meaning and 1 by wording among 89 earlier reports to the organisation.
+- Sarah Clarke: Prevention of future deaths report to Alice Litman: Prevention of future deaths report (NHS England): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 94 by meaning and 29 by wording among 258 earlier reports to the organisation.
+- Leroy Medford to Neal Saunders: Prevention of future deaths report (College of Policing): Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 9 by meaning and 2 by wording among 19 earlier reports to the organisation.
+
 ## Precision
 
 Status: pending: no labels filled in yet. Labelled pairs: 0.
@@ -41,10 +68,10 @@ Status: pending: no labels filled in yet. Labelled pairs: 0.
 
 ## Cost
 
-1. Total Token Factory spend so far: $4.7636.
-2. Analysis cost (development, embeddings, Stages A to C): $4.0698.
-3. Verified chains: 619. Cost per verified chain: $0.0066.
-4. By stage: A $0.7729, B $0.1943, C $3.0227, D $0.6802, F $0.0135, dev $0.0682, embed $0.0117.
+1. Total Token Factory spend so far: $5.1515.
+2. Analysis cost (development, embeddings, Stages A to C): $4.0395.
+3. Verified chains: 618. Cost per verified chain: $0.0083.
+4. By stage: A $0.7729, B $0.2321, C $3.0227, D $0.9660, F $0.0352, dev $0.1108, embed $0.0117.
 
 ## Weak spots
 

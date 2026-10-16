@@ -88,12 +88,16 @@ def responses_for(conn, url: str, org_id: int | None, red: Redactor) -> list[dic
     return out
 
 
-def followups_for(conn, promise_ids: list[int]) -> list[dict]:
+def followups_for(conn, promise_ids: list[int], red: "Redactor | None" = None) -> list[dict]:
+    """Web follow-up evidence. Source quotes come from news and board papers, so they are redacted too."""
     out = []
     for pid in promise_ids:
         for f in conn.execute("SELECT * FROM followups WHERE promise_id=?", (pid,)):
-            out.append({"promise_id": pid, "classification": f["classification"], "summary": f["findings"],
-                        "sources": json.loads(f["sources"] or "[]")})
+            sources = json.loads(f["sources"] or "[]")
+            if red is not None:
+                sources = [{**s, "quote": red(s.get("quote") or "")} for s in sources]
+            out.append({"promise_id": pid, "classification": f["classification"],
+                        "summary": red(f["findings"]) if red is not None else f["findings"], "sources": sources})
     return out
 
 
@@ -230,7 +234,7 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         chain_list.append(summary)
         org_chains[ch["organisation_id"]].append(ch["chain_key"])
         _write(WEB_DATA / "chains" / f"{ch['chain_key']}.json", {
-            **summary, "reports": reports, "links": links, "followups": followups_for(conn, pids), "dossier": dossier_out,
+            **summary, "reports": reports, "links": links, "followups": followups_for(conn, pids, red), "dossier": dossier_out,
         })
         # Recent recurrences: links whose later report is from the last RECENT_DAYS days.
         by_url = {r["url"]: r for r in reports}

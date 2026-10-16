@@ -1,19 +1,28 @@
 ## Where things stand
 
 1. The site reads PostgreSQL and works as a tool. To open it on this PC, double-click start_site.cmd, then go to http://localhost:3000.
-2. New on 16 Oct:
-   - Check a report shows the agent's every step: model, tokens, time, cost and each verdict;
-   - three new pages: Promises then the same concern, the Hazard map, and How Nemotron did the work;
-   - a command palette (Ctrl K), a light and dark toggle, breadcrumbs and explainers;
-   - chains told as a story, report by report.
-3. Quotes now name the deceased by report title only: their names become [the deceased]. Untitled staff and family names are redacted too.
-4. deploy/ holds the server package, and deploy/README.md the steps. The stack was rebuilt and run in Docker on this PC with the new pages.
+2. New on 16 Oct, latest round:
+   - Check a report is a tool-calling agent: Nemotron Super chooses each tool, and every call is shown;
+   - 269 promises have Tavily follow-up checks;
+   - the evaluation shows 95% ranges and explains every miss;
+   - a read-only API, backup and smoke-test scripts, and a December runbook;
+   - submission writing in docs/DEVPOST_DRAFT.md, docs/VIDEO_SHOT_LIST.md and docs/SUBMISSION_CHECKLIST.md.
+3. Earlier on 16 Oct:
+   - the guided tour, You be the judge and the map replay;
+   - the Promises, Hazard map and How Nemotron did the work pages;
+   - a command palette and a light and dark toggle.
+4. Quotes name the deceased by report title only, and staff and family names are redacted, including in web sources.
 5. The smart motorways chain is /chains/c52cded99f756309.
+
+## Blockers this round
+
+1. The roughly $25 of Tavily credit Pilot mentioned does not show on the key in .env: it reports the free 1,000-a-month plan, and pay-as-you-go is unused. The budget was therefore set from that plan's balance (D28). If the paid credit is on another key, swap the key in .env.
+2. The Token Factory credit expiry cannot be read from the API. It has to be checked in the console.
 
 ## Verified
 
 1. The whole pipeline ran on the real archive: scrape, parse, OCR, normalise, Stages A, B, C, D and F, chains, evaluation and publish.
-2. 54 Python tests and 6 TypeScript tests pass. They run offline, apart from one publish test that uses a throwaway schema in the local PostgreSQL.
+2. 56 Python tests and 15 TypeScript tests pass. They run offline, apart from one publish test that uses a throwaway schema in the local PostgreSQL.
 3. Every paid stage passed its 20-item pilot before its full run.
 4. In the Docker test:
    - every route answered;

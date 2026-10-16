@@ -96,13 +96,34 @@ curl -s https://<SITE_ADDRESS>/api/health
 data/ is the source of truth. Postgres holds only published copies, which `python -m pipeline.cli publish` rebuilds, plus the live brief's cache and spend counters.
 
 ```
-docker compose stop worker
-tar -czf ~/rw-data-$(date +%F).tar.gz -C .. data
-docker compose start worker
-docker compose exec -T db pg_dump -U rw recurrence | gzip > ~/rw-db-$(date +%F).sql.gz
+bash backup.sh
 ```
 
-Copy both files off the server.
+It writes a database dump and an archive of data/ to ~/rw-backups and keeps the last 7 of each. Copy them off the server, for example with scp to your own machine. To run it every night at 03:00, add this line with `crontab -e`:
+
+```
+0 3 * * * cd /home/<user>/recurrence-watch/deploy && bash backup.sh >> ~/rw-backups/backup.log 2>&1
+```
+
+## 8. Check it works
+
+```
+bash smoke.sh https://<SITE_ADDRESS>
+```
+
+It checks every page, the not-found and redirect codes, the APIs, the health check and one live agent run (about $0.006, or nothing if that brief is already saved). Add --no-agent to skip the live run.
+
+For outside monitoring, add https://<SITE_ADDRESS>/api/health to a free uptime checker (UptimeRobot or Better Stack) with a 5-minute interval. It returns 200 when the database is up and data is published, and 503 otherwise.
+
+## 9. Runbook, 1 to 15 December
+
+1. On 1 Dec, run smoke.sh and open the site on a phone.
+2. Each morning, glance at the uptime checker. If it is down, run `docker compose ps`, then `docker compose logs --tail 50 web`, then `docker compose up -d`.
+3. Each Monday, after the weekly refresh, check the "Data updated" date in the sidebar.
+4. If live spend looks high, check it with `docker compose exec db psql -U rw recurrence -c "select key, value from brief_kv where key like 'spend%' or key like 'tavily-credits%'"`. To stop live calls at once, set LIVE_BRIEF_PAUSED=1 in .env, then run `docker compose up -d web`. The site keeps working, and the brief shows examples instead.
+5. If the agent misbehaves, set LIVE_AGENT=off. The brief falls back to the fixed pipeline.
+6. Before changing anything, run backup.sh.
+7. After 15 Dec, set LIVE_BRIEF_PAUSED=1, then delete the live key in the Token Factory console.
 
 ## Notes
 

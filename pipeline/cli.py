@@ -195,6 +195,16 @@ def cmd_evaluate(a):
     from .evaluate import metrics
 
     print(json.dumps(metrics.evaluate(_llm(), judge=not a.no_judge), indent=1, default=str))
+    # The report step (intervals, misses, costs) builds on the fresh results.
+    from .evaluate.report import enrich
+
+    enrich()
+
+
+def cmd_eval_report(a):
+    from .evaluate.report import enrich
+
+    print(json.dumps(enrich(), indent=1, default=str))
 
 
 def cmd_label_prepare(a):
@@ -301,6 +311,8 @@ def main(argv=None):
     s = sub.add_parser("evaluate")
     s.add_argument("--no-judge", action="store_true")
     s.set_defaults(fn=cmd_evaluate)
+    sub.add_parser("eval-report", help="intervals, misses and costs from the stored evaluation (no model calls)").set_defaults(
+        fn=cmd_eval_report)
     s = sub.add_parser("label-prepare", help="write the hand-labelling candidate file")
     s.add_argument("--n", type=int, default=80)
     s.set_defaults(fn=cmd_label_prepare)

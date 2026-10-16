@@ -45,6 +45,22 @@ lines += [
     "",
     "For the hybrid system, the top-5 column means the pair passed the candidate rule and reached the judge.",
     "",
+]
+lines += ["95% Wilson intervals on recall, with only these pairs:", ""]
+for s_ in ev["systems"]:
+    if s_.get("recall_ci95"):
+        lo, hi = s_["recall_ci95"]
+        lines.append(f"- {s_['name']}: {s_.get('hits')} of {s_.get('n')}, from {pct(lo)} to {pct(hi)}.")
+lines += ["", "The intervals overlap. The ordering is consistent, but the gap is not yet statistically settled.", ""]
+misses = ev.get("misses") or []
+if misses:
+    lines += ["## Where it fails", "",
+              f"The hybrid + Nemotron system missed {len(misses)} pairs: "
+              + ", ".join(f"{v} {k.replace('_', ' ')}" for k, v in (ev.get("miss_summary") or {}).items()) + ".", ""]
+    for m in misses:
+        lines.append(f"- {m['earlier']['title']} to {m['later']['title']} ({m['organisation']}): {m['reason']}.")
+    lines += [""]
+lines += [
     "## Precision",
     "",
     f"Status: {ev['hand_labels']['status']}. Labelled pairs: {ev['hand_labels']['n_labelled']}.",

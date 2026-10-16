@@ -29,6 +29,7 @@ export default async function Methodology() {
           ["#how", "How it works"],
           ["#safeguards", "Safeguards"],
           ["#limits", "Limitations"],
+          ["#api", "Open data API"],
           ["#corrections", "Corrections"],
         ].map(([href, label]) => (
           <a key={href} href={href} className="rounded-full border border-rule bg-surface px-3 py-1 text-ink-2 hover:no-underline hover:border-accent">
@@ -114,6 +115,24 @@ export default async function Methodology() {
           <li>The Preventable Deaths Tracker by Georgia Richards tracks responses and overdue replies.</li>
           <li>PFD Toolkit by Sam Osian provides an open-source loader and thematic analysis. No PFD Toolkit code is used here.</li>
         </ol>
+      </section>
+
+      <section id="api" className="card p-5 sm:p-6 space-y-3 scroll-mt-24">
+        <h2 className="font-serif text-xl">Open data API</h2>
+        <p className="text-ink-2">
+          The same published, display-safe data is available as JSON, for researchers and other tools. Quotes are verified
+          and redacted exactly as on the site. Results are ordered by date, never ranked. Up to 60 requests a minute.
+        </p>
+        <ul className="list-none p-0 space-y-2 text-sm">
+          <li>
+            <code className="rounded bg-paper-2 px-1.5 py-0.5">GET /api/v1/chains?org=National+Highways&amp;q=hard+shoulder</code>
+            <span className="block text-muted">Recurrence chains, filtered by organisation name and words. Also limit and offset.</span>
+          </li>
+          <li>
+            <code className="rounded bg-paper-2 px-1.5 py-0.5">GET /api/v1/chains/c52cded99f756309</code>
+            <span className="block text-muted">One chain: its reports, each verified link with both quotes, stated actions and follow-up evidence.</span>
+          </li>
+        </ul>
       </section>
 
       <section id="corrections" className="card p-5 sm:p-6 space-y-3 scroll-mt-24">

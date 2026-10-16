@@ -49,7 +49,7 @@ L += ["## Spend", "", f"Total Token Factory spend: ${total:.4f} of the $20.00 pi
 for k, cap in config.STAGE_CAPS.items():
     s = by.get(k, 0.0)
     L.append(f"| {k} | ${s:.4f} | ${cap:.2f} | ${cap - s:.4f} |")
-L += ["", f"Tavily credits used: {lg.tavily_credits():.0f} of the 250 allowed for Stage F.", ""]
+L += ["", f"Tavily credits used by Stage F: {lg.tavily_credits('F'):.0f} of its cap of {config.TAVILY_STAGE_F_CAP_CREDITS} (ledger count; D28). The live agent has its own allowance.", ""]
 L += ["## What the pipeline produced", ""]
 L += [f"1. Report pages parsed: {counts['reports']} ({counts['unique']} unique after removing republished copies).",
       f"2. Reports with extracted concerns: {counts['with_concerns']}. Concerns: {counts['concerns']}, of which {counts['verified_concerns']} have a verified quote.",
@@ -73,19 +73,14 @@ L += ["## Blockers", "", "See docs/BLOCKERS.md for each note in full." if blk.ex
 if blk.exists():
     L += ["- " + ln[3:] for ln in blk.read_text(encoding="utf-8").splitlines() if ln.startswith("## ")] + [""]
 L += ["## Things only you can do", "",
-      "1. Check in the Token Factory console when your credits were issued. Builder credits expire 90 days after issue, so credits issued before 16 Sep would expire before judging ends on 15 Dec.",
-      "2. Check whether your Nebius credits cover an AI Cloud CPU VM. If they do, create one (deploy/README.md, step 1). If not, any Linux VPS works with the same files.",
-      "3. Create a separate Token Factory key for the hosted brief, named recurrence-watch-live (docs/DEPLOY.md).",
-      "4. Optional: a domain name. Without one, the site gets HTTPS on an sslip.io name for the server's IP.",
-      "5. Choose the corrections contact address for the methodology page (CORRECTIONS_EMAIL in deploy/.env).",
-      "6. Read the dossiers (python -m pipeline.cli dossiers-export writes them to data/exports/dossiers_for_review.md), approve the ones you are happy with (python -m pipeline.cli review), then python -m pipeline.cli publish. The handoff asks for at least three reviewed.",
-      "7. Label the 80 candidate pairs: python -m pipeline.cli label. Then python -m pipeline.cli evaluate (free, cached) and publish, to fill in precision.",
-      "8. Optional: approve more Tavily credits for follow-up searches after the monthly reset. Only 82 promises have a follow-up check.",
-      "9. Decide who signs off dossiers: Ubaid, Safwan, or both (A5 question 3).",
-      "10. Read the live Devpost rules page once; automated fetches were blocked.",
-      "11. Before making the repo public, run bash scripts/purge_private_exports.sh (removes three files with unredacted or unreviewed text from earlier local commits), then gitleaks detect --config .gitleaks.toml on the full history, then make it public and set the MIT licence in the About section.",
-      "12. Record the demo video from docs/DEMO_SCRIPT.md and upload it to YouTube.",
-      "13. Submit on Devpost, pasting the feedback from docs/FEEDBACK.md.",
-      "14. Consider rotating the three keys after the hackathon, since they were pasted into a chat.", ""]
+      "Each step is written out in docs/SUBMISSION_CHECKLIST.md.", "",
+      "1. Check the credit expiry date in the Token Factory console, if you can find it. It cannot be read from the API.",
+      "2. Create the server (deploy/README.md) and a separate Token Factory key for it.",
+      "3. Approve at least 3 dossiers: read data/exports/review_pack.md, then run .venv\Scripts\python -m pipeline.cli review --featured.",
+      "4. Optional: label the 80 test pairs (.venv\Scripts\python -m pipeline.cli label) to fill in precision.",
+      "5. Purge the private files from git history, scan it, then make the repo public (the commands are in the checklist).",
+      "6. Record the video from docs/VIDEO_SHOT_LIST.md and make it public on YouTube.",
+      "7. Submit on Devpost with docs/DEVPOST_DRAFT.md and docs/FEEDBACK.md.",
+      "8. After the hackathon, rotate the keys that were pasted into a chat.", ""]
 (ROOT / "docs" / "MORNING_REPORT.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 print("wrote docs/MORNING_REPORT.md")

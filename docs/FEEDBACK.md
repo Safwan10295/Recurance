@@ -24,3 +24,18 @@ Notes for the Devpost feedback field, from building Recurrence Watch: 6,454 coro
 7. There is no per-key spend limit. For a public demo key this is the most-wanted feature: a hard cap per key would remove the need for an app-side cost ceiling.
 8. There is no balance or credit-expiry endpoint, so a pipeline cannot check its remaining credit or a promotional expiry date programmatically.
 9. No NVIDIA embedding model is served, so a fully NVIDIA retrieval stack is not possible on Token Factory today.
+
+## Added 16 Oct 2026: building the tool-calling agent
+
+What worked well:
+
+1. Native tool calling on Nemotron 3 Super works with reasoning switched on. With an OpenAI-style tools list, the first call came back with finish_reason tool_calls and a well-formed search_earlier_concerns call, and the second turn, given the tool result, answered from it. Two calls cost $0.0007.
+2. A forced tool_choice naming one function is honoured. We use it on the agent's last round so a run always ends with a submission, which makes a hard round limit safe.
+3. Low-effort reasoning keeps agent rounds cheap: 40 to 180 reasoning tokens a round, about $0.0005 to $0.0009 per round. A full five-round brief costs about half a cent.
+4. The /v1/models listing correctly reports tools as a supported feature for Super, so the capability was discoverable before we tried it.
+
+Friction, with what would help:
+
+1. Verbatim quotes inside tool-call arguments are less reliable than in json_schema output. In our first agent version, Super wrote the "quote" fields of its submit_findings call itself. It changed "THERE WAS NOWHERE" to "There was nowhere" and paraphrased one passage, and none of the submitted quotes matched the source. The same model in a dedicated json_schema judge call copied quotes exactly. We moved judging into a judge_candidate tool that makes a structured call. Suggestion: a note in the tool-calling docs that strict schemas (or a strict flag) apply to tool arguments too, and whether guided decoding is used for them.
+2. There is still no way to read credit balance or expiry. We probed /v1/billing, /v1/balance, /v1/credits, /v1/usage, /v1/account, /v1/organization and /v1/dashboard/billing/credit_grants: all 404. Response headers carry rate limits only. With promotional credits that expire 90 days after issue, a GET /v1/credits returning balance, grants and expiry dates would let a deployed app warn its owner in time.
+3. A per-key spend cap is still the most-wanted feature for public demos. Our app keeps its own ceiling, daily caps and per-visitor caps in a database, because a leaked or abused demo key could otherwise spend the whole balance.

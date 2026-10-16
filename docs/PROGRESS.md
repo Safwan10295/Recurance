@@ -199,3 +199,28 @@ Spend: $5.11 of $20. The $5 live reserve and the $9.50 margin are untouched.
 4. Shares are rounded normally again, except that a share below 1 never shows as 100%.
 
 Verified in a browser at desktop and phone width: the game played through and stopped early, the map replay, and every tour stop. No browser errors and no sideways scrolling.
+
+## Phase 9: tool-calling agent, deeper Tavily, honest evaluation, hardening (2026-10-16)
+
+1. The live brief is a tool-calling agent (D29). Nemotron Super chooses search, judge, promises, chain and web-check tools in up to 5 rounds, within $0.015 a run. Tested live: 4 verified earlier warnings for an archive report, against 2 from the fixed pipeline, for $0.0056. The fixed pipeline remains the fallback.
+2. Tavily (D28):
+   - the budget was set from the real balance;
+   - 269 promises checked, covering all 16 on the demo chains, all 176 on chains with a dossier, and 71 more;
+   - evidence found for 28, contradicting for 2, nothing either way for 239;
+   - the live agent has its own daily allowance.
+   Quotes from web sources are now redacted too.
+3. Evaluation:
+   - 95% Wilson intervals: TF-IDF 20% to 53%, embeddings 26% to 59%, Nemotron 34% to 69%;
+   - each of the 14 misses explained: 9 never reached the judge, and in 5 the judge called it a different hazard;
+   - per-model cost and tokens, and the cost per chain both with every stage and with analysis only.
+   No threshold was changed.
+4. The Token Factory credit balance cannot be read from the API (RESEARCH_LOG).
+5. Deployment: backup.sh, smoke.sh, an uptime check and a 1 to 15 Dec runbook. A read-only JSON API at /api/v1/chains.
+6. Submission writing: GAP_ANALYSIS, DEVPOST_DRAFT, VIDEO_SHOT_LIST, SUBMISSION_CHECKLIST, plus additions to FEEDBACK and the README.
+
+Verified:
+- 56 Python and 15 TypeScript tests pass offline, including new tests for the agent loop and its checks.
+- smoke.sh passes against the local site.
+- The live agent was tested in a browser under a $0.05 ceiling.
+
+Spend by stage: A $0.77, B $0.23, C $3.02, D $0.97, F $0.05, dev $0.11, embeddings $0.01. Total $5.16 of $20. The $5 live reserve and the $9.50 margin are untouched.

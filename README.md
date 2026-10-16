@@ -41,7 +41,7 @@ Every model call goes to Nebius Token Factory through one wrapper (pipeline/llm.
 | Flagship dossiers (Stage D) | nvidia/Nemotron-3-Ultra-550b-a55b | Long context (1M) for a whole chain in one prompt |
 | Follow-up classification (Stage F) | nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B | Classifies Tavily results with quotes |
 | Embeddings | Qwen/Qwen3-Embedding-8B | No NVIDIA embedding model is served; this keeps retrieval on Token Factory |
-| Live brief (runtime) | Nano to extract, Super to judge, Qwen3 embeddings to retrieve | Runs on every new report a user submits |
+| Live agent (runtime) | Super with native tool calling chooses the tools; Nano extracts; Qwen3 embeddings retrieve | Runs on every new report a user submits, with the fixed pipeline as fallback |
 
 Features of Token Factory used:
 
@@ -49,8 +49,31 @@ Features of Token Factory used:
 2. chat_template_kwargs to switch Nemotron reasoning off for extraction and to low effort for the judge.
 3. The models endpoint with verbose pricing, used to set the budget guard from live prices.
 4. Rate-limit headers, used by the wrapper to pace calls.
+5. Native tool calling on Nemotron 3 Super, with a forced tool_choice on the agent's last round.
 
-### Cost ledger summary (15 Oct 2026)
+### The live agent
+
+Check a report runs an agent. Nemotron Super chooses among five tools until it submits its findings:
+
+| Tool | What it does |
+|---|---|
+| search_earlier_concerns | Finds the earlier concerns sent to the same organisation that are closest in meaning (Qwen3 embeddings, pgvector) |
+| judge_candidate | Runs the recurrence judge (Super, structured output) and checks both quotes word for word |
+| get_response_promises | Reads the actions stated in the organisation's published response |
+| get_chain | Looks up whether the earlier report is already part of a recurrence chain |
+| tavily_check | Searches the web for evidence of what happened next, reusing an earlier check when there is one |
+
+The limits are 5 rounds and $0.015 per run. The model never writes a shown quote: verdicts come from judge_candidate, and every quote is checked in code. If the agent fails or hits a limit, the fixed pipeline runs instead. The loop and its checks are tested offline with a scripted model (web/tests/agent.test.ts).
+
+### Other Nebius services
+
+The site is packaged to run on one Nebius AI Cloud CPU virtual machine with Docker Compose: PostgreSQL with pgvector, the web app, a weekly refresh worker and Caddy for HTTPS (deploy/README.md).
+
+### Tavily
+
+Tavily checks what happened after an organisation stated an action. For each promise in a chain, two searches and one extract gather sources. Nemotron Nano then classifies them as evidence found, not found or contradicting, quoting the source word for word. "Not found" is never shown as "did not happen". Credits are budgeted from the balance read from Tavily's usage endpoint (D28). The checks went first to the demo chains, then to the chains with a dossier, then to the chains with the most recurrences. 269 promises have been checked: evidence found for 28, contradicting for 2, not found for 239. The live agent can run its own checks, with a daily cap.
+
+### Cost ledger summary (16 Oct 2026)
 
 | Stage | Model | Paid calls | Spend |
 |---|---|---|---|
@@ -58,12 +81,12 @@ Features of Token Factory used:
 | B, promises from responses, including one incremental refresh | Nano | 1,751 | $0.23 |
 | C, 4,061 report pairs judged, plus evaluation and systemic clusters | Super | 4,122 | $3.02 |
 | D, flagship dossiers | Ultra | 76 | $0.97 |
-| F, follow-up classification | Nano | 82 | $0.01 |
+| F, follow-up classification | Nano | 266 | $0.05 |
 | Embeddings | Qwen3-Embedding-8B | 310 | $0.01 |
-| Pilots, development and chain titles | mixed | 808 | $0.08 |
-| Total | | 13,929 | $5.10 |
+| Pilots, development, chain titles and live tests | mixed | 868 | $0.11 |
+| Total | | 14,173 | $5.16 |
 
-Every call is in the llm_calls ledger (14,109 rows, including 179 free cache hits). One row is a local attempt made before the key was loaded; it sent nothing and cost nothing. Tavily used 250 credits for follow-up searches.
+Every call is in the llm_calls ledger (14,371 rows, including 197 free cache hits). One row is a local attempt made before the key was loaded; it sent nothing and cost nothing. Stage F used 801 Tavily credits by the ledger's count, every call logged in tavily_calls.
 
 ## Results
 
@@ -161,12 +184,18 @@ deploy/README.md has the steps for one Linux server with Docker Compose. A worke
 
 ## Prior art
 
-1. PFD Monitor (pfdmonitor.org): AI-extracted concerns grouped into themes.
-2. Preventable Deaths Tracker (preventabledeathstracker.net, Georgia Richards): response tracking.
-3. PFD Toolkit (github.com/Sam-Osian/PFD-toolkit): open-source loader and thematic analysis.
+Recurrence Watch builds on earlier work with the same reports, and differs in what it asks of them.
+
+| Project | What it does | How Recurrence Watch differs |
+|---|---|---|
+| PFD Monitor (pfdmonitor.org) | AI-extracted concerns grouped into themes, with stated actions | Links each later concern to the earlier warning to the same organisation, with quotes from both |
+| Preventable Deaths Tracker (preventabledeathstracker.net, Georgia Richards) | Tracks responses and overdue replies | Asks whether the concern came back after a response stated an action |
+| PFD Toolkit (github.com/Sam-Osian/PFD-toolkit) | Open-source loader and thematic analysis | Written from scratch; no PFD Toolkit code is used |
 
 ## Limitations
 
 1. Linking is within one organisation, so a recurrence after a rename is found only if the rename is known.
 2. Some older reports and responses are scanned images read with OCR.
-3. The judge model can be wrong. The evaluation page reports how often, against coroner-acknowledged pairs and hand labels.
+3. The judge model can be wrong. The evaluation page reports how often, with 95% intervals and every miss explained. On the 29 coroner-acknowledged pairs, 9 of the 14 misses never reached the judge, because no concern pair passed the candidate filter.
+4. The test set is small, so the gap between the three systems is consistent but not yet statistically settled.
+5. Follow-up evidence depends on what is published online. Most checks find nothing either way, which says nothing about whether an action was taken.

@@ -5,7 +5,7 @@ import { q } from "./db";
 import { chat, embed } from "./llm";
 import { tavilySearch, TavilyUnavailable } from "./tavily";
 import { JUDGE_SCHEMA, JUDGE_SYSTEM } from "./judge-prompt";
-import { normForMatch } from "./text";
+import { normForMatch, redactNames } from "./text";
 
 // The live agent: Nemotron Super chooses tools until it submits its findings (native tool calling on
 // Nebius Token Factory). Limits: 5 rounds, $0.015 per run. Any failure returns null and the caller
@@ -411,7 +411,8 @@ export async function runAgent(ctx: AgentContext, emit: (s: Step) => void): Prom
       .map((f) => {
         const ok = checkFollowup(f, web);
         const p = promises.get(f.promise_id)!;
-        return { promise: p.quote, ...ok };
+        // Web sources can name staff: redact them like every other displayed quote.
+        return { promise: p.quote, ...ok, ...(ok.quote ? { quote: redactNames(ok.quote) } : {}) };
       });
     matches.push({
       earlier: m,

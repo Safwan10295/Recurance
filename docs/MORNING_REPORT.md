@@ -4,20 +4,20 @@ Written for Pilot. Numbers below are generated from the ledger and database by s
 
 ## Spend
 
-Total Token Factory spend: $5.1051 of the $20.00 pipeline hard stop. The $5 live reserve and the $9.50 margin are untouched.
+Total Token Factory spend: $5.1613 of the $20.00 pipeline hard stop. The $5 live reserve and the $9.50 margin are untouched.
 
 | Bucket | Spent | Cap | Remaining |
 |---|---|---|---|
-| dev | $0.0862 | $5.40 | $5.3138 |
+| dev | $0.1108 | $5.40 | $5.2892 |
 | embed | $0.0117 | $0.30 | $0.2883 |
-| F | $0.0135 | $0.30 | $0.2865 |
+| F | $0.0451 | $0.30 | $0.2549 |
 | A | $0.7729 | $1.50 | $0.7271 |
 | B | $0.2321 | $1.00 | $0.7679 |
 | C | $3.0227 | $4.00 | $0.9773 |
 | D | $0.9660 | $2.00 | $1.0340 |
 | ntsb | $0.0000 | $1.00 | $1.0000 |
 
-Tavily credits used: 250 of the 250 allowed for Stage F.
+Tavily credits used by Stage F: 801 of its cap of 801 (ledger count; D28). The live agent has its own allowance.
 
 ## What the pipeline produced
 
@@ -26,7 +26,7 @@ Tavily credits used: 250 of the 250 allowed for Stage F.
 3. Organisations after normalisation: 3832.
 4. Candidate pairs: 4061. Judged by Nemotron Super: 4061 (closely_related 940, different 1307, identical 473, related 1341).
 5. Response documents read: 1763. Promises with verified quotes: 2276.
-6. Verified chains: 618. Dossiers drafted (all unreviewed): 25. Follow-up checks: 82.
+6. Verified chains: 618. Dossiers drafted (all unreviewed): 25. Follow-up checks: 269.
 
 Unique reports vs the expected 6,449: 6454 (+0.1%). The listing pages and sitemaps were cross-checked (docs/RESEARCH_LOG.md).
 
@@ -43,19 +43,28 @@ Full detail: docs/EVALUATION.md.
 ## Where things stand
 
 1. The site reads PostgreSQL and works as a tool. To open it on this PC, double-click start_site.cmd, then go to http://localhost:3000.
-2. New on 16 Oct:
-   - Check a report shows the agent's every step: model, tokens, time, cost and each verdict;
-   - three new pages: Promises then the same concern, the Hazard map, and How Nemotron did the work;
-   - a command palette (Ctrl K), a light and dark toggle, breadcrumbs and explainers;
-   - chains told as a story, report by report.
-3. Quotes now name the deceased by report title only: their names become [the deceased]. Untitled staff and family names are redacted too.
-4. deploy/ holds the server package, and deploy/README.md the steps. The stack was rebuilt and run in Docker on this PC with the new pages.
+2. New on 16 Oct, latest round:
+   - Check a report is a tool-calling agent: Nemotron Super chooses each tool, and every call is shown;
+   - 269 promises have Tavily follow-up checks;
+   - the evaluation shows 95% ranges and explains every miss;
+   - a read-only API, backup and smoke-test scripts, and a December runbook;
+   - submission writing in docs/DEVPOST_DRAFT.md, docs/VIDEO_SHOT_LIST.md and docs/SUBMISSION_CHECKLIST.md.
+3. Earlier on 16 Oct:
+   - the guided tour, You be the judge and the map replay;
+   - the Promises, Hazard map and How Nemotron did the work pages;
+   - a command palette and a light and dark toggle.
+4. Quotes name the deceased by report title only, and staff and family names are redacted, including in web sources.
 5. The smart motorways chain is /chains/c52cded99f756309.
+
+## Blockers this round
+
+1. The roughly $25 of Tavily credit Pilot mentioned does not show on the key in .env: it reports the free 1,000-a-month plan, and pay-as-you-go is unused. The budget was therefore set from that plan's balance (D28). If the paid credit is on another key, swap the key in .env.
+2. The Token Factory credit expiry cannot be read from the API. It has to be checked in the console.
 
 ## Verified
 
 1. The whole pipeline ran on the real archive: scrape, parse, OCR, normalise, Stages A, B, C, D and F, chains, evaluation and publish.
-2. 54 Python tests and 6 TypeScript tests pass. They run offline, apart from one publish test that uses a throwaway schema in the local PostgreSQL.
+2. 56 Python tests and 15 TypeScript tests pass. They run offline, apart from one publish test that uses a throwaway schema in the local PostgreSQL.
 3. Every paid stage passed its 20-item pilot before its full run.
 4. In the Docker test:
    - every route answered;
@@ -89,18 +98,14 @@ See docs/BLOCKERS.md for each note in full.
 
 ## Things only you can do
 
-1. Check in the Token Factory console when your credits were issued. Builder credits expire 90 days after issue, so credits issued before 16 Sep would expire before judging ends on 15 Dec.
-2. Check whether your Nebius credits cover an AI Cloud CPU VM. If they do, create one (deploy/README.md, step 1). If not, any Linux VPS works with the same files.
-3. Create a separate Token Factory key for the hosted brief, named recurrence-watch-live (docs/DEPLOY.md).
-4. Optional: a domain name. Without one, the site gets HTTPS on an sslip.io name for the server's IP.
-5. Choose the corrections contact address for the methodology page (CORRECTIONS_EMAIL in deploy/.env).
-6. Read the dossiers (python -m pipeline.cli dossiers-export writes them to data/exports/dossiers_for_review.md), approve the ones you are happy with (python -m pipeline.cli review), then python -m pipeline.cli publish. The handoff asks for at least three reviewed.
-7. Label the 80 candidate pairs: python -m pipeline.cli label. Then python -m pipeline.cli evaluate (free, cached) and publish, to fill in precision.
-8. Optional: approve more Tavily credits for follow-up searches after the monthly reset. Only 82 promises have a follow-up check.
-9. Decide who signs off dossiers: Ubaid, Safwan, or both (A5 question 3).
-10. Read the live Devpost rules page once; automated fetches were blocked.
-11. Before making the repo public, run bash scripts/purge_private_exports.sh (removes three files with unredacted or unreviewed text from earlier local commits), then gitleaks detect --config .gitleaks.toml on the full history, then make it public and set the MIT licence in the About section.
-12. Record the demo video from docs/DEMO_SCRIPT.md and upload it to YouTube.
-13. Submit on Devpost, pasting the feedback from docs/FEEDBACK.md.
-14. Consider rotating the three keys after the hackathon, since they were pasted into a chat.
+Each step is written out in docs/SUBMISSION_CHECKLIST.md.
+
+1. Check the credit expiry date in the Token Factory console, if you can find it. It cannot be read from the API.
+2. Create the server (deploy/README.md) and a separate Token Factory key for it.
+3. Approve at least 3 dossiers: read data/exports/review_pack.md, then run .venv\Scripts\python -m pipeline.cli review --featured.
+4. Optional: label the 80 test pairs (.venv\Scripts\python -m pipeline.cli label) to fill in precision.
+5. Purge the private files from git history, scan it, then make the repo public (the commands are in the checklist).
+6. Record the video from docs/VIDEO_SHOT_LIST.md and make it public on YouTube.
+7. Submit on Devpost with docs/DEVPOST_DRAFT.md and docs/FEEDBACK.md.
+8. After the hackathon, rotate the keys that were pasted into a chat.
 
