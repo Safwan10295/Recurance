@@ -1,5 +1,6 @@
 import { RecentCard } from "@/components/cards";
-import { EmptyState, PageHeader, Pagination, orgTypeLabel } from "@/components/ui";
+import AutoForm from "@/components/AutoForm";
+import { EmptyState, PageHeader, Pagination, btnPrimary, fieldCls, orgTypeLabel } from "@/components/ui";
 import { listRecent } from "@/lib/queries";
 
 export const metadata = { title: "Recent recurrences · Recurrence Watch" };
@@ -12,11 +13,11 @@ export default async function RecentPage({ searchParams }: { searchParams: Promi
   const orgType = TYPES.includes(sp.type ?? "") ? sp.type : undefined;
   const page = Math.max(1, Number(sp.page) || 1);
   const data = await listRecent({ months, orgType, page });
-  const sel = "rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm";
+  const sel = `${fieldCls} w-auto`;
   return (
     <div>
       <PageHeader
-        eyebrow="Use the tool"
+        crumbs={[{ href: "/", label: "Start here" }, { label: "Recent recurrences" }]}
         title="Recent recurrences"
         description={
           <>
@@ -25,7 +26,7 @@ export default async function RecentPage({ searchParams }: { searchParams: Promi
           </>
         }
       />
-      <form className="flex flex-wrap items-end gap-3 mb-5" method="get">
+      <AutoForm className="flex flex-wrap items-end gap-3 mb-5">
         <label className="text-sm space-y-1">
           <span className="block text-muted">Reports from the last</span>
           <select name="months" defaultValue={String(months)} className={sel}>
@@ -46,9 +47,11 @@ export default async function RecentPage({ searchParams }: { searchParams: Promi
             ))}
           </select>
         </label>
-        <button className="rounded-md bg-accent text-accent-ink px-3.5 py-1.5 text-sm font-medium">Apply</button>
-        <span className="text-sm text-muted ml-auto">{data.total} reports</span>
-      </form>
+        <noscript>
+          <button className={btnPrimary}>Apply</button>
+        </noscript>
+        <span className="text-sm text-muted ml-auto num">{data.total} reports</span>
+      </AutoForm>
       {data.rows.length === 0 ? (
         <EmptyState title="No recurrences in this period">Try a longer period or another organisation type.</EmptyState>
       ) : (

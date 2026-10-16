@@ -4,7 +4,7 @@ import { BudgetExceeded, LiveUnavailable } from "@/lib/llm";
 import { checkLive, countLive } from "@/lib/limits";
 import { getMeta } from "@/lib/queries";
 import { getStore } from "@/lib/store";
-import { redactTitles, sha256, stableStringify } from "@/lib/text";
+import { redactNames, sha256, stableStringify } from "@/lib/text";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,15 +18,19 @@ const PAUSED_MESSAGE: Record<string, string> = {
   error: "Live analysis could not finish this time. Here are precomputed examples instead.",
 };
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 function clientIp(req: NextRequest) {
   return (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || req.headers.get("x-real-ip") || "local";
 }
 
+// Text read fresh from the new report: redact staff and family names, and name the deceased by title only.
 function clean(result: BriefResult): BriefResult {
+  const titles = result.report?.title ? [result.report.title] : [];
   return {
     ...result,
-    concerns: result.concerns.map((c) => ({ ...c, quote: redactTitles(c.quote) })),
-    matches: result.matches.map((m) => ({ ...m, later_quote: redactTitles(m.later_quote) })),
+    concerns: result.concerns.map((c) => ({ ...c, quote: redactNames(c.quote, titles) })),
+    matches: result.matches.map((m) => ({ ...m, later_quote: redactNames(m.later_quote, titles) })),
   };
 }
 
@@ -43,7 +47,7 @@ export async function GET(req: NextRequest) {
   const h = req.nextUrl.searchParams.get("h") ?? "";
   if (!/^[a-f0-9]{64}$/.test(h)) return Response.json({ error: "bad id" }, { status: 400 });
   const store = getStore();
-  const saved = store.kind !== "none" ? await store.get<{ input: unknown; result: BriefResult }>(`brief:${h}`).catch(() => null) : null;
+  const saved = store.kind !== "none" ? await store.get<{ input: unknown; result: BriefResult; steps?: Step[] }>(`brief:${h}`).catch(() => null) : null;
   if (!saved) return Response.json({ error: "not found" }, { status: 404 });
   return Response.json(saved);
 }
@@ -72,9 +76,16 @@ export async function POST(req: NextRequest) {
         const hash = await sha256(stableStringify(input));
         const key = `brief:${hash}`;
         const store = getStore();
-        const saved = store.kind !== "none" ? await store.get<{ result: BriefResult }>(key).catch(() => null) : null;
+        const saved = store.kind !== "none" ? await store.get<{ result: BriefResult; steps?: Step[] }>(key).catch(() => null) : null;
         if (saved?.result) {
-          send({ type: "step", step: { id: "cache", label: "Using a saved brief for this exact input", status: "done" } satisfies Step });
+          // Replay the saved run's trace at a readable pace, so a repeated input still shows the agent's work.
+          send({ type: "replay" });
+          for (const step of saved.steps ?? []) {
+            send({ type: "step", step: { ...step, status: "running" } });
+            await sleep(260);
+            send({ type: "step", step });
+            await sleep(140);
+          }
           send({ type: "result", result: saved.result, cached: true, hash });
           controller.close();
           return;
@@ -86,8 +97,15 @@ export async function POST(req: NextRequest) {
           return;
         }
         await countLive(clientIp(req));
-        const result = clean(await runBrief(input, (step) => send({ type: "step", step })));
-        if (!result.notes.length || result.matches.length) await store.set(key, { input, result }).catch(() => undefined);
+        const steps = new Map<string, Step>();
+        const result = clean(
+          await runBrief(input, (step) => {
+            if (step.status !== "pending") steps.set(step.id, step);
+            send({ type: "step", step });
+          }),
+        );
+        const trace = [...steps.values()].filter((st) => st.status === "done");
+        if (!result.notes.length || result.matches.length) await store.set(key, { input, result, steps: trace }).catch(() => undefined);
         send({ type: "result", result, cached: false, hash });
       } catch (e) {
         if (e instanceof BudgetExceeded) await paused("budget");

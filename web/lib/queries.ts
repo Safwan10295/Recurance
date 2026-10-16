@@ -77,7 +77,7 @@ export interface ChainFilter {
   relation?: string;
   minConf?: number;
   minReports?: number;
-  sort?: "recent" | "oldest" | "largest";
+  sort?: "recent" | "oldest";
   page?: number;
   size?: number;
 }
@@ -96,7 +96,7 @@ export async function listChains(f: ChainFilter) {
   if (f.minConf) add("confidence >= $?", f.minConf);
   if (f.minReports) add("n_reports >= $?", f.minReports);
   const w = where.length ? `WHERE ${where.join(" AND ")}` : "";
-  const order = f.sort === "oldest" ? "first_date ASC" : f.sort === "largest" ? "n_reports DESC, last_date DESC" : "last_date DESC";
+  const order = f.sort === "oldest" ? "first_date ASC" : "last_date DESC";
   const size = f.size ?? 20;
   const page = Math.max(1, f.page ?? 1);
   const key = `chains:${JSON.stringify(f)}`;
@@ -160,20 +160,28 @@ export async function listRecent(opts: { months?: number; orgType?: string; page
       `SELECT l.later_url, c.org_id, c.org_name, c.org_type, MAX(l.later_date)::text AS later_date ${base}
        GROUP BY l.later_url, c.org_id, c.org_name, c.org_type
        ORDER BY later_date DESC, l.later_url LIMIT ${size} OFFSET ${(page - 1) * size}`, params);
+    // Two batched queries for the whole page instead of two per row.
+    const urls = groups.map((g) => g.later_url);
+    const [reps, links, meta] = await Promise.all([
+      q<RecentEntry["later"]>("SELECT url, slug, title, date, coroner, area, first_seen::text FROM pub_reports WHERE url = ANY($1)", [urls]),
+      q<{ later_url: string; org_id: number; payload: Link & { hazard: string }; chain_key: string; e_title: string; e_date: string; e_coroner: string | null; e_slug: string }>(
+        `SELECT l.later_url, c.org_id, l.payload, l.chain_key, r.title e_title, r.date e_date, r.coroner e_coroner, r.slug e_slug
+         FROM pub_links l JOIN pub_chains c ON c.key = l.chain_key LEFT JOIN pub_reports r ON r.url = l.earlier_url
+         WHERE l.later_url = ANY($1) ORDER BY r.date`, [urls]),
+      getMeta(),
+    ]);
+    const repBy = new Map(reps.map((r) => [r.url, r]));
     const out: RecentEntry[] = [];
     for (const g of groups) {
-      const rep = await q1<RecentEntry["later"]>(
-        "SELECT url, slug, title, date, coroner, area, first_seen::text FROM pub_reports WHERE url = $1", [g.later_url]);
-      const links = await q<{ payload: Link & { hazard: string }; chain_key: string; e_title: string; e_date: string; e_coroner: string | null; e_slug: string }>(
-        `SELECT l.payload, l.chain_key, r.title e_title, r.date e_date, r.coroner e_coroner, r.slug e_slug
-         FROM pub_links l JOIN pub_chains c ON c.key = l.chain_key LEFT JOIN pub_reports r ON r.url = l.earlier_url
-         WHERE l.later_url = $1 AND c.org_id = $2 ORDER BY r.date`, [g.later_url, g.org_id]);
+      const rep = repBy.get(g.later_url);
       if (!rep) continue;
       out.push({
         later: rep,
         org: { id: g.org_id, name: g.org_name, type: g.org_type },
-        earlier: links.map((x) => ({ ...x.payload, chain: x.chain_key, hazard: x.payload.hazard, e_title: x.e_title, e_date: x.e_date, e_coroner: x.e_coroner, e_slug: x.e_slug })),
-        is_new: Date.now() - new Date(rep.first_seen).getTime() < 8 * 864e5 && !!(await getMeta()).last_refresh,
+        earlier: links
+          .filter((x) => x.later_url === g.later_url && x.org_id === g.org_id)
+          .map((x) => ({ ...x.payload, chain: x.chain_key, hazard: x.payload.hazard, e_title: x.e_title, e_date: x.e_date, e_coroner: x.e_coroner, e_slug: x.e_slug })),
+        is_new: Date.now() - new Date(rep.first_seen).getTime() < 8 * 864e5 && !!meta.last_refresh,
       });
     }
     return { rows: out, total: totalRow?.n ?? 0, page, size, months };
@@ -301,21 +309,54 @@ export async function suggestReports(term: string, limit = 8) {
 
 export async function searchAll(term: string) {
   const t = term.trim();
-  if (!t) return { chains: [], reports: [], orgs: [] };
+  if (!t) return { chains: [], reports: [], orgs: [], totals: { chains: 0, reports: 0, orgs: 0 } };
   return cached(`search:${t.toLowerCase()}`, async () => {
-    const [chains, reports, orgs] = await Promise.all([
+    const like = `%${t}%`;
+    const [chains, reports, orgs, totals] = await Promise.all([
       q<ChainRow>(`SELECT ${CHAIN_COLS} FROM pub_chains, websearch_to_tsquery('english', $1) query
-                   WHERE search @@ query ORDER BY ts_rank(search, query) DESC, n_reports DESC LIMIT 12`, [t]),
+                   WHERE search @@ query ORDER BY ts_rank(search, query) DESC, last_date DESC LIMIT 12`, [t]),
       q<{ url: string; slug: string; title: string; date: string; coroner: string | null; area: string | null; n_links: number }>(
         `SELECT url, slug, title, date, coroner, area, n_links FROM pub_reports, websearch_to_tsquery('english', $1) query
          WHERE search @@ query OR title ILIKE $2 ORDER BY (title ILIKE $2) DESC, ts_rank(search, query) DESC, date DESC LIMIT 15`,
-        [t, `%${t}%`]),
+        [t, like]),
       q<OrgRow>(`SELECT id, name, type, national, n_reports, n_chains FROM pub_orgs
-                 WHERE lower(name) LIKE $1 OR search @@ websearch_to_tsquery('english', $2)
-                 ORDER BY n_reports DESC LIMIT 10`, [`%${t.toLowerCase()}%`, t]),
+                 WHERE name ILIKE $1 OR search @@ websearch_to_tsquery('english', $2)
+                 ORDER BY (name ILIKE $1) DESC, name LIMIT 10`, [like, t]),
+      q1<{ chains: number; reports: number; orgs: number }>(
+        `SELECT (SELECT COUNT(*)::int FROM pub_chains WHERE search @@ websearch_to_tsquery('english', $1)) chains,
+                (SELECT COUNT(*)::int FROM pub_reports WHERE search @@ websearch_to_tsquery('english', $1) OR title ILIKE $2) reports,
+                (SELECT COUNT(*)::int FROM pub_orgs WHERE name ILIKE $2 OR search @@ websearch_to_tsquery('english', $1)) orgs`,
+        [t, like]),
     ]);
-    return { chains: chains.map(toSummary), reports, orgs };
+    return { chains: chains.map(toSummary), reports, orgs, totals: totals ?? { chains: 0, reports: 0, orgs: 0 } };
   });
+}
+
+// Typeahead for the command palette: a few of each kind, fast.
+export async function quickSearch(term: string) {
+  const t = term.trim();
+  if (t.length < 2) return { chains: [], reports: [], orgs: [] };
+  return cached(
+    `quick:${t.toLowerCase()}`,
+    async () => {
+      const like = `%${t}%`;
+      const [chains, reports, orgs] = await Promise.all([
+        q<{ key: string; hazard: string; org_name: string; n_reports: number }>(
+          `SELECT key, hazard, org_name, n_reports FROM pub_chains
+           WHERE hazard ILIKE $1 OR search @@ websearch_to_tsquery('english', $2)
+           ORDER BY (hazard ILIKE $1) DESC, last_date DESC LIMIT 5`, [like, t]),
+        q<{ slug: string; title: string; date: string; n_links: number }>(
+          `SELECT slug, title, date, n_links FROM pub_reports
+           WHERE title ILIKE $1 OR search @@ websearch_to_tsquery('english', $2)
+           ORDER BY (title ILIKE $1) DESC, date DESC NULLS LAST LIMIT 6`, [like, t]),
+        q<{ id: number; name: string; n_chains: number }>(
+          `SELECT id, name, n_chains FROM pub_orgs WHERE name ILIKE $1 ORDER BY (name ILIKE $2) DESC, name LIMIT 5`,
+          [like, `${t}%`]),
+      ]);
+      return { chains, reports, orgs };
+    },
+    60_000,
+  );
 }
 
 // ---------- systemic ----------

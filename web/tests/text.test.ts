@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { htmlToText, normForMatch, orgKey, redactTitles, splitSections, stripBoilerplate, verifyQuote, wordingClean } from "../lib/text.ts";
+import { htmlToText, normForMatch, orgKey, redactNames, redactTitles, splitSections, stripBoilerplate, verifyQuote, wordingClean } from "../lib/text.ts";
 
 const PAGES = path.join(import.meta.dirname, "..", "..", "tests", "fixtures", "pages");
 
@@ -41,4 +41,16 @@ test("wording and redaction", () => {
   assert.ok(wordingClean("A similar concern was raised again."));
   assert.equal(redactTitles("Dr Smith saw her"), "Dr [name redacted] saw her");
   assert.equal(normForMatch(" a \n b "), "a b");
+});
+
+test("redactNames matches the Python redaction rules", () => {
+  const t = ["David Levett: Prevention of future deaths report"];
+  assert.equal(
+    redactNames("David Levett's car stopped. When David's mother called, Mary Levett, his wife, said.", t),
+    "[the deceased]'s car stopped. When [the deceased]'s mother called, [name redacted], his wife, said.",
+  );
+  assert.equal(redactNames("Mr Levett was seen by Jane Smith, the triage nurse.", t), "Mr [name redacted] was seen by [name redacted], the triage nurse.");
+  const places = redactNames("He went by St John Ambulance to the John Radcliffe Hospital.", ["John Smith"]);
+  assert.ok(places.includes("St John Ambulance") && places.includes("John Radcliffe Hospital"));
+  assert.equal(redactNames("His mother Mary called.", ["Peter Westwell, Mary Cunningham"]), "His mother [name redacted] called.");
 });

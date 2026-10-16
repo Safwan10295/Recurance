@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS pub_reports (
   first_seen timestamptz NOT NULL DEFAULT now(), -- when this report first appeared on the site
   search tsvector
 );
+ALTER TABLE pub_reports ADD COLUMN IF NOT EXISTS theme text;   -- grouped from categories (hazard_map.THEMES)
 CREATE INDEX IF NOT EXISTS pub_reports_search ON pub_reports USING gin (search);
 CREATE INDEX IF NOT EXISTS pub_reports_date ON pub_reports (date DESC);
 
@@ -119,6 +120,24 @@ CREATE TABLE IF NOT EXISTS pub_brief_concerns (
 );
 CREATE INDEX IF NOT EXISTS pub_brief_concerns_org ON pub_brief_concerns (org_id);
 CREATE INDEX IF NOT EXISTS pub_brief_concerns_report ON pub_brief_concerns (report_url);
+
+-- The hazard map: every verified concern placed in 2-D by meaning (pipeline/publish/hazard_map.py).
+CREATE TABLE IF NOT EXISTS pub_hazard_points (
+  id bigint PRIMARY KEY,                        -- concern id
+  x real NOT NULL,
+  y real NOT NULL,
+  report_url text NOT NULL,
+  hazard text,
+  theme text NOT NULL,
+  chain_key text                                -- set when the concern is in a shown recurrence link
+);
+
+CREATE TABLE IF NOT EXISTS pub_hazard_links (
+  earlier_id bigint NOT NULL,
+  later_id bigint NOT NULL,
+  chain_key text NOT NULL,
+  PRIMARY KEY (earlier_id, later_id)
+);
 
 CREATE TABLE IF NOT EXISTS pub_org_aliases (
   alias_key text PRIMARY KEY,

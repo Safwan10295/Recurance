@@ -100,7 +100,8 @@ def main() -> None:
         # Repeat the first case: must be served from the response cache at no cost.
         if cases:
             ev = post(cases[0][1])
-            results["repeat_cached"] = any(e["type"] == "step" and e["step"]["id"] == "cache" for e in ev)
+            # A saved brief is replayed: a "replay" event, then the saved trace, then the result.
+            results["repeat_cached"] = any(e["type"] == "replay" for e in ev)
             print("repeat served from cache:", results["repeat_cached"])
     finally:
         proc.terminate()

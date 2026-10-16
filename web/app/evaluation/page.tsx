@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { EmptyState, PageHeader, Section, StatTile, pct } from "@/components/ui";
 import { getMeta } from "@/lib/queries";
 
@@ -38,7 +39,7 @@ export default async function EvaluationPage() {
   return (
     <div className="space-y-10">
       <PageHeader
-        eyebrow="How we know"
+        crumbs={[{ href: "/", label: "Start here" }, { label: "Evaluation" }]}
         title="Evaluation"
         description="Does the system find recurrences that coroners themselves recognised, and does Nemotron add anything over simple baselines?"
       />
@@ -120,6 +121,20 @@ export default async function EvaluationPage() {
           <li>Linking is within one organisation, so recurrences after an unknown rename are missed.</li>
         </ol>
       </Section>
+      <section className="grid gap-3 sm:grid-cols-3 border-t border-rule pt-8">
+        <Link href="/nemotron" className="card card-link p-4 hover:no-underline">
+          <span className="block font-medium text-ink">How Nemotron did the work →</span>
+          <span className="block text-sm text-muted">Models, tokens and cost for every stage.</span>
+        </Link>
+        <Link href="/methodology" className="card card-link p-4 hover:no-underline">
+          <span className="block font-medium text-ink">Methodology →</span>
+          <span className="block text-sm text-muted">How links are made, safeguards and limits.</span>
+        </Link>
+        <Link href="/brief" className="card card-link p-4 hover:no-underline">
+          <span className="block font-medium text-ink">Try it on a report →</span>
+          <span className="block text-sm text-muted">Watch the agent judge earlier warnings.</span>
+        </Link>
+      </section>
     </div>
   );
 }

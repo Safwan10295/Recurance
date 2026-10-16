@@ -150,10 +150,90 @@ export function wordingClean(s: string | null | undefined): boolean {
   return !BANNED.test(s ?? "");
 }
 
+// Redaction for text the live brief reads fresh from judiciary.uk. Mirrors pipeline/redact.py:
+// staff and family names become [name redacted]; the deceased (named in the report title) become
+// [the deceased]; coroners stay named. Archive text is already redacted when it is published.
+const REDACTED = "[name redacted]";
+const DECEASED = "[the deceased]";
+const HON = "(?:Mr|Mrs|Ms|Miss|Master|Mx)";
+const CAP = "[A-Z][a-z'\\-]+";
 const TITLE_RX =
-  /\b(Dr|Doctor|Nurse|Sister|Matron|Professor|Prof|PC|DC|DS|DI|DCI|Sgt|Sergeant|Inspector|Constable|Officer|Paramedic|Midwife|Consultant|Registrar)\.?\s+((?:[A-Z][a-z'\-]+|[A-Z]\.?)(?:\s+[A-Z][a-z'\-]+)?)\b/g;
+  /\b(Dr|Doctor|Nurse|Sister|Matron|Professor|Prof|PC|DC|DS|DI|DCI|Sgt|Sergeant|Inspector|Constable|Officer|Paramedic|Midwife|Consultant|Registrar|Mr|Mrs|Ms|Miss)\.?\s+((?:[A-Z][a-z'\-]+|[A-Z]\.?)(?:\s+[A-Z][a-z'\-]+)?)\b/g;
+const ROLE =
+  "nurse|doctor|GP|paramedic|call handler|call taker|clinician|consultant|registrar|surgeon|psychiatrist|psychologist|anaesthetist|radiologist|radiographer|pharmacist|physiotherapist|midwife|health visitor|healthcare assistant|support worker|care worker|carer|social worker|care coordinator|key ?worker|officer|manager|practitioner|therapist|technician|dispatcher|mother|father|wife|husband|partner|son|daughter|sister|brother|parents?|grandmother|grandfather|aunt|uncle|friend|cousin|fianc[ée]e?|girlfriend|boyfriend|neighbour";
+const ROLE_BEFORE = new RegExp(`\\b(?:${ROLE}),?\\s+(${CAP}(?:\\s+${CAP})?)\\b`, "g");
+const ROLE_AFTER = new RegExp(`\\b(${CAP}\\s+${CAP}),\\s+(?:a|an|the|his|her|their)\\s+(?:[a-z\\-]+\\s+){0,2}(?:${ROLE})\\b`, "g");
+const NOT_NAME = new Set(
+  ("and of the baby mr mrs ms miss master dr prevention future deaths death report regulation inquest into re in deceased " +
+    "coroner area pm st saint nhs trust county council police constabulary fire hospital university borough city health " +
+    "service services prison road street house court ward unit centre center park lane way school college ambulance " +
+    "practice surgery team clinic board partnership foundation group limited ltd home care on at when after before during " +
+    "however although this that there it he she they his her their a an i we following despite while whilst as if by").split(" "),
+);
+const COMMON = new Set(
+  "hope grace faith joy will may june april rose summer mark bill frank ray dean guy rich long young love star sky skye jack max victoria georgia carol page hunter mason chase ivy holly dawn eve".split(" "),
+);
+const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const capWords = (s: string) => s.match(/[A-Z][A-Za-z'\-]+/g) ?? [];
 
-// Light redaction for user-supplied text in the live brief: titled staff names.
+function deceasedParts(titles: string[]) {
+  const fulls: string[][] = [];
+  const firsts = new Set<string>();
+  const surnames = new Set<string>();
+  for (const t of titles) {
+    const head = (t ?? "").split(/\s*(?::| - | – )\s*/)[0];
+    for (const person of head.split(/\s*(?:,|&|\band\b)\s*/)) {
+      const ws = capWords(person).filter((w) => !NOT_NAME.has(w.toLowerCase()) && w.length > 1);
+      if (!ws.length || ws.length > 5) continue;
+      firsts.add(ws[0]);
+      if (ws.length >= 2) {
+        surnames.add(ws[ws.length - 1]);
+        fulls.push(ws);
+      }
+    }
+  }
+  return { fulls: fulls.sort((a, b) => b.length - a.length), firsts, surnames };
+}
+
+function redactDeceased(text: string, titles: string[]): string {
+  const { fulls, firsts, surnames } = deceasedParts(titles);
+  if (!firsts.size) return text;
+  let out = text;
+  for (const ws of fulls) {
+    for (const v of new Set([ws.map(esc).join("\\s+"), `${esc(ws[0])}\\s+${esc(ws[ws.length - 1])}`])) {
+      out = out.replace(new RegExp(`(?:\\b${HON}\\.?\\s+)?\\b${v}\\b`, "g"), DECEASED);
+    }
+  }
+  if (surnames.size) {
+    const sur = [...surnames].sort((a, b) => b.length - a.length).map(esc).join("|");
+    out = out.replace(new RegExp(`\\b(${HON})\\.?\\s+(?:${sur})\\b`, "g"), (_m, h: string) => `${h} ${REDACTED}`);
+    out = out.replace(new RegExp(`\\b${CAP}\\s+(?:${sur})\\b`, "g"), (m) =>
+      NOT_NAME.has(m.split(/\s+/)[0].toLowerCase()) ? m : REDACTED,
+    );
+  }
+  const fst = [...firsts].sort((a, b) => b.length - a.length).map(esc).join("|");
+  const src = out;
+  return src.replace(new RegExp(`\\b(?:${fst})\\b(?!\\s+[A-Z][a-z])(?!-)`, "g"), (w, offset: number) => {
+    const before = src.slice(0, offset).trimEnd();
+    if (/\b(?:St|Saint)\.?$/.test(before)) return w;
+    const sentenceStart = !before || ".!?\"“(:;".includes(before[before.length - 1]);
+    if (COMMON.has(w.toLowerCase()) && sentenceStart) return w;
+    return DECEASED;
+  });
+}
+
+export function redactNames(s: string, deceasedTitles: string[] = []): string {
+  const keep = (name: string) => {
+    const ws = capWords(name).map((w) => w.toLowerCase());
+    return !ws.length || ws.some((w) => NOT_NAME.has(w));
+  };
+  let out = (s ?? "").replace(TITLE_RX, (m, title: string, name: string) => (keep(name) ? m : `${title} ${REDACTED}`));
+  const role = (m: string, name: string) => (keep(name) ? m : m.replace(name, REDACTED));
+  out = out.replace(ROLE_BEFORE, role).replace(ROLE_AFTER, role);
+  return redactDeceased(out, deceasedTitles);
+}
+
+// Kept for callers that have no report title.
 export function redactTitles(s: string): string {
-  return (s ?? "").replace(TITLE_RX, (_m, title: string) => `${title} [name redacted]`);
+  return redactNames(s, []);
 }

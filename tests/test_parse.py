@@ -94,12 +94,30 @@ def test_split_receivers_and_key():
     assert split_receivers("Cardiff and Vale University Health Board") == ["Cardiff and Vale University Health Board"]
 
 
-def test_redaction_keeps_coroner_and_deceased():
+def test_redaction_keeps_coroner_and_hides_names():
     people = [{"name": "Jane Doe", "role": "staff"}, {"name": "Anne Pember", "role": "coroner"}]
     t = "Dr Smith told Anne Pember that Jane Doe saw Mr Levett."
     out = redact(t, people, coroners={"Anne Pember"}, deceased={"David Levett"})
-    assert "Jane Doe" not in out and "Smith" not in out
-    assert "Anne Pember" in out and "Mr Levett" in out and REDACTED in out
+    assert "Jane Doe" not in out and "Smith" not in out and "Levett" not in out
+    assert "Anne Pember" in out and REDACTED in out
+
+
+def test_deceased_named_by_title_only():
+    d = {"David Levett: Prevention of future deaths report"}
+    out = redact("David Levett's car stopped. When David's mother called, Mary Levett, his wife, said.", [], set(), d)
+    assert out == "[the deceased]'s car stopped. When [the deceased]'s mother called, [name redacted], his wife, said."
+    # Places and other people who share a first name are left alone.
+    out = redact("He went by St John Ambulance to the John Radcliffe Hospital.", [], set(), {"John Smith"})
+    assert "St John Ambulance" in out and "John Radcliffe Hospital" in out
+    # A name next to a role word is a relative or staff member, never the deceased.
+    out = redact("His mother Mary called.", [], set(), {"Peter Westwell, Mary Cunningham"})
+    assert out == "His mother [name redacted] called."
+
+
+def test_untitled_staff_names_next_to_role_words():
+    out = redact("Jane Smith, the triage nurse, did not escalate. The paramedic, Tom Hardy, arrived at the GP Practice.",
+                 [], set(), {"Alan Able"})
+    assert "Jane Smith" not in out and "Tom Hardy" not in out and "GP Practice" in out
 
 
 def test_wording_rules():

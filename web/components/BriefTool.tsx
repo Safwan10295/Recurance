@@ -1,10 +1,12 @@
 "use client";
 
+import { ArrowRight, Check, Copy, FileText, Globe, Loader2, PenLine, RotateCcw, ScanSearch } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import AgentTrace, { type Step } from "./brief/AgentTrace";
+import { ConfidenceTag, QuotePair, RelationTag, btnPrimary, btnSecondary, fieldCls, formatDate, shortTitle, slugOf } from "./ui";
 import type { Relation } from "@/lib/types";
 
-type Step = { id: string; label: string; status: "running" | "done" | "skipped"; detail?: string };
 type Match = {
   earlier: { url: string; slug?: string; title: string; date: string; coroner: string | null; area: string | null };
   relation: Relation;
@@ -22,265 +24,399 @@ type Result = {
   matches: Match[];
   other_earlier: { url: string; slug?: string; title: string; date: string; hazard: string }[];
   searched?: number;
+  cost?: number;
   notes: string[];
 };
 type Example = { title: string; input: Record<string, string>; result: Result };
 type Suggestion = { url: string; slug: string; title: string; date: string };
 type Mode = "pick" | "url" | "text";
 
-const REL: Record<string, string> = { identical: "Identical hazard", closely_related: "Closely related" };
+const EXAMPLES = [
+  { label: "A smart motorway death, 2023", term: "Levett" },
+  { label: "A railway platform death", term: "platform" },
+  { label: "An ambulance delay", term: "ambulance" },
+];
 
-function fmt(iso?: string | null) {
-  if (!iso) return "";
-  const d = new Date(iso.length === 10 ? iso + "T00:00:00Z" : iso);
-  return isNaN(d.getTime()) ? iso : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-}
-const slugOf = (u: string) => u.replace(/\/$/, "").split("/").pop() ?? "";
-
-export default function BriefTool({ initialUrl }: { initialUrl?: string }) {
-  const [mode, setMode] = useState<Mode>(initialUrl ? "url" : "pick");
+export default function BriefTool({
+  initialUrl,
+  initialSlug,
+  initialOrg,
+  autoRun = false,
+}: {
+  initialUrl?: string;
+  initialSlug?: { slug: string; title: string; date: string; url: string };
+  initialOrg?: { id: number; name: string };
+  autoRun?: boolean;
+}) {
+  const [mode, setMode] = useState<Mode>(initialOrg ? "text" : initialUrl ? "url" : "pick");
   const [term, setTerm] = useState("");
   const [sugg, setSugg] = useState<Suggestion[]>([]);
-  const [picked, setPicked] = useState<Suggestion | null>(null);
+  const [active, setActive] = useState(0);
+  const [picked, setPicked] = useState<Suggestion | null>(initialSlug ?? null);
   const [reportUrl, setReportUrl] = useState(initialUrl ?? "");
   const [concerns, setConcerns] = useState("");
-  const [organisation, setOrganisation] = useState("");
+  const [organisation, setOrganisation] = useState(initialOrg?.name ?? "");
   const [steps, setSteps] = useState<Step[]>([]);
   const [result, setResult] = useState<Result | null>(null);
   const [hash, setHash] = useState<string | null>(null);
   const [paused, setPaused] = useState<{ message: string; examples: Example[] } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [replay, setReplay] = useState(false);
   const [copied, setCopied] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [elapsed, setElapsed] = useState<number | undefined>();
+  const [loadingShared, setLoadingShared] = useState(false);
+  const outRef = useRef<HTMLDivElement>(null);
+  const started = useRef(0);
+  const ran = useRef(false);
 
   // Load a shared brief from ?h=
   useEffect(() => {
     const h = new URLSearchParams(window.location.search).get("h");
-    if (h && /^[a-f0-9]{64}$/.test(h)) {
-      fetch(`/api/brief?h=${h}`)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => {
-          if (d?.result) {
-            setResult(d.result);
-            setHash(h);
-          }
-        })
-        .catch(() => undefined);
-    }
+    if (!h || !/^[a-f0-9]{64}$/.test(h)) return;
+    setLoadingShared(true);
+    fetch(`/api/brief?h=${h}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.result) {
+          setResult(d.result);
+          setSteps(d.steps ?? []);
+          setReplay(true);
+          setHash(h);
+        } else setPaused({ message: "That shared brief could not be found. It may have expired.", examples: [] });
+      })
+      .catch(() => setPaused({ message: "That shared brief could not be loaded just now.", examples: [] }))
+      .finally(() => setLoadingShared(false));
   }, []);
 
+  // Typeahead for "Pick a report".
   useEffect(() => {
     if (mode !== "pick" || picked) return;
-    if (timer.current) clearTimeout(timer.current);
     if (term.trim().length < 2) {
       setSugg([]);
       return;
     }
-    timer.current = setTimeout(() => {
-      fetch(`/api/reports/suggest?q=${encodeURIComponent(term)}`)
-        .then((r) => r.json())
-        .then(setSugg)
-        .catch(() => setSugg([]));
-    }, 200);
+    const ctl = new AbortController();
+    const t = setTimeout(() => {
+      fetch(`/api/reports/suggest?q=${encodeURIComponent(term)}`, { signal: ctl.signal })
+        .then((r) => (r.ok ? r.json() : []))
+        .then((s: Suggestion[]) => {
+          setSugg(s);
+          setActive(0);
+        })
+        .catch(() => undefined);
+    }, 180);
+    return () => {
+      clearTimeout(t);
+      ctl.abort();
+    };
   }, [term, mode, picked]);
 
-  async function run() {
-    setBusy(true);
-    setSteps([]);
-    setResult(null);
-    setPaused(null);
-    setHash(null);
-    const body =
-      mode === "pick" ? { reportSlug: picked?.slug } : mode === "url" ? { reportUrl } : { concerns, organisation };
-    try {
-      const res = await fetch("/api/brief", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      const reader = res.body!.getReader();
-      const dec = new TextDecoder();
-      let buf = "";
-      for (;;) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buf += dec.decode(value, { stream: true });
-        let i;
-        while ((i = buf.indexOf("\n")) >= 0) {
-          const line = buf.slice(0, i).trim();
-          buf = buf.slice(i + 1);
-          if (!line) continue;
-          const ev = JSON.parse(line);
-          if (ev.type === "step") setSteps((s) => [...s.filter((x) => x.id !== ev.step.id), ev.step]);
-          else if (ev.type === "result") {
-            setResult(ev.result);
-            setHash(ev.hash ?? null);
-            if (ev.hash) history.replaceState(null, "", `/brief?h=${ev.hash}`);
-          } else if (ev.type === "paused") setPaused({ message: ev.message, examples: ev.examples ?? [] });
+  // Elapsed timer while the agent works.
+  useEffect(() => {
+    if (!busy) return;
+    const id = setInterval(() => setElapsed(Date.now() - started.current), 100);
+    return () => clearInterval(id);
+  }, [busy]);
+
+  const run = useCallback(
+    async (override?: { reportSlug?: string }) => {
+      setBusy(true);
+      setSteps([]);
+      setResult(null);
+      setPaused(null);
+      setHash(null);
+      setReplay(false);
+      started.current = Date.now();
+      setElapsed(0);
+      setTimeout(() => outRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      const body =
+        override ??
+        (mode === "pick"
+          ? { reportSlug: picked?.slug }
+          : mode === "url"
+            ? { reportUrl }
+            : { concerns, organisation, ...(initialOrg && organisation === initialOrg.name ? { orgId: initialOrg.id } : {}) });
+      try {
+        const res = await fetch("/api/brief", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+        let buf = "";
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          let i;
+          while ((i = buf.indexOf("\n")) >= 0) {
+            const line = buf.slice(0, i).trim();
+            buf = buf.slice(i + 1);
+            if (!line) continue;
+            const ev = JSON.parse(line);
+            if (ev.type === "replay") setReplay(true);
+            else if (ev.type === "step")
+              setSteps((s) => {
+                const at = s.findIndex((x) => x.id === ev.step.id);
+                if (at < 0) return [...s, ev.step];
+                const next = [...s];
+                next[at] = ev.step;
+                return next;
+              });
+            else if (ev.type === "result") {
+              setResult(ev.result);
+              setHash(ev.hash ?? null);
+              if (ev.hash) history.replaceState(null, "", `/brief?h=${ev.hash}`);
+            } else if (ev.type === "paused") setPaused({ message: ev.message, examples: ev.examples ?? [] });
+          }
         }
+      } catch {
+        setPaused({ message: "Live analysis could not be reached just now. Here are precomputed examples instead.", examples: [] });
+      } finally {
+        setElapsed(Date.now() - started.current);
+        setBusy(false);
       }
-    } catch {
-      setPaused({ message: "Live analysis could not be reached. Here are precomputed examples instead.", examples: [] });
-    } finally {
-      setBusy(false);
+    },
+    [mode, picked, reportUrl, concerns, organisation, initialOrg],
+  );
+
+  // Arriving from a report page with ?report=…&run=1 runs straight away.
+  useEffect(() => {
+    if (autoRun && initialSlug && !ran.current) {
+      ran.current = true;
+      run({ reportSlug: initialSlug.slug });
     }
-  }
+  }, [autoRun, initialSlug, run]);
 
   const canRun =
-    !busy && ((mode === "pick" && !!picked) || (mode === "url" && /^https?:\/\//.test(reportUrl)) || (mode === "text" && concerns.trim().length >= 40 && organisation.trim().length > 1));
-  const field = "w-full rounded-md border border-rule bg-surface px-3 py-2";
-  const modeBtn = (m: Mode, label: string) => (
+    !busy &&
+    ((mode === "pick" && !!picked) ||
+      (mode === "url" && /^https:\/\/www\.judiciary\.uk\//.test(reportUrl.trim())) ||
+      (mode === "text" && concerns.trim().length >= 40 && organisation.trim().length > 1));
+
+  const modeBtn = (m: Mode, label: string, Icon: typeof FileText) => (
     <button
       type="button"
       onClick={() => setMode(m)}
       aria-pressed={mode === m}
-      className={`flex-1 rounded-md px-3 py-2 text-sm font-medium ${mode === m ? "bg-surface shadow-sm text-ink" : "text-muted hover:text-ink"}`}
+      className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-2 text-sm font-medium transition-colors ${
+        mode === m ? "bg-surface text-ink shadow-sm" : "text-muted hover:text-ink"
+      }`}
     >
-      {label}
+      <Icon size={15} aria-hidden /> <span>{label}</span>
     </button>
   );
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr] items-start">
-      <div className="space-y-4 lg:sticky lg:top-24">
-        <form
-          className="card p-4 sm:p-5 space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (canRun) run();
-          }}
-        >
-          <div className="flex gap-1 rounded-lg bg-paper-2 p-1" role="group" aria-label="How to give the report">
-            {modeBtn("pick", "Pick a report")}
-            {modeBtn("url", "Web address")}
-            {modeBtn("text", "Paste concerns")}
-          </div>
+  const choose = (s: Suggestion) => {
+    setPicked(s);
+    setSugg([]);
+  };
 
-          {mode === "pick" && (
-            <div className="space-y-2">
+  const showIntro = !result && !paused && steps.length === 0 && !loadingShared;
+
+  return (
+    <div className="space-y-6">
+      <form
+        className="card p-4 sm:p-5 space-y-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (canRun) run();
+        }}
+      >
+        <div className="flex gap-1 rounded-lg bg-paper-2 p-1" role="group" aria-label="How to give the report">
+          {modeBtn("pick", "Pick a report", FileText)}
+          {modeBtn("url", "Web address", Globe)}
+          {modeBtn("text", "Paste text", PenLine)}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
+          <div className="min-w-0">
+            {mode === "pick" && (
+              <div className="relative">
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">Any report in the archive, by name or words in it</span>
+                  <input
+                    className={`${fieldCls} py-2 text-base`}
+                    value={picked ? shortTitle(picked.title) : term}
+                    onChange={(e) => {
+                      setPicked(null);
+                      setTerm(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (!sugg.length) return;
+                      if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setActive((a) => Math.min(sugg.length - 1, a + 1));
+                      } else if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        setActive((a) => Math.max(0, a - 1));
+                      } else if (e.key === "Enter") {
+                        e.preventDefault();
+                        choose(sugg[active]);
+                      } else if (e.key === "Escape") setSugg([]);
+                    }}
+                    placeholder="e.g. Levett"
+                    autoComplete="off"
+                    role="combobox"
+                    aria-expanded={!picked && sugg.length > 0}
+                    aria-controls="brief-sugg"
+                  />
+                </label>
+                {!picked && sugg.length > 0 && (
+                  <ul id="brief-sugg" role="listbox" className="absolute z-20 mt-1 w-full card max-h-72 overflow-y-auto list-none p-1 shadow-[var(--shadow-lg)]">
+                    {sugg.map((s, i) => (
+                      <li key={s.url} role="option" aria-selected={i === active}>
+                        <button
+                          type="button"
+                          onMouseMove={() => setActive(i)}
+                          onClick={() => choose(s)}
+                          className={`w-full rounded-md px-3 py-2 text-left ${i === active ? "bg-accent-soft" : ""}`}
+                        >
+                          <span className="block text-sm text-ink">{shortTitle(s.title)}</span>
+                          <span className="block text-xs text-muted">{formatDate(s.date)}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+            {mode === "url" && (
               <label className="block text-sm space-y-1">
-                <span className="text-muted">Search any report in the archive by name</span>
+                <span className="text-muted">A report&apos;s address on judiciary.uk, including brand-new ones</span>
                 <input
-                  className={field}
-                  value={picked ? picked.title : term}
-                  onChange={(e) => {
-                    setPicked(null);
-                    setTerm(e.target.value);
-                  }}
-                  placeholder="e.g. David Levett"
-                  autoComplete="off"
+                  className={`${fieldCls} py-2 text-base`}
+                  value={reportUrl}
+                  onChange={(e) => setReportUrl(e.target.value)}
+                  placeholder="https://www.judiciary.uk/prevention-of-future-death-reports/…"
+                  inputMode="url"
                 />
               </label>
-              {!picked && sugg.length > 0 && (
-                <ul className="rounded-md border border-rule bg-surface divide-y divide-rule max-h-64 overflow-y-auto list-none p-0">
-                  {sugg.map((s) => (
-                    <li key={s.url}>
-                      <button type="button" className="w-full text-left px-3 py-2 hover:bg-paper-2" onClick={() => { setPicked(s); setSugg([]); }}>
-                        <span className="block text-sm">{s.title}</span>
-                        <span className="block text-xs text-muted">{fmt(s.date)}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-          {mode === "url" && (
-            <label className="block text-sm space-y-1">
-              <span className="text-muted">A report&apos;s address on judiciary.uk, including brand-new ones</span>
-              <input className={field} value={reportUrl} onChange={(e) => setReportUrl(e.target.value)} placeholder="https://www.judiciary.uk/prevention-of-future-death-reports/…" />
-            </label>
-          )}
-          {mode === "text" && (
-            <>
-              <label className="block text-sm space-y-1">
-                <span className="text-muted">Organisation the concerns are addressed to</span>
-                <input className={field} value={organisation} onChange={(e) => setOrganisation(e.target.value)} placeholder="e.g. Network Rail" />
-              </label>
-              <label className="block text-sm space-y-1">
-                <span className="text-muted">Draft concerns (please remove names first)</span>
-                <textarea className={field + " min-h-40"} value={concerns} onChange={(e) => setConcerns(e.target.value)} />
-              </label>
-            </>
-          )}
-          <button type="submit" disabled={!canRun} className="w-full rounded-md bg-accent text-accent-ink px-4 py-2.5 text-sm font-medium disabled:opacity-50">
+            )}
+            {mode === "text" && (
+              <div className="grid gap-3">
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">Organisation the concerns are addressed to</span>
+                  <input className={fieldCls} value={organisation} onChange={(e) => setOrganisation(e.target.value)} placeholder="e.g. Network Rail" />
+                </label>
+                <label className="block text-sm space-y-1">
+                  <span className="text-muted">Draft concerns (please remove names first)</span>
+                  <textarea className={`${fieldCls} min-h-32`} value={concerns} onChange={(e) => setConcerns(e.target.value)} />
+                </label>
+              </div>
+            )}
+          </div>
+          <button type="submit" disabled={!canRun} className={`${btnPrimary} py-2.5 md:px-5`}>
+            {busy ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <ScanSearch size={16} aria-hidden />}
             {busy ? "Working…" : "Check for earlier warnings"}
           </button>
-          <p className="text-xs text-muted">
-            Live checks use Nemotron on Nebius Token Factory and are limited each day. The same input always returns the same saved brief.
-          </p>
-        </form>
+        </div>
 
-        {steps.length > 0 && (
-          <div className="card p-4 space-y-3" aria-live="polite">
-            <p className="eyebrow">What the agent is doing</p>
-            <ol className="space-y-2.5 list-none p-0">
-              {steps.map((s) => (
-                <li key={s.id} className="flex gap-2.5 text-sm">
-                  <span
-                    aria-hidden
-                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
-                      s.status === "done" ? "bg-accent text-accent-ink" : "border-2 border-accent animate-pulse"
-                    }`}
-                  >
-                    {s.status === "done" ? "✓" : ""}
-                  </span>
-                  <span>
-                    <span className="block">{s.label}</span>
-                    {s.detail && <span className="block text-xs text-muted">{s.detail}</span>}
-                  </span>
-                </li>
-              ))}
-            </ol>
+        {mode === "pick" && !picked && (
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-muted">Try:</span>
+            {EXAMPLES.map((ex) => (
+              <button
+                key={ex.term}
+                type="button"
+                onClick={() => setTerm(ex.term)}
+                className="rounded-full border border-rule bg-surface px-2.5 py-1 text-ink-2 hover:border-accent"
+              >
+                {ex.label}
+              </button>
+            ))}
           </div>
         )}
-      </div>
+        <p className="text-xs text-muted">
+          Runs live on Nebius Token Factory with daily limits. The same input returns the same saved brief, with its trace
+          replayed.
+        </p>
+      </form>
 
-      <div className="min-w-0 space-y-4">
-        {!result && !paused && steps.length === 0 && (
-          <div className="card p-6 space-y-3 text-ink-2">
-            <p className="font-serif text-xl text-ink">What you will get</p>
-            <ol className="list-decimal pl-5 space-y-1.5 text-sm">
-              <li>Earlier reports to the same organisation that raised the same or a closely related hazard.</li>
-              <li>The exact words from both reports, side by side, checked word for word.</li>
-              <li>What the organisation said it would do after the earlier report.</li>
-              <li>A link to the full chain, if the hazard has recurred before.</li>
-            </ol>
-            <p className="text-sm">
-              Not sure where to start? Pick &ldquo;Pick a report&rdquo; and type <em>Levett</em>, a smart motorway death from 2023.
-            </p>
-          </div>
-        )}
-        {paused && (
-          <div className="space-y-4">
-            <p className="card p-4 text-ink-2">{paused.message}</p>
-            {paused.examples.map((ex, i) => (
-              <div key={i} className="space-y-2">
-                <p className="eyebrow">Example {i + 1}</p>
-                <BriefView r={ex.result} />
+      <div ref={outRef} className="scroll-mt-24">
+        {showIntro && (
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              { t: "1. Read and extract", d: "Nemotron Nano pulls out each concern, with a quote checked word for word." },
+              { t: "2. Search by meaning", d: "Qwen3 embeddings and pgvector find the closest earlier concerns sent to the same organisation." },
+              { t: "3. Judge and verify", d: "Nemotron Super decides if each is the same hazard. Only verified quotes reach the brief." },
+            ].map((x) => (
+              <div key={x.t} className="card p-4 space-y-1">
+                <p className="font-medium text-ink">{x.t}</p>
+                <p className="text-sm text-ink-2">{x.d}</p>
               </div>
             ))}
-            {paused.examples.length === 0 && (
-              <p className="text-ink-2">
-                You can still explore every verified <Link href="/chains">recurrence chain</Link>.
-              </p>
-            )}
           </div>
         )}
-        {result && (
-          <>
-            {hash && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  className="rounded-md border border-rule bg-surface px-3 py-1.5 text-sm"
-                  onClick={() => {
-                    navigator.clipboard?.writeText(`${window.location.origin}/brief?h=${hash}`).then(() => setCopied(true));
-                    setTimeout(() => setCopied(false), 2000);
-                  }}
-                >
-                  {copied ? "Link copied" : "Copy link to this brief"}
-                </button>
+        {loadingShared && <div className="skeleton h-40" aria-label="Loading the shared brief" />}
+
+        {(steps.length > 0 || result || paused) && (
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-start">
+            {steps.length > 0 ? (
+              <div className="lg:sticky lg:top-20">
+                <AgentTrace steps={steps} elapsed={elapsed} replay={replay} />
               </div>
+            ) : (
+              <div />
             )}
-            <BriefView r={result} />
-          </>
+            <div className="min-w-0 space-y-4">
+              {busy && !result && (
+                <div className="card p-5 space-y-3" aria-hidden>
+                  <div className="skeleton h-5 w-2/3" />
+                  <div className="skeleton h-4 w-full" />
+                  <div className="skeleton h-4 w-5/6" />
+                  <div className="skeleton h-24 w-full" />
+                </div>
+              )}
+              {paused && (
+                <div className="space-y-4">
+                  <p className="card p-4 text-ink-2">{paused.message}</p>
+                  {paused.examples.map((ex, i) => (
+                    <div key={i} className="space-y-2">
+                      <p className="eyebrow">Example: {shortTitle(ex.title)}</p>
+                      <BriefView r={ex.result} />
+                    </div>
+                  ))}
+                  {paused.examples.length === 0 && (
+                    <p className="text-ink-2">
+                      You can still explore every verified <Link href="/chains">recurrence chain</Link>.
+                    </p>
+                  )}
+                </div>
+              )}
+              {result && (
+                <>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    {hash && (
+                      <button
+                        type="button"
+                        className={btnSecondary}
+                        onClick={() => {
+                          navigator.clipboard?.writeText(`${window.location.origin}/brief?h=${hash}`).then(() => setCopied(true));
+                          setTimeout(() => setCopied(false), 2000);
+                        }}
+                      >
+                        {copied ? <Check size={15} aria-hidden /> : <Copy size={15} aria-hidden />} {copied ? "Link copied" : "Copy link to this brief"}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className={btnSecondary}
+                      onClick={() => {
+                        setResult(null);
+                        setSteps([]);
+                        setPicked(null);
+                        setTerm("");
+                        history.replaceState(null, "", "/brief");
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                    >
+                      <RotateCcw size={15} aria-hidden /> Check another report
+                    </button>
+                  </div>
+                  <BriefView r={result} />
+                </>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -289,16 +425,16 @@ export default function BriefTool({ initialUrl }: { initialUrl?: string }) {
 
 function BriefView({ r }: { r: Result }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 fade-in">
       {r.notes.map((n, i) => (
         <p key={i} className="card p-4 text-ink-2">
           {n}
         </p>
       ))}
       {r.organisation && (
-        <div className="card p-5 space-y-1">
-          <p className="eyebrow">Brief</p>
-          <h2 className="font-serif text-xl">
+        <div className="card p-5 space-y-1.5 border-l-4 border-l-accent">
+          <p className="eyebrow">The brief</p>
+          <h2 className="font-serif text-2xl leading-snug">
             {r.matches.length === 0
               ? "No earlier warning judged to be the same hazard"
               : `${r.matches.length} earlier ${r.matches.length === 1 ? "warning" : "warnings"} to ${r.organisation.name}`}
@@ -307,68 +443,63 @@ function BriefView({ r }: { r: Result }) {
             {r.report ? (
               <>
                 For{" "}
-                {r.report.slug ? <Link href={`/reports/${r.report.slug}`}>{r.report.title}</Link> : r.report.title}
-                {r.report.date ? ` (${fmt(r.report.date)})` : ""}.{" "}
+                {r.report.slug ? <Link href={`/reports/${r.report.slug}`}>{shortTitle(r.report.title)}</Link> : shortTitle(r.report.title)}
+                {r.report.date ? ` (${formatDate(r.report.date)})` : ""}.{" "}
               </>
             ) : (
               "For the concerns given. "
             )}
             Organisation: <Link href={`/organisations/${r.organisation.id}`}>{r.organisation.name}</Link>
-            {r.searched ? ` · ${r.searched} earlier concerns searched` : ""}
+            {r.searched ? ` · ${r.searched.toLocaleString("en-GB")} earlier concerns searched` : ""}
           </p>
           {r.matches.length === 0 && (
-            <p className="text-sm text-muted">That does not mean none exists; it means none of the closest earlier concerns was judged the same hazard.</p>
+            <p className="text-sm text-muted">
+              That does not mean none exists; it means none of the closest earlier concerns was judged the same hazard.
+            </p>
           )}
         </div>
       )}
       {r.matches.map((m, i) => (
         <div key={i} className="card p-4 sm:p-5 space-y-3">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${m.relation === "identical" ? "bg-accent text-accent-ink" : "bg-accent-soft text-accent"}`}>
-              {REL[m.relation] ?? m.relation}
-            </span>
-            <span className="rounded-full border border-rule bg-paper-2 px-2.5 py-0.5 text-xs">Confidence {m.confidence.toFixed(2)}</span>
+            <RelationTag relation={m.relation} />
+            <ConfidenceTag value={m.confidence} />
           </div>
-          <p className="text-sm">
+          <p className="text-sm text-ink-2">
             Raised before in{" "}
-            <Link href={`/reports/${m.earlier.slug ?? slugOf(m.earlier.url)}`}>{m.earlier.title}</Link>, {fmt(m.earlier.date)}, coroner{" "}
-            {m.earlier.coroner ?? "not stated"}.
+            <Link href={`/reports/${m.earlier.slug ?? slugOf(m.earlier.url)}`}>{shortTitle(m.earlier.title)}</Link>,{" "}
+            {formatDate(m.earlier.date)}, coroner {m.earlier.coroner ?? "not stated"}.
           </p>
-          {m.explanation && <p className="text-ink-2">{m.explanation}</p>}
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1">
-              <p className="eyebrow">Earlier report</p>
-              <blockquote className="quote">&ldquo;{m.earlier_quote}&rdquo;</blockquote>
-            </div>
-            <div className="space-y-1">
-              <p className="eyebrow">New concerns</p>
-              <blockquote className="quote">&ldquo;{m.later_quote}&rdquo;</blockquote>
-            </div>
-          </div>
+          {m.explanation && <p className="text-ink">{m.explanation}</p>}
+          <QuotePair
+            earlier={{ label: `Earlier report · ${formatDate(m.earlier.date)}`, text: m.earlier_quote, href: m.earlier.url }}
+            later={{ label: "New report", text: m.later_quote }}
+          />
           {m.promises.length > 0 ? (
-            <div className="space-y-1.5">
-              <p className="eyebrow">What was promised after the earlier report</p>
-              {m.promises.slice(0, 2).map((p) => (
-                <blockquote key={p.id} className="quote">
-                  &ldquo;{p.quote}&rdquo;
-                </blockquote>
+            <div className="space-y-1.5 rounded-lg bg-paper-2/70 p-3">
+              <p className="eyebrow">What the response to the earlier report said it would do</p>
+              {m.promises.slice(0, 3).map((p) => (
+                <div key={p.id} className="space-y-0.5">
+                  <blockquote className="quote">&ldquo;{p.quote}&rdquo;</blockquote>
+                  {p.timescale && <p className="pl-4 text-xs text-muted">Stated timescale: {p.timescale}</p>}
+                </div>
               ))}
             </div>
           ) : (
             <p className="text-xs text-muted">No published stated action was found for the earlier report.</p>
           )}
           {m.chains.length > 0 && (
-            <p className="text-sm">
+            <div className="flex flex-wrap gap-2">
               {m.chains.map((c, j) => {
                 const key = typeof c === "string" ? c : c.key;
-                const label = typeof c === "string" ? "See the full chain" : `Full chain: ${c.hazard}`;
+                const label = typeof c === "string" ? "See the full chain" : c.hazard;
                 return (
-                  <Link key={j} href={`/chains/${key}`} className="block">
-                    {label} →
+                  <Link key={j} href={`/chains/${key}`} className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-sm text-accent hover:no-underline">
+                    Full chain: {label} <ArrowRight size={14} aria-hidden />
                   </Link>
                 );
               })}
-            </p>
+            </div>
           )}
         </div>
       ))}
@@ -378,7 +509,7 @@ function BriefView({ r }: { r: Result }) {
           <ul className="list-disc pl-5 mt-2 space-y-1">
             {r.other_earlier.map((o) => (
               <li key={o.url}>
-                <Link href={`/reports/${o.slug ?? slugOf(o.url)}`}>{o.title}</Link> ({fmt(o.date)}): {o.hazard}
+                <Link href={`/reports/${o.slug ?? slugOf(o.url)}`}>{shortTitle(o.title)}</Link> ({formatDate(o.date)}): {o.hazard}
               </li>
             ))}
           </ul>

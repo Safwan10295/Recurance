@@ -19,8 +19,9 @@ export function year(iso: string | null | undefined): string {
   return iso ? iso.slice(0, 4) : "";
 }
 
+// Rounds down, so a share is never overstated (0.996 shows as 99%, not 100%).
 export function pct(x: number): string {
-  return `${Math.round(x * 100)}%`;
+  return `${Math.floor(x * 100 + 1e-9)}%`;
 }
 
 export function confidenceWord(c: number): string {
@@ -105,21 +106,23 @@ export function QuotePair({
 
 export function PageHeader({
   eyebrow,
+  crumbs,
   title,
   description,
   actions,
 }: {
   eyebrow?: React.ReactNode;
+  crumbs?: { href?: string; label: string }[];
   title: React.ReactNode;
   description?: React.ReactNode;
   actions?: React.ReactNode;
 }) {
   return (
     <header className="flex flex-wrap items-end justify-between gap-4 pb-5 mb-6 border-b border-rule">
-      <div className="space-y-1.5 max-w-3xl">
-        {eyebrow && <div className="eyebrow">{eyebrow}</div>}
-        <h1 className="font-serif text-2xl sm:text-3xl leading-tight">{title}</h1>
-        {description && <div className="text-ink-2">{description}</div>}
+      <div className="space-y-2 max-w-3xl min-w-0">
+        {crumbs ? <Breadcrumbs items={crumbs} /> : eyebrow && <div className="eyebrow">{eyebrow}</div>}
+        <h1 className="font-serif text-[1.7rem] sm:text-4xl leading-[1.15] tracking-tight">{title}</h1>
+        {description && <div className="text-ink-2 text-[1.02rem] leading-relaxed">{description}</div>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </header>
@@ -169,14 +172,127 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 
 export function ButtonLink({ href, children, primary }: { href: string; children: React.ReactNode; primary?: boolean }) {
   return (
-    <Link
-      href={href}
-      className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-2 text-sm font-medium hover:no-underline ${
-        primary ? "bg-accent text-accent-ink hover:opacity-90" : "border border-rule bg-surface text-ink hover:border-accent"
-      }`}
-    >
+    <Link href={href} className={primary ? btnPrimary : btnSecondary}>
       {children}
     </Link>
+  );
+}
+
+// ---- Shared controls, so every page uses the same buttons, fields and tabs ----
+
+export const btnPrimary =
+  "inline-flex items-center justify-center gap-1.5 rounded-md bg-accent text-accent-ink px-3.5 py-2 text-sm font-medium hover:no-underline hover:bg-accent-strong transition-colors disabled:opacity-50";
+export const btnSecondary =
+  "inline-flex items-center justify-center gap-1.5 rounded-md border border-rule bg-surface text-ink px-3.5 py-2 text-sm font-medium hover:no-underline hover:border-accent transition-colors";
+export const fieldCls =
+  "w-full rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm text-ink focus:border-accent focus:outline-none";
+
+export function LinkTabs({ tabs }: { tabs: { href: string; label: React.ReactNode; count?: number; active: boolean }[] }) {
+  return (
+    <nav className="flex gap-1 border-b border-rule mb-6 overflow-x-auto hide-scrollbar" aria-label="Views">
+      {tabs.map((t) => (
+        <Link
+          key={t.href}
+          href={t.href}
+          aria-current={t.active ? "page" : undefined}
+          className={`px-3.5 py-2.5 text-sm font-medium border-b-2 -mb-px whitespace-nowrap hover:no-underline ${
+            t.active ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
+          }`}
+        >
+          {t.label}
+          {t.count !== undefined && <span className="text-muted num"> ({t.count.toLocaleString("en-GB")})</span>}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+export function Breadcrumbs({ items }: { items: { href?: string; label: string }[] }) {
+  return (
+    <nav aria-label="Breadcrumb" className="eyebrow flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+      {items.map((it, i) => (
+        <span key={i} className="flex items-center gap-1.5">
+          {i > 0 && <span aria-hidden className="text-rule">/</span>}
+          {it.href ? (
+            <Link href={it.href} className="text-muted hover:text-accent">
+              {it.label}
+            </Link>
+          ) : (
+            <span aria-current="page">{it.label}</span>
+          )}
+        </span>
+      ))}
+    </nav>
+  );
+}
+
+// A small "?" that explains a term on hover, focus or tap. Pure CSS, works with the keyboard.
+export function InfoTip({ text, label = "What does this mean?" }: { text: string; label?: string }) {
+  return (
+    <span className="group relative inline-flex align-middle">
+      <button
+        type="button"
+        aria-label={label}
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-rule text-[10px] leading-none text-muted hover:border-accent hover:text-accent focus:border-accent"
+      >
+        ?
+      </button>
+      <span
+        role="tooltip"
+        className="pointer-events-none hidden group-hover:block group-focus-within:block absolute left-1/2 top-full z-40 mt-2 w-[min(16rem,calc(100vw-2rem))] -translate-x-1/2 rounded-lg border border-rule bg-surface p-3 text-left text-xs font-normal normal-case tracking-normal text-ink-2 shadow-[var(--shadow-lg)]"
+      >
+        {text}
+      </span>
+    </span>
+  );
+}
+
+// ---- Text helpers ----
+
+export function slugOf(url: string): string {
+  return url.replace(/\/+$/, "").split("/").pop() ?? url;
+}
+
+// "Jane Doe: Prevention of future deaths report" -> "Jane Doe"
+export function shortTitle(title: string | null | undefined): string {
+  return (title ?? "").replace(/\s*[:\-–]\s*(Prevention of future deaths?|PFD) report\s*$/i, "").trim() || (title ?? "");
+}
+
+// 431 days -> "1 year 2 months"
+export function gapText(days: number | null | undefined): string {
+  if (days === null || days === undefined) return "";
+  const months = Math.round(days / 30.44);
+  if (months < 12) return `${months} month${months === 1 ? "" : "s"}`;
+  const y = Math.floor(months / 12);
+  const m = months % 12;
+  return `${y} year${y === 1 ? "" : "s"}${m ? ` ${m} month${m === 1 ? "" : "s"}` : ""}`;
+}
+
+// A report title that opens its page in the app, with the original on judiciary.uk as a small secondary link.
+export function ReportLink({
+  url,
+  title,
+  slug,
+  external = true,
+  className = "",
+}: {
+  url: string;
+  title: string;
+  slug?: string | null;
+  external?: boolean;
+  className?: string;
+}) {
+  return (
+    <span className={className}>
+      <Link href={`/reports/${slug ?? slugOf(url)}`} className="text-ink hover:text-accent">
+        {shortTitle(title)}
+      </Link>
+      {external && (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="ml-1.5 text-xs text-muted hover:text-accent" title="Original on judiciary.uk">
+          ↗
+        </a>
+      )}
+    </span>
   );
 }
 

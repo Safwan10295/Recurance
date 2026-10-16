@@ -1,14 +1,37 @@
+import { ArrowRight, Building2, ChevronDown, ScanSearch } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import ChainStory from "@/components/ChainStory";
 import Tabs from "@/components/Tabs";
-import { Badge, ConfidenceTag, Quote, QuotePair, RelationTag, StatTile, formatDate, orgTypeLabel, year } from "@/components/ui";
-import { getChain } from "@/lib/queries";
-import type { ChainDetail, Followup, ReportCard } from "@/lib/types";
+import {
+  Badge,
+  Breadcrumbs,
+  ConfidenceTag,
+  InfoTip,
+  Quote,
+  QuotePair,
+  RelationTag,
+  ReportLink,
+  StatTile,
+  btnPrimary,
+  btnSecondary,
+  formatDate,
+  gapText,
+  orgTypeLabel,
+  shortTitle,
+  slugOf,
+  year,
+} from "@/components/ui";
+import { GLOSSARY } from "@/lib/glossary";
+import { getChain, getOrgChains } from "@/lib/queries";
+import type { ChainDetail, Followup } from "@/lib/types";
 
 export async function generateMetadata({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
   const { chain } = await getChain(key);
-  return { title: chain ? `${chain.hazard} · Recurrence Watch` : "Chain · Recurrence Watch" };
+  if (!chain) return { title: "Chain · Recurrence Watch" };
+  const description = `${chain.org.name}: a similar concern raised in ${chain.n_reports} coroners' reports, ${year(chain.first_date)} to ${year(chain.last_date)}, with verified quotes.`;
+  return { title: `${chain.hazard} · Recurrence Watch`, description, openGraph: { title: chain.hazard, description } };
 }
 
 const FOLLOWUP_LABEL: Record<Followup["classification"], string> = {
@@ -16,10 +39,6 @@ const FOLLOWUP_LABEL: Record<Followup["classification"], string> = {
   not_found: "No evidence found either way",
   contradicting: "Evidence suggests the action was not carried out as stated",
 };
-
-function slugOf(url: string) {
-  return url.replace(/\/$/, "").split("/").pop() ?? "";
-}
 
 function summaryText(c: ChainDetail): string[] {
   const first = c.reports[0];
@@ -39,28 +58,6 @@ function summaryText(c: ChainDetail): string[] {
   return lines;
 }
 
-function Timeline({ reports }: { reports: ReportCard[] }) {
-  return (
-    <ol className="flex gap-3 overflow-x-auto pb-2 list-none p-0 snap-x">
-      {reports.map((r, i) => (
-        <li key={r.url} className="snap-start shrink-0 w-56 card p-3 space-y-1">
-          <div className="flex items-center gap-2">
-            <span className={`h-2.5 w-2.5 rounded-full ${i === 0 ? "bg-accent" : "border-2 border-accent"}`} aria-hidden />
-            <span className="eyebrow">{i === 0 ? "First warning" : `Raised again · ${year(r.date)}`}</span>
-          </div>
-          <Link href={`/reports/${slugOf(r.url)}`} className="block text-sm font-medium text-ink line-clamp-2">
-            {r.title.replace(/: Prevention of future deaths? report$/i, "")}
-          </Link>
-          <p className="text-xs text-muted">
-            {formatDate(r.date)} · {r.coroner ?? "coroner not stated"}
-          </p>
-          <p className="text-xs text-ink-2">{r.responses.some((x) => x.promises.length) ? "Response with stated actions" : r.responses.length ? "Response published" : "No published response found"}</p>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 export default async function ChainPage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
   const { chain, redirect: to } = await getChain(key);
@@ -69,13 +66,16 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
   const byUrl = new Map(chain.reports.map((r) => [r.url, r]));
   const fuByPromise = new Map<number, Followup[]>();
   for (const f of chain.followups) fuByPromise.set(f.promise_id, [...(fuByPromise.get(f.promise_id) ?? []), f]);
+  const others = (await getOrgChains(chain.org.id)).filter((c) => c.key !== chain.key).slice(0, 4);
+  // Evidence grouped by the later report, in date order.
+  const links = [...chain.links].sort((a, b) => (byUrl.get(a.later)?.date ?? "").localeCompare(byUrl.get(b.later)?.date ?? "") || b.confidence - a.confidence);
   const strongest = [...chain.links].sort((a, b) => b.confidence - a.confidence)[0];
 
   const summary = (
-    <div className="space-y-6">
-      <div className="card p-5 space-y-2">
+    <div className="space-y-7">
+      <div className="card p-5 sm:p-6 space-y-2">
         {summaryText(chain).map((l, i) => (
-          <p key={i} className={i === 0 ? "text-lg text-ink" : "text-ink-2"}>
+          <p key={i} className={i === 0 ? "text-lg text-ink leading-snug" : "text-ink-2"}>
             {l}
           </p>
         ))}
@@ -86,60 +86,71 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
         <StatTile value={`${year(chain.first_date)}–${year(chain.last_date)}`} label="years" />
         <StatTile value={chain.confidence.toFixed(2)} label="lowest link confidence" />
       </div>
-      <section className="space-y-2">
-        <h2 className="font-serif text-lg">Timeline</h2>
-        <Timeline reports={chain.reports} />
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-serif text-xl">The story, report by report</h2>
+          <p className="text-xs text-muted">Spacing grows with the time between reports.</p>
+        </div>
+        <ChainStory chain={chain} />
       </section>
-      {strongest && (
-        <section className="space-y-3">
-          <h2 className="font-serif text-lg">The clearest match</h2>
-          <div className="card p-4 sm:p-5 space-y-3">
-            <div className="flex flex-wrap gap-1.5">
-              <RelationTag relation={strongest.relation} />
-              <ConfidenceTag value={strongest.confidence} />
-            </div>
-            {strongest.explanation && <p className="text-ink-2">{strongest.explanation}</p>}
-            <QuotePair
-              earlier={{ label: `Earlier report, ${formatDate(byUrl.get(strongest.earlier)?.date)}`, text: strongest.earlier_quote, href: strongest.earlier }}
-              later={{ label: `Later report, ${formatDate(byUrl.get(strongest.later)?.date)}`, text: strongest.later_quote, href: strongest.later }}
-            />
-          </div>
-        </section>
-      )}
     </div>
   );
 
   const evidence = (
     <div className="space-y-4">
-      <p className="text-sm text-muted">
-        Each pair below is one judged link. Both quotes were found word for word in the original reports.
+      <p className="text-sm text-muted flex flex-wrap items-center gap-1.5">
+        Each row is one judged link between an earlier and a later report. Open a row to read both quotes, found word for
+        word in the originals. <InfoTip text={GLOSSARY.verified} />
       </p>
-      {chain.links.map((l, i) => {
-        const e = byUrl.get(l.earlier)!;
-        const later = byUrl.get(l.later)!;
-        return (
-          <div key={i} className="card p-4 sm:p-5 space-y-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <RelationTag relation={l.relation} />
-              <ConfidenceTag value={l.confidence} />
-              <span className="text-xs text-muted">
-                {Math.max(1, Math.round(l.days_apart / 30.4))} months apart · {l.same_coroner ? "same coroner" : "different coroner"}
-              </span>
-            </div>
-            {l.explanation && <p className="text-ink-2">{l.explanation}</p>}
-            <QuotePair
-              earlier={{ label: `${e.title.replace(/: Prevention.*$/i, "")}, ${formatDate(e.date)}`, text: l.earlier_quote, href: e.url }}
-              later={{ label: `${later.title.replace(/: Prevention.*$/i, "")}, ${formatDate(later.date)}`, text: l.later_quote, href: later.url }}
-            />
-            {l.promise_quote && (
-              <div className="space-y-1">
-                <p className="eyebrow">Stated action in the response to the earlier report</p>
-                <Quote text={l.promise_quote} />
-              </div>
-            )}
-          </div>
-        );
-      })}
+      <ul className="card divide-y divide-rule list-none p-0">
+        {links.map((l, i) => {
+          const e = byUrl.get(l.earlier)!;
+          const later = byUrl.get(l.later)!;
+          return (
+            <li key={i}>
+              <details className="group" open={l === strongest}>
+                <summary className="flex cursor-pointer list-none items-center gap-3 p-3.5 sm:px-5 [&::-webkit-details-marker]:hidden hover:bg-paper-2/60">
+                  <span className="num w-[5.5rem] shrink-0 text-sm text-muted">
+                    {year(e.date)} → {year(later.date)}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm text-ink">{shortTitle(later.title)}</span>
+                    <span className="block text-xs text-muted">
+                      {gapText(l.days_apart)} after {shortTitle(e.title)} · {l.same_coroner ? "same coroner" : "different coroner"}
+                    </span>
+                  </span>
+                  <span className="hidden sm:flex shrink-0 gap-1.5">
+                    <RelationTag relation={l.relation} />
+                    <ConfidenceTag value={l.confidence} />
+                  </span>
+                  <ChevronDown size={16} className="shrink-0 text-muted transition-transform group-open:rotate-180" aria-hidden />
+                </summary>
+                <div className="space-y-3 px-3.5 pb-5 sm:px-5">
+                  <div className="flex flex-wrap gap-1.5 sm:hidden">
+                    <RelationTag relation={l.relation} />
+                    <ConfidenceTag value={l.confidence} />
+                  </div>
+                  {l.explanation && <p className="text-ink-2">{l.explanation}</p>}
+                  <QuotePair
+                    earlier={{ label: `${shortTitle(e.title)} · ${formatDate(e.date)}`, text: l.earlier_quote, href: e.url }}
+                    later={{ label: `${shortTitle(later.title)} · ${formatDate(later.date)}`, text: l.later_quote, href: later.url }}
+                  />
+                  {l.promise_quote && (
+                    <div className="space-y-1">
+                      <p className="eyebrow">Stated action in the response to the earlier report</p>
+                      <Quote text={l.promise_quote} />
+                    </div>
+                  )}
+                  <p className="text-xs text-muted">
+                    <Link href={`/reports/${slugOf(e.url)}`}>Earlier report in the app</Link> ·{" "}
+                    <Link href={`/reports/${slugOf(later.url)}`}>Later report in the app</Link>
+                  </p>
+                </div>
+              </details>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 
@@ -148,9 +159,7 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
       {chain.reports.map((r, i) => (
         <div key={r.url} className="card p-4 sm:p-5 space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <Link href={`/reports/${slugOf(r.url)}`} className="font-medium text-ink">
-              {r.title}
-            </Link>
+            <ReportLink url={r.url} title={r.title} slug={slugOf(r.url)} className="font-medium" />
             <span className="text-sm text-muted">{formatDate(r.date)}</span>
           </div>
           {r.responses.length === 0 ? (
@@ -200,26 +209,30 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
         <li>Each report&apos;s concerns were extracted by Nemotron 3 Nano on Nebius Token Factory, each with a quote copied from the report.</li>
         <li>Concerns from reports to {chain.org.name} at least six months apart were compared by meaning (Qwen3 embeddings) and wording (TF-IDF).</li>
         <li>The closest pairs were judged by Nemotron 3 Super with reasoning on. Only identical or closely related, with confidence of at least 0.70, are shown.</li>
-        <li>Every quote was checked by code as an exact substring of the original text. Names of staff and family are redacted.</li>
+        <li>Every quote was checked by code as an exact substring of the original text. Names of staff and family are redacted, and the deceased are named by report title only.</li>
       </ol>
       <div className="card overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm num">
           <thead>
-            <tr className="text-left border-b border-rule">
-              <th className="p-3">Link</th>
-              <th className="p-3">Embedding</th>
-              <th className="p-3">TF-IDF</th>
-              <th className="p-3">Judge</th>
-              <th className="p-3">Coroner</th>
+            <tr className="text-left border-b border-rule text-muted">
+              <th className="p-3 font-medium">Link</th>
+              <th className="p-3 font-medium">
+                <span className="inline-flex items-center gap-1">Meaning <InfoTip text={GLOSSARY.scores} /></span>
+              </th>
+              <th className="p-3 font-medium">Wording</th>
+              <th className="p-3 font-medium">Judge</th>
+              <th className="p-3 font-medium">Coroner</th>
             </tr>
           </thead>
           <tbody>
-            {chain.links.map((l, i) => (
+            {links.map((l, i) => (
               <tr key={i} className="border-b border-rule last:border-0">
                 <td className="p-3">{year(byUrl.get(l.earlier)?.date)} → {year(byUrl.get(l.later)?.date)}</td>
                 <td className="p-3">{l.scores.embedding.toFixed(2)}</td>
                 <td className="p-3">{l.scores.tfidf.toFixed(2)}</td>
-                <td className="p-3">{l.relation.replace("_", " ")} · {l.confidence.toFixed(2)}</td>
+                <td className="p-3 whitespace-nowrap">
+                  {l.relation === "identical" ? "Identical" : "Closely related"} · {l.confidence.toFixed(2)}
+                </td>
                 <td className="p-3">{l.same_coroner ? "same" : "different"}</td>
               </tr>
             ))}
@@ -227,7 +240,8 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
         </table>
       </div>
       <p className="text-muted">
-        Judge model: {chain.links[0]?.model}. <Link href="/methodology">Full methodology</Link>.
+        Judge model: {chain.links[0]?.model}. <Link href="/nemotron">How Nemotron did the work</Link> ·{" "}
+        <Link href="/methodology">Full methodology</Link>.
       </p>
     </div>
   );
@@ -263,20 +277,77 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
   return (
     <article>
       <header className="space-y-3 pb-5 mb-2">
-        <p className="eyebrow">
-          <Link href="/chains">Recurrence chains</Link> ·{" "}
-          <Link href={`/organisations/${chain.org.id}`}>{chain.org.name}</Link> · {orgTypeLabel(chain.org.type)}
-        </p>
-        <h1 className="font-serif text-2xl sm:text-3xl leading-tight max-w-4xl">{chain.hazard}</h1>
-        <div className="flex flex-wrap gap-1.5">
+        <Breadcrumbs
+          items={[
+            { href: "/chains", label: "Recurrence chains" },
+            { href: `/organisations/${chain.org.id}`, label: chain.org.name },
+            { label: orgTypeLabel(chain.org.type) },
+          ]}
+        />
+        <h1 className="font-serif text-[1.7rem] sm:text-4xl leading-[1.15] tracking-tight max-w-4xl">{chain.hazard}</h1>
+        <div className="flex flex-wrap items-center gap-1.5">
           <RelationTag relation={chain.relation} />
           <ConfidenceTag value={chain.confidence} />
+          <InfoTip text={`${GLOSSARY.confidence} ${GLOSSARY.lowest_confidence}`} />
           <Badge>
             {chain.n_reports} reports · {year(chain.first_date)}–{year(chain.last_date)}
           </Badge>
+          {chain.any_no_response && <Badge>No published response to an earlier report</Badge>}
         </div>
       </header>
       <Tabs tabs={tabs} />
+
+      <section className="mt-12 space-y-4 border-t border-rule pt-8">
+        <h2 className="font-serif text-xl">Next</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link href={`/brief?org=${chain.org.id}`} className="card card-link p-4 flex items-start gap-3 hover:no-underline">
+            <ScanSearch size={20} className="mt-0.5 text-accent shrink-0" aria-hidden />
+            <span>
+              <span className="block font-medium text-ink">Check a new report to {chain.org.name}</span>
+              <span className="block text-sm text-muted">The agent looks for earlier warnings like these.</span>
+            </span>
+          </Link>
+          <Link href={`/organisations/${chain.org.id}`} className="card card-link p-4 flex items-start gap-3 hover:no-underline">
+            <Building2 size={20} className="mt-0.5 text-accent shrink-0" aria-hidden />
+            <span>
+              <span className="block font-medium text-ink">Everything sent to {chain.org.name}</span>
+              <span className="block text-sm text-muted">Reports, responses and all of its chains.</span>
+            </span>
+          </Link>
+        </div>
+        {others.length > 0 && (
+          <div className="space-y-2">
+            <p className="eyebrow">Other chains for {chain.org.name}</p>
+            <ul className="card divide-y divide-rule list-none p-0">
+              {others.map((c) => (
+                <li key={c.key}>
+                  <Link href={`/chains/${c.key}`} className="flex items-center justify-between gap-3 p-3.5 hover:no-underline hover:bg-paper-2/60">
+                    <span className="min-w-0">
+                      <span className="block text-ink truncate">{c.hazard}</span>
+                      <span className="block text-xs text-muted num">
+                        {c.n_reports} reports · {year(c.first_date)}–{year(c.last_date)}
+                      </span>
+                    </span>
+                    <ArrowRight size={16} className="shrink-0 text-muted" aria-hidden />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <Link href="/chains" className={btnSecondary}>
+            All chains
+          </Link>
+          <Link href="/map" className={btnSecondary}>
+            See it on the hazard map
+          </Link>
+          <Link href="/brief" className={btnPrimary}>
+            Check a report
+          </Link>
+        </div>
+      </section>
+
       <p className="text-xs text-muted max-w-3xl mt-10">
         This shows that a similar concern was raised again after an earlier report. It does not say why, and it is not a
         finding about any organisation or person. To report an error, see the{" "}

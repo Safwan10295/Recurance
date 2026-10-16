@@ -1,0 +1,27 @@
+"""Display helpers: grouped themes for the hazard map and filters, and title casing."""
+from pipeline.export.web import restore_case
+from pipeline.publish.hazard_map import _fit_square, theme_of
+
+
+def test_theme_groups_most_specific_first():
+    assert theme_of(["Hospital Death (Clinical Procedures and medical management) related deaths", "Suicide (from 2015)"]) == "Suicide"
+    assert theme_of('["Road (Highways Safety) related deaths"]') == "Roads and rail"
+    assert theme_of(["Alcohol, drugs medication related death"]) == "Drugs, alcohol and medication"
+    assert theme_of([]) == "Other"
+
+
+def test_restore_case_only_acronyms_and_prison_names():
+    src = ["The ACCT process at HMP Woodhill was not followed. The London Ambulance Service said an ambulance was late."]
+    assert restore_case("Inadequate acct case management at hmp woodhill", src) == "Inadequate ACCT case management at HMP Woodhill"
+    assert restore_case("Delayed ambulance response", src) == "Delayed ambulance response"
+    assert restore_case("Rigid mpsd questioning", []) == "Rigid MPDS questioning"
+    # Shouted headings say nothing about casing.
+    assert restore_case("No hard shoulder", ["THE SMART MOTORWAY HAS NO HARD SHOULDER"]) == "No hard shoulder"
+
+
+def test_map_layout_keeps_proportions():
+    import numpy as np
+
+    xy = _fit_square(np.array([[0.0, 0.0], [10.0, 2.0]], dtype=np.float32))
+    assert xy.min() >= 0 and xy.max() <= 1
+    assert abs((xy[1, 0] - xy[0, 0]) / (xy[1, 1] - xy[0, 1]) - 5.0) < 1e-4  # aspect ratio preserved

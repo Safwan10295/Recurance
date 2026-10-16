@@ -24,6 +24,7 @@ from ..judge.chains import DEFAULT_MIN_CONFIDENCE
 from ..judge.titles import title_for
 from ..llm import Ledger
 from ..normalise.orgs import key as org_key
+from ..publish.hazard_map import theme_of
 from ..redact import redact
 from ..wording import is_clean
 
@@ -155,7 +156,8 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
     for ch in chains:
         members = conn.execute(
             """SELECT v.*, p.tfidf_score, p.embed_score, p.hybrid_score, p.days_apart, p.same_coroner, p.same_area,
-                      ce.report_url AS e_url, cl.report_url AS l_url, ce.hazard AS e_hazard, cl.hazard AS l_hazard
+                      ce.report_url AS e_url, cl.report_url AS l_url, ce.hazard AS e_hazard, cl.hazard AS l_hazard,
+                      p.earlier_concern_id AS e_cid, p.later_concern_id AS l_cid
                FROM chain_members m JOIN recurrence_verdicts v ON v.pair_id=m.pair_id
                JOIN candidate_pairs p ON p.id=m.pair_id
                JOIN concerns ce ON ce.id=p.earlier_concern_id JOIN concerns cl ON cl.id=p.later_concern_id
@@ -167,6 +169,9 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
             later_text = conn.execute("SELECT body_text FROM reports WHERE url=?", (v["l_url"],)).fetchone()[0] or ""
             cites = bool(re.search(r"previous|previously|before|earlier|prior", later_text, re.I)) and (
                 (conn.execute("SELECT ref FROM reports WHERE url=?", (v["e_url"],)).fetchone()[0] or "~~") in later_text)
+            prom = conn.execute(
+                "SELECT pr.stated_date_or_deadline, rs.pdf_url FROM promises pr JOIN responses rs ON rs.id=pr.response_id "
+                "WHERE pr.id=?", (v["promise_id"],)).fetchone() if v["promise_id"] else None
             has_resp = conn.execute("SELECT 1 FROM responses WHERE report_url=? AND (organisation_id=? OR organisation_id IS NULL)",
                                     (v["e_url"], ch["organisation_id"])).fetchone() is not None
             links.append({
@@ -175,7 +180,9 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
                 "explanation": red(v["same_hazard_explanation"], v["e_url"], v["l_url"]),
                 "earlier_quote": red(v["earlier_quote"], v["e_url"]), "later_quote": red(v["later_quote"], v["l_url"]),
                 "promise_quote": red(v["promise_quote"], v["e_url"]) if v["promise_quote"] else None,
-                "after_promise": v["after_promise"], "scores": {
+                "after_promise": v["after_promise"],
+                "promise_timescale": prom[0] if prom else None, "promise_pdf": prom[1] if prom else None,
+                "e_cid": v["e_cid"], "l_cid": v["l_cid"], "scores": {
                     "tfidf": round(v["tfidf_score"] or 0, 3), "embedding": round(v["embed_score"] or 0, 3),
                     "hybrid": round(v["hybrid_score"] or 0, 3)},
                 "days_apart": v["days_apart"], "same_coroner": bool(v["same_coroner"]), "same_area": bool(v["same_area"]),
@@ -209,11 +216,14 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         summary = {
             "key": ch["chain_key"], "org": {"id": ch["organisation_id"], "name": ch["org"], "type": ch["org_type"],
                                             "national": bool(ch["is_national"])},
-            "hazard": title_for(conn, ch["chain_key"]) or hazard_title(ch["hazard_label"]), "relation": ch["relation"],
+            "hazard": restore_case(title_for(conn, ch["chain_key"]) or hazard_title(ch["hazard_label"]),
+                                   [l["earlier_quote"] for l in links] + [l["later_quote"] for l in links]
+                                   + [c["quote"] for r in reports for c in r["concerns"]]),
+            "relation": ch["relation"],
             "confidence": round(min(l["confidence"] for l in links), 2),
             "first_date": reports[0]["date"], "last_date": reports[-1]["date"], "n_reports": len(reports),
             "coroners": coroners, "areas": sorted({r["area"] for r in reports if r["area"]}),
-            "different_coroner": len(coroners) > 1, "theme": (reports[0]["categories"] or ["Other"])[0],
+            "different_coroner": len(coroners) > 1, "theme": theme_of([c for r in reports for c in r["categories"]]),
             "has_dossier": dossier_out is not None,
             "any_no_response": any(not l["earlier_has_response"] for l in links),
         }
@@ -362,6 +372,49 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         _write(WEB_DATA / "evaluation.json", json.loads(ev.read_text(encoding="utf-8")))
     conn.close()
     return {"chains": len(chain_list), "orgs": len(orgs_out), "brief_shards": len(shard_rows), "links": pair_stats["links"]}
+
+
+ACRONYMS = {w.lower(): w for w in (
+    "NHS GP GPs ED A&E CQC ACCT CPR ICU CAMHS HMP HMPPS IPP DVLA ECG MHA PPE DNACPR NICE MHRA CT MRI MPDS NEWS2 "
+    "SOP SOPs RTC NIV CCG ICB CRHT HTT IT UK MP DWP CPS HSE ADHD ASD PTSD SSRI ECT").split()}
+ACRONYMS["mpsd"] = "MPDS"  # the model's transposition of the Medical Priority Dispatch System
+
+
+def restore_case(title: str, texts: list[str]) -> str:
+    """Titles come back lower-cased ("acct", "hmp woodhill"). Restore each word's casing from how the
+    chain's own source quotes write it mid-sentence, then from a short list of known acronyms."""
+    forms: dict[str, Counter] = defaultdict(Counter)
+    for t in texts:
+        letters = [c for c in t or "" if c.isalpha()]
+        if not letters or sum(c.isupper() for c in letters) / len(letters) > 0.5:
+            continue  # shouted headings say nothing about casing
+        for m in re.finditer(r"[A-Za-z][A-Za-z0-9&']*", t):
+            before = t[: m.start()].rstrip()
+            if before and before[-1] not in ".!?:;\"“(":  # skip sentence starts
+                forms[m.group(0).lower()][m.group(0)] += 1
+
+    out: list[str] = []
+
+    def fix(m: re.Match) -> str:
+        w = m.group(0)
+        prev = out[-1] if out else ""
+        if m.start() == 0 or w != w.lower():
+            res = w
+        elif prev in ("HMP", "HMYOI"):
+            res = w[0].upper() + w[1:]  # the prison's name
+        else:
+            seen = forms.get(w)
+            res = ACRONYMS.get(w, w)
+            if seen:
+                best, n = seen.most_common(1)[0]
+                # Only acronyms are restored from the source ("acct" -> "ACCT"); capitalised ordinary words
+                # in quotes are too often headings or organisation names.
+                if best.isupper() and len(best) > 1 and n > seen.get(w, 0):
+                    res = best
+        out.append(res)
+        return res
+
+    return re.sub(r"[A-Za-z][A-Za-z0-9&']*", fix, title)
 
 
 def hazard_title(label: str | None) -> str:

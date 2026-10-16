@@ -1,7 +1,10 @@
+import { SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
+import AutoForm from "@/components/AutoForm";
 import { ChainRow } from "@/components/cards";
 import SystemicList, { type Systemic } from "@/components/SystemicList";
-import { EmptyState, PageHeader, Pagination, orgTypeLabel } from "@/components/ui";
+import { EmptyState, InfoTip, LinkTabs, PageHeader, Pagination, btnPrimary, btnSecondary, fieldCls, orgTypeLabel } from "@/components/ui";
+import { GLOSSARY } from "@/lib/glossary";
 import { chainFacets, getSystemic, listChains } from "@/lib/queries";
 
 export const metadata = { title: "Recurrence chains · Recurrence Watch" };
@@ -16,60 +19,55 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
     relation: sp.relation === "identical" || sp.relation === "closely_related" ? sp.relation : undefined,
     minConf: sp.conf ? Number(sp.conf) : undefined,
     minReports: sp.min ? Number(sp.min) : undefined,
-    sort: (sp.sort === "oldest" || sp.sort === "largest" ? sp.sort : "recent") as "recent" | "oldest" | "largest",
+    sort: (sp.sort === "oldest" ? "oldest" : "recent") as "recent" | "oldest",
     page: Math.max(1, Number(sp.page) || 1),
   };
   const [data, facets, systemic] = await Promise.all([listChains(f), chainFacets(), getSystemic()]);
   const active = [f.orgType, f.theme, f.relation, sp.conf, sp.min].filter(Boolean).length;
-  const sel = "w-full rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm";
-  const tab = (id: string, label: string, n: number) => (
-    <Link
-      href={id === "same" ? "/chains" : "/chains?view=across"}
-      aria-current={view === id ? "page" : undefined}
-      className={`px-3.5 py-2.5 text-sm font-medium border-b-2 -mb-px hover:no-underline ${
-        view === id ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
-      }`}
-    >
-      {label} <span className="text-muted">({n})</span>
-    </Link>
-  );
+  const label = "block text-sm space-y-1";
   return (
     <div>
       <PageHeader
-        eyebrow="Explore the record"
+        crumbs={[{ href: "/", label: "Start here" }, { label: "Recurrence chains" }]}
         title="Recurrence chains"
-        description="A chain is one hazard raised with one organisation in two or more reports, at least six months apart. Every link is judged identical or closely related, and both quotes are checked word for word."
+        description={
+          <>
+            A chain is one hazard raised with one organisation in two or more reports, at least six months apart. Every link
+            is judged identical or closely related by Nemotron Super, and both quotes are checked word for word.
+          </>
+        }
       />
-      <div className="flex gap-1 border-b border-rule mb-6">
-        {tab("same", "Same organisation", data.total)}
-        {tab("across", "Across organisations", systemic.length)}
-      </div>
+      <LinkTabs
+        tabs={[
+          { href: "/chains", label: "Same organisation", count: data.total, active: view === "same" },
+          { href: "/chains?view=across", label: "Across organisations", count: systemic.length, active: view === "across" },
+        ]}
+      />
 
       {view === "across" ? (
         <SystemicList items={systemic as Systemic[]} />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-          <form method="get" className="card p-4 space-y-3 h-fit lg:sticky lg:top-24">
-            <label className="block text-sm space-y-1">
+        <div className="grid gap-6 lg:grid-cols-[250px_1fr]">
+          <AutoForm className="card p-4 space-y-3 h-fit lg:sticky lg:top-24">
+            <label className={label}>
               <span className="text-muted">Search</span>
-              <input name="q" defaultValue={f.q} placeholder="e.g. smart motorway" className={sel} />
+              <input name="q" defaultValue={f.q} placeholder="e.g. smart motorway" className={fieldCls} />
             </label>
-            <label className="block text-sm space-y-1">
+            <label className={label}>
               <span className="text-muted">Order</span>
-              <select name="sort" defaultValue={f.sort} className={sel}>
+              <select name="sort" defaultValue={f.sort} className={fieldCls}>
                 <option value="recent">Most recent report first</option>
                 <option value="oldest">Earliest warning first</option>
-                <option value="largest">Most reports first</option>
               </select>
             </label>
             <details open={active > 0} className="group">
-              <summary className="cursor-pointer text-sm text-accent list-none [&::-webkit-details-marker]:hidden">
-                More filters{active > 0 ? ` (${active} on)` : ""} <span aria-hidden className="inline-block group-open:rotate-180">▾</span>
+              <summary className="flex cursor-pointer items-center gap-1.5 text-sm text-accent list-none [&::-webkit-details-marker]:hidden">
+                <SlidersHorizontal size={14} aria-hidden /> More filters{active > 0 ? ` (${active} on)` : ""}
               </summary>
               <div className="space-y-3 pt-3">
-                <label className="block text-sm space-y-1">
+                <label className={label}>
                   <span className="text-muted">Organisation type</span>
-                  <select name="type" defaultValue={f.orgType ?? ""} className={sel}>
+                  <select name="type" defaultValue={f.orgType ?? ""} className={fieldCls}>
                     <option value="">All</option>
                     {facets.types.map((t) => (
                       <option key={t.org_type} value={t.org_type}>
@@ -78,9 +76,9 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
                     ))}
                   </select>
                 </label>
-                <label className="block text-sm space-y-1">
+                <label className={label}>
                   <span className="text-muted">Theme</span>
-                  <select name="theme" defaultValue={f.theme ?? ""} className={sel}>
+                  <select name="theme" defaultValue={f.theme ?? ""} className={fieldCls}>
                     <option value="">All</option>
                     {facets.themes.map((t) => (
                       <option key={t.theme} value={t.theme}>
@@ -89,45 +87,49 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
                     ))}
                   </select>
                 </label>
-                <label className="block text-sm space-y-1">
-                  <span className="text-muted">Relation</span>
-                  <select name="relation" defaultValue={f.relation ?? ""} className={sel}>
+                <div className={label}>
+                  <span className="flex items-center gap-1.5 text-muted">
+                    Relation <InfoTip text={`${GLOSSARY.identical} ${GLOSSARY.closely_related}`} />
+                  </span>
+                  <select name="relation" defaultValue={f.relation ?? ""} className={fieldCls} aria-label="Relation">
                     <option value="">Identical or closely related</option>
                     <option value="identical">Identical only</option>
                     <option value="closely_related">Closely related only</option>
                   </select>
-                </label>
-                <label className="block text-sm space-y-1">
+                </div>
+                <label className={label}>
                   <span className="text-muted">At least</span>
-                  <select name="min" defaultValue={sp.min ?? ""} className={sel}>
+                  <select name="min" defaultValue={sp.min ?? ""} className={fieldCls}>
                     <option value="">2 reports</option>
                     <option value="3">3 reports</option>
                     <option value="5">5 reports</option>
                     <option value="10">10 reports</option>
                   </select>
                 </label>
-                <label className="block text-sm space-y-1">
-                  <span className="text-muted">Minimum confidence</span>
-                  <select name="conf" defaultValue={sp.conf ?? ""} className={sel}>
+                <div className={label}>
+                  <span className="flex items-center gap-1.5 text-muted">
+                    Minimum confidence <InfoTip text={GLOSSARY.confidence} />
+                  </span>
+                  <select name="conf" defaultValue={sp.conf ?? ""} className={fieldCls} aria-label="Minimum confidence">
                     <option value="">0.70 (all shown)</option>
                     <option value="0.8">0.80</option>
                     <option value="0.9">0.90</option>
                   </select>
-                </label>
+                </div>
               </div>
             </details>
             <div className="flex gap-2 pt-1">
-              <button className="rounded-md bg-accent text-accent-ink px-3.5 py-1.5 text-sm font-medium">Apply</button>
-              <Link href="/chains" className="rounded-md border border-rule px-3.5 py-1.5 text-sm hover:no-underline">
+              <button className={btnPrimary}>Apply</button>
+              <Link href="/chains" className={btnSecondary}>
                 Reset
               </Link>
             </div>
-          </form>
+          </AutoForm>
 
           <div className="min-w-0">
-            <p className="text-sm text-muted mb-1">
-              {data.total.toLocaleString("en-GB")} chains{f.q ? ` matching "${f.q}"` : ""}. There is no ranking of
-              organisations: lists are ordered by date or size only.
+            <p className="text-sm text-muted mb-2 num">
+              {data.total.toLocaleString("en-GB")} chains{f.q ? ` matching "${f.q}"` : ""}, ordered by date. There is no
+              ranking of organisations.
             </p>
             {data.rows.length === 0 ? (
               <EmptyState title="No chains match these filters">Try removing a filter or a broader search.</EmptyState>

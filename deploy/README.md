@@ -61,6 +61,7 @@ Fill in:
 
 - POSTGRES_PASSWORD and WEB_DB_PASSWORD: two long random strings of letters and digits. Generate one with `openssl rand -hex 24`.
 - SITE_ADDRESS: your domain, or the server's IP written with dashes plus .sslip.io (for example 203-0-113-5.sslip.io). Caddy gets an HTTPS certificate for either. Use :80 for plain HTTP while testing.
+- SITE_URL: the same address with https:// in front. Share previews of chain pages use it.
 - NEBIUS_LIVE_API_KEY: a Token Factory key made only for the hosted live brief. Without it the site works and the brief shows a paused notice.
 - NEBIUS_API_KEY, TAVILY_API_KEY and SCRAPER_CONTACT_EMAIL: used by the worker's scheduled refresh.
 - CORRECTIONS_EMAIL and REPO_URL: shown on the methodology page.

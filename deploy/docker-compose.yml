@@ -37,6 +37,7 @@ services:
       LIVE_BRIEF_PAUSED: ${LIVE_BRIEF_PAUSED:-}
       CORRECTIONS_EMAIL: ${CORRECTIONS_EMAIL:-}
       REPO_URL: ${REPO_URL:-}
+      SITE_URL: ${SITE_URL:-}
 
   worker:
     build:

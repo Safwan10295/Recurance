@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChainRow } from "@/components/cards";
-import { EmptyState, PageHeader, Pagination, Quote, StatTile, formatDate, orgTypeLabel } from "@/components/ui";
+import { EmptyState, PageHeader, Pagination, Quote, StatTile, formatDate, orgTypeLabel, LinkTabs, btnPrimary } from "@/components/ui";
 import { getOrg, getOrgChains, getOrgReports } from "@/lib/queries";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -25,30 +25,29 @@ export default async function OrgPage({
   const view = sp.view === "reports" ? "reports" : "chains";
   const page = Math.max(1, Number(sp.page) || 1);
   const [chains, reports] = await Promise.all([getOrgChains(org.id), getOrgReports(org.id, view === "reports" ? page : 1)]);
-  const tab = (v: string, label: string) => (
-    <Link
-      href={`/organisations/${org.id}${v === "chains" ? "" : `?view=${v}`}`}
-      aria-current={view === v ? "page" : undefined}
-      className={`px-3.5 py-2.5 text-sm font-medium border-b-2 -mb-px hover:no-underline ${
-        view === v ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
-      }`}
-    >
-      {label}
-    </Link>
-  );
   return (
     <div>
-      <PageHeader eyebrow={<><Link href="/organisations">Organisations</Link> · {orgTypeLabel(org.type)}</>} title={org.name} />
+      <PageHeader
+        crumbs={[{ href: "/", label: "Start here" }, { href: "/organisations", label: "Organisations" }, { label: orgTypeLabel(org.type) }]}
+        title={org.name}
+        actions={
+          <Link href={`/brief?org=${org.id}`} className={btnPrimary}>
+            Check a new report to {org.name.length > 28 ? "this organisation" : org.name}
+          </Link>
+        }
+      />
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-4 mb-8">
         <StatTile value={org.n_reports} label="reports received" />
         <StatTile value={reports.with_response} label="with a published response found" />
         <StatTile value={org.n_chains} label="recurrence chains" />
         <StatTile value={chains.reduce((n, c) => n + c.n_reports, 0)} label="reports in those chains" />
       </div>
-      <div className="flex gap-1 border-b border-rule mb-6">
-        {tab("chains", `Recurrence chains (${chains.length})`)}
-        {tab("reports", `Reports and responses (${reports.total})`)}
-      </div>
+      <LinkTabs
+        tabs={[
+          { href: `/organisations/${org.id}`, label: "Recurrence chains", count: chains.length, active: view === "chains" },
+          { href: `/organisations/${org.id}?view=reports`, label: "Reports and responses", count: reports.total, active: view === "reports" },
+        ]}
+      />
 
       {view === "chains" ? (
         chains.length === 0 ? (

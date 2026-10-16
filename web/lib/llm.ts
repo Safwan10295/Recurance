@@ -25,7 +25,7 @@ export class LiveUnavailable extends Error {}
 // Shape of the OpenAI-compatible responses we read.
 interface ApiResponse {
   choices?: { message?: { content?: string }; finish_reason?: string | null }[];
-  usage?: { prompt_tokens?: number; completion_tokens?: number };
+  usage?: { prompt_tokens?: number; completion_tokens?: number; completion_tokens_details?: { reasoning_tokens?: number } };
   data?: { index: number; embedding: number[] }[];
 }
 
@@ -35,6 +35,12 @@ export interface ChatResult {
   cost: number;
   cacheHit: boolean;
   finishReason: string | null;
+  // For the live agent trace: what the call used.
+  model: string;
+  tokensIn: number;
+  tokensOut: number;
+  reasoningTokens: number;
+  ms: number;
 }
 
 function estimateTokens(s: string) {
@@ -132,10 +138,11 @@ export async function chat(opts: {
   if (opts.responseFormat) body.response_format = opts.responseFormat;
   const hash = await sha256(stableStringify(body));
   const store = getStore();
+  const t0 = Date.now();
   const cached = await store.get<ApiResponse>(`llm:${hash}`);
   if (cached) {
     await ledger({ stage: opts.stage, model: m.id, cost: 0, cache_hit: true, hash });
-    return toResult(m, cached, true);
+    return toResult(m, cached, true, Date.now() - t0);
   }
   const worst = estimateTokens(JSON.stringify(opts.messages)) * m.inPrice + opts.maxTokens * m.outPrice;
   await reserve(worst);
@@ -152,7 +159,7 @@ export async function chat(opts: {
     await ledger({ stage: opts.stage, model: m.id, cost: 0, cache_hit: false, hash, success: false, error: `HTTP ${res.status}` });
     throw new Error(`Token Factory HTTP ${res.status}`);
   }
-  const out = toResult(m, res.data, false);
+  const out = toResult(m, res.data, false, Date.now() - t0);
   await settle(worst, out.cost);
   await ledger({ stage: opts.stage, model: m.id, cost: out.cost, cache_hit: false, hash, success: true,
     in: res.data?.usage?.prompt_tokens, out: res.data?.usage?.completion_tokens });
@@ -160,12 +167,23 @@ export async function chat(opts: {
   return out;
 }
 
-function toResult(m: { inPrice: number; outPrice: number }, data: ApiResponse, cacheHit: boolean): ChatResult {
+function toResult(m: { id: string; inPrice: number; outPrice: number }, data: ApiResponse, cacheHit: boolean, ms: number): ChatResult {
   const choice = data?.choices?.[0] ?? {};
   const content: string = choice?.message?.content ?? "";
   const u = data?.usage ?? {};
   const cost = cacheHit ? 0 : (u.prompt_tokens ?? 0) * m.inPrice + (u.completion_tokens ?? 0) * m.outPrice;
-  return { content, parsed: parseJson(content), cost, cacheHit, finishReason: choice?.finish_reason ?? null };
+  return {
+    content,
+    parsed: parseJson(content),
+    cost,
+    cacheHit,
+    finishReason: choice?.finish_reason ?? null,
+    model: m.id,
+    tokensIn: u.prompt_tokens ?? 0,
+    tokensOut: u.completion_tokens ?? 0,
+    reasoningTokens: u.completion_tokens_details?.reasoning_tokens ?? 0,
+    ms,
+  };
 }
 
 export async function embed(stage: string, texts: string[], dimensions = 256): Promise<number[][]> {

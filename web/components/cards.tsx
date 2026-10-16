@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ChainSummary } from "@/lib/types";
 import type { RecentEntry } from "@/lib/queries";
-import { Badge, ConfidenceTag, QuotePair, Quote, RelationTag, formatDate, orgTypeLabel, year } from "./ui";
+import { Badge, ConfidenceTag, QuotePair, Quote, RelationTag, formatDate, orgTypeLabel, year, shortTitle } from "./ui";
 
 export function ChainCard({ c }: { c: ChainSummary }) {
   return (
@@ -61,7 +61,7 @@ export function RecentCard({ it, open = false }: { it: RecentEntry; open?: boole
             <Link href={`/organisations/${it.org.id}`}>{it.org.name}</Link>
           </p>
           <Link href={`/reports/${it.later.slug}`} className="font-serif text-lg text-ink">
-            {it.later.title}
+            {shortTitle(it.later.title)}
           </Link>
           <p className="text-sm text-ink-2">
             {formatDate(it.later.date)} · Coroner {it.later.coroner ?? "not stated"}

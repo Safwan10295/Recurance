@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { EmptyState, PageHeader, Pagination, orgTypeLabel } from "@/components/ui";
+import AutoForm from "@/components/AutoForm";
+import { EmptyState, PageHeader, Pagination, btnPrimary, fieldCls, orgTypeLabel } from "@/components/ui";
 import { listOrgs } from "@/lib/queries";
 
 export const metadata = { title: "Organisations · Recurrence Watch" };
@@ -13,18 +14,18 @@ export default async function OrgsPage({ searchParams }: { searchParams: Promise
   const withChains = sp.chains === "1";
   const page = Math.max(1, Number(sp.page) || 1);
   const data = await listOrgs({ q: qv, type, withChains, page });
-  const sel = "rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm";
+  const sel = `${fieldCls} w-auto`;
   return (
     <div>
       <PageHeader
-        eyebrow="Explore the record"
+        crumbs={[{ href: "/", label: "Start here" }, { label: "Organisations" }]}
         title="Organisations"
         description="Every organisation that received a report. Each profile shows its reports, its published responses and stated actions, and any recurrence chains. There is no ranking: more reports often reflects size and range of services, not performance."
       />
-      <form method="get" className="flex flex-wrap items-end gap-3 mb-5">
+      <AutoForm className="flex flex-wrap items-end gap-3 mb-5">
         <label className="text-sm space-y-1">
           <span className="block text-muted">Name</span>
-          <input name="q" defaultValue={qv} placeholder="e.g. National Highways" className={`${sel} w-64`} />
+          <input name="q" defaultValue={qv} placeholder="e.g. National Highways" className={`${fieldCls} w-64 max-w-full`} />
         </label>
         <label className="text-sm space-y-1">
           <span className="block text-muted">Type</span>
@@ -40,15 +41,15 @@ export default async function OrgsPage({ searchParams }: { searchParams: Promise
         <label className="flex items-center gap-2 text-sm pb-1.5">
           <input type="checkbox" name="chains" value="1" defaultChecked={withChains} /> Only with chains
         </label>
-        <button className="rounded-md bg-accent text-accent-ink px-3.5 py-1.5 text-sm font-medium">Apply</button>
-      </form>
+        <button className={btnPrimary}>Apply</button>
+      </AutoForm>
       {data.rows.length === 0 ? (
         <EmptyState title="No organisations match" />
       ) : (
         <div className="card overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm num">
             <thead>
-              <tr className="text-left border-b border-rule">
+              <tr className="text-left border-b border-rule text-muted">
                 <th className="p-3">Organisation</th>
                 <th className="p-3">Type</th>
                 <th className="p-3 text-right">Reports</th>

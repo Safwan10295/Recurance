@@ -62,6 +62,10 @@ export interface Link {
   later_quote: string;
   promise_quote: string | null;
   after_promise: number | null;
+  promise_timescale?: string | null;
+  promise_pdf?: string | null;
+  e_cid?: number;
+  l_cid?: number;
   scores: { tfidf: number; embedding: number; hybrid: number };
   days_apart: number;
   same_coroner: boolean;

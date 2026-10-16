@@ -107,6 +107,11 @@ def test_publish_only_display_safe_rows(mini_db, tmp_path, monkeypatch, pg_schem
         hits = c.execute("SELECT COUNT(*) FROM pub_chains WHERE search @@ websearch_to_tsquery('english', 'motorway')").fetchone()[0]
         assert hits == 1
         first_seen = c.execute("SELECT first_seen FROM pub_reports ORDER BY url LIMIT 1").fetchone()[0]
+        # Hazard map: one point per verified concern, and the shown link drawn between two of them.
+        assert c.execute("SELECT COUNT(*) FROM pub_hazard_points").fetchone()[0] == 3
+        assert c.execute("SELECT COUNT(*) FROM pub_hazard_links").fetchone()[0] >= 1
+        pipeline = c.execute("SELECT value FROM pub_meta WHERE key = 'pipeline'").fetchone()[0]
+        assert pipeline["funnel"]["reports"] == 3 and pipeline["funnel"]["links"] >= 1
 
     publish(pg_schema)  # a second publish keeps first_seen
     with psycopg.connect(pg_schema) as c:

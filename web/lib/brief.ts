@@ -5,6 +5,7 @@ import {
   htmlToText,
   normForMatch,
   orgKey,
+  redactNames,
   splitSections,
   stripBoilerplate,
   tokenSetSimilarity,
@@ -17,7 +18,30 @@ import {
 // -> nearest earlier concerns for that organisation (pgvector) -> judge the closest with Super
 // -> brief with verified quotes, promises and links to chains.
 
-export type Step = { id: string; label: string; status: "running" | "done" | "skipped"; detail?: string };
+// One line in a step's trace: a concern found, a candidate retrieved, a verdict.
+export type TraceItem = {
+  label: string;
+  sub?: string;
+  score?: number; // similarity 0..1 for retrieved candidates
+  verdict?: "kept" | "dropped" | "sent" | "info";
+  note?: string;
+};
+
+// A step of the agent, streamed as it happens. The trace fields show what each tool or model used.
+export type Step = {
+  id: string;
+  label: string;
+  status: "pending" | "running" | "done" | "skipped";
+  detail?: string;
+  tool?: string;
+  ms?: number;
+  tokensIn?: number;
+  tokensOut?: number;
+  reasoningTokens?: number;
+  cost?: number;
+  cached?: boolean;
+  items?: TraceItem[];
+};
 export type Emit = (s: Step) => void;
 
 const DIM = 256;
@@ -158,11 +182,36 @@ interface Candidate {
   d: number;
 }
 
+const LABELS: Record<string, string> = {
+  fetch: "Read the report",
+  org: "Identify the organisation",
+  extract: "Extract the concerns",
+  retrieve: "Search earlier warnings",
+  judge: "Judge each match",
+  brief: "Write the brief",
+};
+const TOOLS: Record<string, string> = {
+  fetch: "Archive or judiciary.uk",
+  org: "Organisation index",
+  extract: "Nemotron Nano",
+  retrieve: "Qwen3 embeddings + pgvector",
+  judge: "Nemotron Super (reasoning)",
+  brief: "Quote checks",
+};
+const short = (t: string, n = 140) => (t.length > n ? t.slice(0, n - 1).trimEnd() + "…" : t);
+const stripTitle = (t: string) => t.replace(/\s*[:\-–]\s*Prevention of future deaths? report\s*$/i, "");
+
 export async function runBrief(
   input: { reportUrl?: string; reportSlug?: string; concerns?: string; organisation?: string; orgId?: number },
   emit: Emit,
 ): Promise<BriefResult> {
   const result: BriefResult = { organisation: null, report: null, concerns: [], matches: [], other_earlier: [], searched: 0, cost: 0, notes: [] };
+  const started: Record<string, number> = {};
+  const step = (id: string, status: Step["status"], extra: Partial<Step> = {}) => {
+    if (status === "running" && !started[id]) started[id] = Date.now();
+    const ms = status === "done" && started[id] ? Date.now() - started[id] : undefined;
+    emit({ id, label: LABELS[id], tool: TOOLS[id], status, ...(ms !== undefined ? { ms } : {}), ...extra });
+  };
 
   // 1. The report: from the archive if we have it, otherwise read judiciary.uk.
   let concernsText = (input.concerns ?? "").trim();
@@ -174,8 +223,11 @@ export async function runBrief(
     const r = await q1<{ url: string }>("SELECT url FROM pub_reports WHERE slug = $1", [input.reportSlug]);
     if (r) url = r.url;
   }
+  // Show the whole plan first, so the steps light up as the agent works through them.
+  for (const id of [...(url ? ["fetch"] : []), "org", "extract", "retrieve", "judge", "brief"]) step(id, "pending");
+
   if (url) {
-    emit({ id: "fetch", label: "Finding the report", status: "running" });
+    step("fetch", "running");
     const known = await q1<{ url: string; slug: string; title: string; date: string; concerns: { quote: string }[] }>(
       "SELECT url, slug, title, date, concerns FROM pub_reports WHERE url = $1", [url]);
     if (known) {
@@ -185,11 +237,11 @@ export async function runBrief(
         `SELECT ro.org_id FROM pub_report_orgs ro JOIN pub_orgs o ON o.id = ro.org_id WHERE ro.report_url = $1
          ORDER BY o.n_chains DESC, o.n_reports DESC`, [url])).map((r) => r.org_id);
       if (!concernsText) concernsText = known.concerns.map((c) => c.quote).join("\n");
-      emit({ id: "fetch", label: "Finding the report", status: "done", detail: `${known.title} (already in the archive)` });
+      step("fetch", "done", { detail: `${stripTitle(known.title)}, already in the archive` });
     } else {
       const rep = await fetchReport(url);
       if (!rep) {
-        emit({ id: "fetch", label: "Finding the report", status: "done", detail: "Could not read that page" });
+        step("fetch", "done", { detail: "Could not read that page" });
         result.notes.push("That address could not be read as a Prevention of Future Deaths report page on judiciary.uk.");
         return result;
       }
@@ -197,7 +249,7 @@ export async function runBrief(
       reportDate = rep.date;
       if (!concernsText) concernsText = rep.concerns;
       if (!orgName && rep.sentTo) orgName = rep.sentTo.split(/;|\|/)[0];
-      emit({ id: "fetch", label: "Finding the report", status: "done", detail: `${rep.title} (read from judiciary.uk)` });
+      step("fetch", "done", { detail: `${stripTitle(rep.title)}, read from judiciary.uk` });
       if (!concernsText) {
         result.notes.push("This report's text is only in a PDF. Paste its concerns section instead.");
         return result;
@@ -206,14 +258,14 @@ export async function runBrief(
   }
 
   // 2. The organisation.
-  emit({ id: "org", label: "Resolving the organisation", status: "running" });
+  step("org", "running");
   let org: { id: number; name: string } | null = null;
   const idx = await orgIndex();
   if (input.orgId && idx.names.has(input.orgId)) org = { id: input.orgId, name: idx.names.get(input.orgId)! };
   else if (orgName) org = await resolveOrg(orgName);
   else if (knownOrgIds.length) org = { id: knownOrgIds[0], name: idx.names.get(knownOrgIds[0]) ?? "" };
   result.organisation = org;
-  emit({ id: "org", label: "Resolving the organisation", status: "done", detail: org ? org.name : `No match for "${orgName}"` });
+  step("org", "done", { detail: org ? org.name : `No match for "${orgName}"` });
   if (!org) {
     result.notes.push(orgName ? "That organisation was not found among those that have received reports." : "Please name the organisation the concerns are addressed to.");
     return result;
@@ -225,15 +277,23 @@ export async function runBrief(
   concernsText = concernsText.slice(0, 7000);
 
   // 3. Concerns: reuse the pipeline's extraction for an archived report, otherwise Nano.
-  emit({ id: "extract", label: "Extracting concerns (Nemotron Nano)", status: "running" });
+  step("extract", "running");
   let newConcerns: { quote: string; hazard: string; vec?: Float32Array }[] = [];
   if (url && result.report?.known) {
     const rows = await q<{ quote: string; hazard: string; e: string }>(
       "SELECT DISTINCT ON (id) quote, hazard, embedding::text AS e FROM pub_brief_concerns WHERE report_url = $1", [url]);
     newConcerns = rows.map((r) => ({ quote: r.quote, hazard: r.hazard, vec: parseVec(r.e) }));
   }
+  // Quotes from a report read fresh from judiciary.uk are redacted before they are shown in the trace.
+  const titles = result.report?.title ? [result.report.title] : [];
+  const concernItems = (): TraceItem[] =>
+    newConcerns.map((c) => ({ label: c.hazard, sub: short(result.report?.known ? c.quote : redactNames(c.quote, titles)), verdict: "info" }));
   if (newConcerns.length) {
-    emit({ id: "extract", label: "Extracting concerns (Nemotron Nano)", status: "done", detail: `${newConcerns.length} concerns already analysed` });
+    step("extract", "done", {
+      detail: `${newConcerns.length} ${newConcerns.length === 1 ? "concern" : "concerns"}, extracted by Nano when the archive was built`,
+      cached: true,
+      items: concernItems(),
+    });
   } else {
     const r = await chat({
       stage: "brief-extract",
@@ -252,14 +312,23 @@ export async function runBrief(
     });
     result.cost += r.cost;
     const parsed = (r.parsed as { concerns?: { quote: string; hazard: string }[] }) ?? {};
-    newConcerns = (parsed.concerns ?? []).filter((c) => verifyQuote(c.quote, concernsText)).slice(0, 6);
+    const all = parsed.concerns ?? [];
+    newConcerns = all.filter((c) => verifyQuote(c.quote, concernsText)).slice(0, 6);
+    const dropped = all.length - newConcerns.length;
     if (!newConcerns.length) newConcerns = [{ quote: concernsText.slice(0, 400), hazard: "concerns as written" }];
-    emit({ id: "extract", label: "Extracting concerns (Nemotron Nano)", status: "done", detail: `${newConcerns.length} concerns found` });
+    step("extract", "done", {
+      detail: `${newConcerns.length} ${newConcerns.length === 1 ? "concern" : "concerns"}, each quote checked word for word${dropped > 0 ? ` (${dropped} dropped: not found in the text)` : ""}`,
+      tokensIn: r.tokensIn,
+      tokensOut: r.tokensOut,
+      cost: r.cost,
+      cached: r.cacheHit,
+      items: concernItems(),
+    });
   }
   result.concerns = newConcerns.map(({ quote, hazard }) => ({ quote, hazard }));
 
   // 4. Nearest earlier concerns for this organisation (pgvector).
-  emit({ id: "retrieve", label: "Searching this organisation's earlier warnings", status: "running" });
+  step("retrieve", "running");
   const missing = newConcerns.filter((c) => !c.vec);
   if (missing.length) {
     const vecs = await embed("brief-embed", missing.map((c) => `${c.hazard}. ${c.quote}`), DIM);
@@ -280,14 +349,22 @@ export async function runBrief(
     }
   }
   const top = [...best.values()].sort((a, b) => a.d - b.d).slice(0, 6);
-  emit({ id: "retrieve", label: "Searching this organisation's earlier warnings", status: "done",
-    detail: `${result.searched} earlier concerns searched; the ${Math.min(3, top.length)} closest sent to the judge` });
 
   // Report details, promises and chains for the candidates.
   const urls = top.map((t) => t.report_url);
   const meta = new Map(
     (await q<{ url: string; slug: string; title: string; date: string; coroner: string | null; area: string | null }>(
       "SELECT url, slug, title, date, coroner, area FROM pub_reports WHERE url = ANY($1)", [urls])).map((r) => [r.url, r]));
+  const titleOf = (u: string) => stripTitle(meta.get(u)?.title ?? u);
+  step("retrieve", "done", {
+    detail: `${result.searched.toLocaleString("en-GB")} earlier concerns to ${org.name} searched by meaning; the ${Math.min(3, top.length)} closest go to the judge`,
+    items: top.map((t, i): TraceItem => ({
+      label: titleOf(t.report_url),
+      sub: `${t.date} · ${t.hazard}`,
+      score: Math.max(0, Math.min(1, 1 - t.d)),
+      verdict: i < 3 ? "sent" : "info",
+    })),
+  });
   const promises = new Map<string, BriefMatch["promises"]>();
   for (const r of await q<{ report_url: string; promises: { id: number; quote: string; timescale: string | null }[] }>(
     "SELECT report_url, promises FROM pub_responses WHERE report_url = ANY($1) AND org_id = $2 AND NOT unmatched", [urls, org.id])) {
@@ -300,11 +377,15 @@ export async function runBrief(
     chainsOf.set(r.report_url, [...(chainsOf.get(r.report_url) ?? []), { key: r.key, hazard: r.hazard }]);
   }
 
-  // 5. Judge the closest three with Super.
-  emit({ id: "judge", label: "Judging the closest matches (Nemotron Super)", status: "running" });
+  // 5. Judge the closest three with Super. Each verdict is streamed as it arrives.
+  step("judge", "running");
   const newText = newConcerns.map((c) => c.quote).join("\n") + "\n" + concernsText;
+  const judgeItems: TraceItem[] = [];
+  const usage = { tokensIn: 0, tokensOut: 0, reasoningTokens: 0, cost: 0, cached: true };
+  type Verdict = { relation: string; same_hazard_explanation: string; earlier_quote: string; later_quote: string; confidence: number };
+  const toJudge = top.slice(0, 3);
   const judged = await Promise.all(
-    top.slice(0, 3).map(async (s) => {
+    toJudge.map(async (s) => {
       const r = await chat({
         stage: "brief-judge",
         model: "super",
@@ -318,26 +399,40 @@ export async function runBrief(
         ],
       });
       result.cost += r.cost;
-      return { s, v: r.parsed as { relation: string; same_hazard_explanation: string; earlier_quote: string; later_quote: string; confidence: number } | null };
+      usage.tokensIn += r.tokensIn;
+      usage.tokensOut += r.tokensOut;
+      usage.reasoningTokens += r.reasoningTokens;
+      usage.cost += r.cost;
+      usage.cached = usage.cached && r.cacheHit;
+      const v = r.parsed as Verdict | null;
+      const rel = v?.relation ? v.relation.replace("_", " ") : "no verdict";
+      let why: string;
+      let ok = false;
+      if (!v) why = "No usable verdict";
+      else if (v.relation !== "identical" && v.relation !== "closely_related") why = `Judged ${rel}: not the same hazard`;
+      else if (v.confidence < 0.7) why = `Confidence ${v.confidence.toFixed(2)} is below 0.70`;
+      else if (!verifyQuote(v.earlier_quote, s.quote)) why = "Earlier quote not found word for word";
+      else if (!verifyQuote(v.later_quote, newText)) why = "New quote not found word for word";
+      else {
+        ok = true;
+        why = `Judged ${rel}, confidence ${v.confidence.toFixed(2)}, both quotes verified`;
+      }
+      judgeItems.push({ label: titleOf(s.report_url), sub: `${s.date} · ${s.hazard}`, verdict: ok ? "kept" : "dropped", note: why, score: Math.max(0, 1 - s.d) });
+      step("judge", "running", { items: [...judgeItems], detail: `${judgeItems.length} of ${toJudge.length} verdicts in` });
+      return { s, v, ok };
     }),
   );
-  for (const { s, v } of judged) {
+  for (const { s, v, ok } of judged) {
     const m = meta.get(s.report_url);
     if (!m) continue;
-    const ok =
-      v &&
-      (v.relation === "identical" || v.relation === "closely_related") &&
-      v.confidence >= 0.7 &&
-      verifyQuote(v.earlier_quote, s.quote) &&
-      verifyQuote(v.later_quote, newText);
-    if (ok) {
+    if (ok && v) {
       result.matches.push({
         earlier: m,
-        relation: v!.relation,
-        confidence: Math.round(Math.min(1, Math.max(0, v!.confidence)) * 100) / 100,
-        explanation: wordingClean(v!.same_hazard_explanation) ? v!.same_hazard_explanation : null,
-        earlier_quote: normForMatch(v!.earlier_quote),
-        later_quote: normForMatch(v!.later_quote),
+        relation: v.relation,
+        confidence: Math.round(Math.min(1, Math.max(0, v.confidence)) * 100) / 100,
+        explanation: wordingClean(v.same_hazard_explanation) ? v.same_hazard_explanation : null,
+        earlier_quote: normForMatch(v.earlier_quote),
+        later_quote: normForMatch(v.later_quote),
         promises: promises.get(s.report_url) ?? [],
         chains: chainsOf.get(s.report_url) ?? [],
       });
@@ -349,8 +444,18 @@ export async function runBrief(
     const m = meta.get(s.report_url);
     if (m) result.other_earlier.push({ url: m.url, slug: m.slug, title: m.title, date: m.date, hazard: s.hazard });
   }
-  emit({ id: "judge", label: "Judging the closest matches (Nemotron Super)", status: "done",
-    detail: `${result.matches.length} judged the same or a closely related hazard` });
-  emit({ id: "brief", label: "Assembling the brief", status: "done" });
+  step("judge", "done", {
+    detail: `${result.matches.length} of ${judged.length} judged the same or a closely related hazard`,
+    items: judgeItems,
+    tokensIn: usage.tokensIn,
+    tokensOut: usage.tokensOut,
+    reasoningTokens: usage.reasoningTokens,
+    cost: usage.cost,
+    cached: judged.length ? usage.cached : undefined,
+  });
+  step("brief", "running");
+  step("brief", "done", {
+    detail: `${result.matches.length} earlier warning${result.matches.length === 1 ? "" : "s"} with verified quotes · cost $${result.cost.toFixed(4)}`,
+  });
   return result;
 }
