@@ -215,6 +215,7 @@ export default function BriefTool({
   return (
     <div className="space-y-6">
       <form
+        data-tour="brief-form"
         className="card p-4 sm:p-5 space-y-4"
         onSubmit={(e) => {
           e.preventDefault();

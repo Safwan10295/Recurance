@@ -106,6 +106,52 @@ def pipeline_summary(conn, stats: dict) -> dict:
     return {"funnel": funnel, "ledger": ledger, "tavily_credits": tavily}
 
 
+def game_pairs(conn, red, shown: dict[tuple[str, str], str], per_relation: int = 16) -> list[dict]:
+    """Pairs for "You be the judge": a fixed, balanced sample of Nemotron Super's verdicts, all four
+    relations, quotes verified and redacted, explanations wording-checked. Short quotes only, so a
+    round reads in seconds."""
+    import random
+
+    from ..wording import is_clean
+
+    rows = conn.execute(
+        """SELECT v.pair_id, v.relation, v.confidence, v.same_hazard_explanation ex, v.earlier_quote eq, v.later_quote lq,
+                  p.days_apart, ce.report_url eu, cl.report_url lu, re.title et, re.report_date ed, re.slug es,
+                  rl.title lt, rl.report_date ld, rl.slug ls, o.canonical_name org
+           FROM recurrence_verdicts v JOIN candidate_pairs p ON p.id = v.pair_id
+           JOIN concerns ce ON ce.id = p.earlier_concern_id JOIN concerns cl ON cl.id = p.later_concern_id
+           JOIN reports re ON re.url = ce.report_url JOIN reports rl ON rl.url = cl.report_url
+           JOIN organisations o ON o.id = p.organisation_id
+           WHERE v.quotes_verified > 0 AND re.duplicate_of IS NULL AND rl.duplicate_of IS NULL
+           ORDER BY v.pair_id"""
+    ).fetchall()
+    rng = random.Random(16)
+    out = []
+    for rel in ("identical", "closely_related", "related", "different"):
+        pool = [r for r in rows if r["relation"] == rel and is_clean(r["ex"])
+                and 40 <= len(r["eq"] or "") <= 260 and 40 <= len(r["lq"] or "") <= 260
+                and (rel not in ("identical", "closely_related") or (r["eu"], r["lu"]) in shown)]
+        rng.shuffle(pool)
+        seen_orgs: set[str] = set()
+        picked = []
+        for r in pool:  # variety: one pair per organisation while possible
+            if r["org"] in seen_orgs and len(seen_orgs) < len({x["org"] for x in pool}):
+                continue
+            seen_orgs.add(r["org"])
+            picked.append(r)
+            if len(picked) == per_relation:
+                break
+        for r in picked:
+            out.append({
+                "id": r["pair_id"], "org": r["org"], "relation": r["relation"], "confidence": round(r["confidence"], 2),
+                "explanation": red(r["ex"], r["eu"], r["lu"]), "days_apart": r["days_apart"],
+                "earlier": {"title": r["et"], "date": r["ed"], "slug": r["es"], "url": r["eu"], "quote": red(r["eq"], r["eu"])},
+                "later": {"title": r["lt"], "date": r["ld"], "slug": r["ls"], "url": r["lu"], "quote": red(r["lq"], r["lu"])},
+                "chain": shown.get((r["eu"], r["lu"])),
+            })
+    return out
+
+
 def build_rows(tmp: Path) -> dict:
     """Run the export into tmp and assemble every row to publish."""
     web.WEB_DATA = tmp
@@ -217,6 +263,7 @@ def build_rows(tmp: Path) -> dict:
         "last_refresh": last_refresh,
         "brief_dim": web.BRIEF_DIM,
         "pipeline": pipeline_summary(conn, stats),
+        "game": game_pairs(conn, red, {(l["earlier"], l["later"]): c["key"] for c in chains for l in details[c["key"]]["links"]}),
         "themes": hazard_map.theme_names(),
     }
     rows["pub_meta"] = [(k, json.dumps(v, ensure_ascii=False)) for k, v in meta.items()]

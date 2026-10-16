@@ -86,7 +86,7 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
         <StatTile value={`${year(chain.first_date)}–${year(chain.last_date)}`} label="years" />
         <StatTile value={chain.confidence.toFixed(2)} label="lowest link confidence" />
       </div>
-      <section className="space-y-4">
+      <section className="space-y-4" data-tour="story">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-serif text-xl">The story, report by report</h2>
           <p className="text-xs text-muted">Spacing grows with the time between reports.</p>

@@ -44,7 +44,7 @@ export default async function EvaluationPage() {
         description="Does the system find recurrences that coroners themselves recognised, and does Nemotron add anything over simple baselines?"
       />
 
-      <Section title="Finding recurrences the coroners flagged">
+      <Section title="Finding recurrences the coroners flagged" tour="eval-chart">
         <div className="card p-5 space-y-5">
           <p className="text-ink-2 text-sm max-w-3xl">
             Test set: {ev.acknowledged.in_scope_6m} pairs where a later report itself names an earlier report to the same

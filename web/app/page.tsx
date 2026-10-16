@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   Clock3,
+  Compass,
   Cpu,
   FileWarning,
   Gavel,
@@ -12,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { TourButton } from "@/components/shell/Tour";
 import { ChainCard, RecentCard } from "@/components/cards";
 import { InfoTip, Section, StatTile, btnPrimary, btnSecondary, formatDate, pct } from "@/components/ui";
 import { q1 } from "@/lib/db";
@@ -66,6 +68,8 @@ export default async function Home() {
     { href: "/promises", icon: MessageSquareQuote, title: "Promises, then again", body: "Where a response stated an action and a later coroner raised the same concern.", stat: `${c.after_promise.toLocaleString("en-GB")} links` },
     { href: "/map", icon: Map, title: "Hazard map", body: "Every concern placed by meaning, with the recurrences drawn between them.", stat: `${c.points.toLocaleString("en-GB")} concerns` },
     { href: "/nemotron", icon: Cpu, title: "How Nemotron did the work", body: "Nano, Super and Ultra, the tokens they used and what it cost.", stat: `$${s.spend.total.toFixed(2)} in total` },
+    { href: "/judge", icon: Gavel, title: "You be the judge", body: "Two concerns, years apart. Same hazard or not? Compare your call with the model's.", stat: "8 rounds, about two minutes" },
+    { href: "/recent", icon: Clock3, title: "Recent recurrences", body: "New reports from the last year that repeat a warning already given.", stat: `${recent.total} reports` },
   ];
 
   const tour = [
@@ -98,13 +102,13 @@ export default async function Home() {
                 See a recurrence <ArrowRight size={16} aria-hidden />
               </Link>
             )}
-            <a href="#tour" className={`${btnSecondary} px-4 py-2.5`}>
-              60-second tour
-            </a>
+            <TourButton className={`${btnSecondary} px-4 py-2.5`}>
+              <Compass size={16} aria-hidden /> Take the guided tour
+            </TourButton>
           </div>
         </div>
 
-        <div className="card p-5 sm:p-6 shadow-[var(--shadow-lg)]">
+        <div className="card p-5 sm:p-6 shadow-[var(--shadow-lg)]" data-tour="problem">
           <div className="mb-4 flex items-baseline justify-between gap-2">
             <p className="eyebrow">The problem, in a real case</p>
             {lead && (
@@ -147,7 +151,7 @@ export default async function Home() {
       </section>
 
       {/* Headline figures */}
-      <section className="space-y-3">
+      <section className="space-y-3" data-tour="stats">
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatTile value={s.n_chains.toLocaleString("en-GB")} label="recurrence chains, every quote verified" href="/chains" />
           <StatTile value={pct(s.share_diff_coroner)} label="of links where the later report came from a different coroner" href="/evaluation" />
@@ -163,7 +167,7 @@ export default async function Home() {
       {/* Showcase features */}
       <section className="space-y-4">
         <h2 className="font-serif text-2xl">Explore</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => {
             const Icon = f.icon;
             return (

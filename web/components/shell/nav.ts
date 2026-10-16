@@ -4,6 +4,7 @@ import {
   Building2,
   Clock3,
   Cpu,
+  Gavel,
   Home,
   Link2,
   Map,
@@ -20,6 +21,7 @@ export const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { href: "/", label: "Start here", hint: "What this is, in one minute", icon: Home },
       { href: "/brief", label: "Check a report", hint: "Watch the agent find earlier warnings", icon: ScanSearch },
+      { href: "/judge", label: "You be the judge", hint: "Same hazard or not? Try it", icon: Gavel },
       { href: "/recent", label: "Recent recurrences", hint: "New reports that repeat a warning", icon: Clock3 },
     ],
   },

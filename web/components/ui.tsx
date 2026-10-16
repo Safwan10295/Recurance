@@ -19,9 +19,10 @@ export function year(iso: string | null | undefined): string {
   return iso ? iso.slice(0, 4) : "";
 }
 
-// Rounds down, so a share is never overstated (0.996 shows as 99%, not 100%).
+// Ordinary rounding, except a share below 1 never shows as 100% (0.996 shows as 99%).
 export function pct(x: number): string {
-  return `${Math.floor(x * 100 + 1e-9)}%`;
+  const r = Math.round(x * 100);
+  return `${r === 100 && x < 1 ? 99 : r}%`;
 }
 
 export function confidenceWord(c: number): string {
@@ -149,9 +150,9 @@ export function Stat({ value, label }: { value: string; label: string }) {
   return <StatTile value={value} label={label} />;
 }
 
-export function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+export function Section({ title, action, children, tour }: { title: string; action?: React.ReactNode; children: React.ReactNode; tour?: string }) {
   return (
-    <section className="space-y-3">
+    <section className="space-y-3" data-tour={tour}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-serif text-xl">{title}</h2>
         {action && <div className="text-sm">{action}</div>}

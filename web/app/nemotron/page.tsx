@@ -214,7 +214,7 @@ export default async function NemotronPage() {
       </div>
 
       {/* 2. Flow */}
-      <Section title="From archive to evidence">
+      <Section title="From archive to evidence" tour="funnel">
         <Explainer>
           Each step narrows the archive. Small models do the reading, a larger one makes the judgement, and plain code
           checks every quote against the source.

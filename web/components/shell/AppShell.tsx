@@ -1,12 +1,13 @@
 "use client";
 
-import { Menu, ScanSearch, Search, X } from "lucide-react";
+import { Compass, Menu, ScanSearch, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CommandPalette from "./CommandPalette";
 import { NAV } from "./nav";
 import ThemeToggle from "./ThemeToggle";
+import Tour, { startTour } from "./Tour";
 
 function isActive(path: string, href: string) {
   return href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
@@ -145,6 +146,13 @@ export default function AppShell({ children, updated }: { children: React.ReactN
           <Wordmark />
         </Link>
         <NavList path={path} />
+        <button
+          type="button"
+          onClick={startTour}
+          className="mx-3 flex items-center justify-center gap-2 rounded-lg border border-dashed border-accent/50 bg-accent-soft/40 px-3 py-2 text-sm font-medium text-accent hover:bg-accent-soft"
+        >
+          <Compass size={16} aria-hidden /> Take the guided tour
+        </button>
         <div className="mt-auto px-3 pt-2 text-xs text-muted space-y-1.5">
           {updated && (
             <p className="flex items-center gap-1.5">
@@ -169,12 +177,23 @@ export default function AppShell({ children, updated }: { children: React.ReactN
               </button>
             </div>
             <NavList path={path} onNavigate={() => setOpen(false)} />
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                startTour();
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-accent/50 px-3 py-2 text-sm font-medium text-accent"
+            >
+              <Compass size={16} aria-hidden /> Take the guided tour
+            </button>
             {updated && <p className="px-3 text-xs text-muted">Data updated {updated}</p>}
           </div>
         </div>
       )}
 
       <CommandPalette open={palette} onClose={closePalette} />
+      <Tour />
 
       <div className="min-w-0 flex flex-col">
         <header className="sticky top-0 z-30 border-b border-rule bg-paper/85 backdrop-blur supports-[backdrop-filter]:bg-paper/70">

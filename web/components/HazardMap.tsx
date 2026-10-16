@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Minus, Plus, RotateCcw, Search, X } from "lucide-react";
+import { Minus, Pause, Play, Plus, RotateCcw, Search, X } from "lucide-react";
 import type { HazardMapPayload } from "@/lib/queries-map";
-import { btnSecondary, fieldCls, formatDate } from "@/components/ui";
+import { btnPrimary, btnSecondary, fieldCls, formatDate } from "@/components/ui";
 
 // ---------------------------------------------------------------------------
 // Data model
@@ -34,7 +34,41 @@ interface Model {
   chainLinks: Int32Array[];
   nChainPts: number;
   grid: { g: number; start: Int32Array; items: Int32Array };
+  // Time, in months since year 0 (year * 12 + month index + day fraction). Undated points never appear in a replay.
+  /** per point: its report date */
+  pt: Float64Array;
+  /** per link: the later report's date */
+  lt: Float64Array;
+  ptSorted: Float64Array;
+  ltSorted: Float64Array;
+  /** replay range: start of the earliest year to the end of the latest month */
+  tStart: number;
+  tEnd: number;
+  minYear: number;
+  maxYear: number;
 }
+
+function monthsOf(date: string | null): number {
+  const m = date ? /^(\d{4})-(\d{2})-(\d{2})/.exec(date) : null;
+  return m ? Number(m[1]) * 12 + Number(m[2]) - 1 + (Number(m[3]) - 1) / 31 : Infinity;
+}
+
+// Number of sorted values <= t.
+function countUpTo(sorted: Float64Array, t: number): number {
+  let lo = 0;
+  let hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (sorted[mid] <= t) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const YEAR_MS = 1200; // one year of replay per 1.2 seconds
+const POP_MS = 450; // new points grow in, then settle
+const FLASH_MS = 1000; // new links flash, then settle
 
 // Same rule as titleFromSlug in lib/queries-map.ts: the API leaves a title out when this rebuilds it.
 function titleFromSlug(slug: string): string {
@@ -99,7 +133,34 @@ function buildModel(p: HazardMapPayload): Model {
   const items = new Int32Array(n);
   for (let i = 0; i < n; i++) items[fill[cellOf[i]]++] = i;
 
+  // Timestamps, computed once.
+  const reportT = p.reports.map((r) => monthsOf(r[2]));
+  const pt = new Float64Array(n);
+  for (let i = 0; i < n; i++) pt[i] = reportT[report[i]] ?? Infinity;
+  const lt = new Float64Array(nl);
+  for (let i = 0; i < nl; i++) lt[i] = Math.max(pt[la[i]], pt[lb[i]]);
+  const ptSorted = pt.slice().sort();
+  const ltSorted = lt.slice().sort();
+  let tMin = Infinity;
+  let tMax = -Infinity;
+  for (let i = 0; i < n; i++) {
+    if (!Number.isFinite(pt[i])) continue;
+    if (pt[i] < tMin) tMin = pt[i];
+    if (pt[i] > tMax) tMax = pt[i];
+  }
+  if (!Number.isFinite(tMin)) tMin = tMax = new Date().getFullYear() * 12;
+  const minYear = Math.floor(tMin / 12);
+  const maxYear = Math.floor(tMax / 12);
+
   return {
+    pt,
+    lt,
+    ptSorted,
+    ltSorted,
+    tStart: minYear * 12,
+    tEnd: Math.floor(tMax) + 1,
+    minYear,
+    maxYear,
     n,
     x,
     y,
@@ -279,6 +340,17 @@ function MapView({ m }: { m: Model }) {
   const sx = useMemo(() => new Float32Array(m.n), [m]);
   const sy = useMemo(() => new Float32Array(m.n), [m]);
 
+  // Replay ("Replay the years"). The clock lives in a ref; React only hears about whole months.
+  const [replayOn, setReplayOn] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [tUi, setTUi] = useState(m.tEnd);
+  const rp = useRef({ on: false, playing: false, t: m.tEnd, last: 0, acc: 0, fresh: false, busyUntil: 0, uiMonth: m.tEnd });
+  const loop = useRef(0);
+  // Wall-clock time each point or link appeared in the replay (0 = not shown yet), for the brief pop and flash.
+  const pSeen = useMemo(() => new Float64Array(m.n), [m]);
+  const lSeen = useMemo(() => new Float64Array(m.la.length), [m]);
+  const pop = useMemo(() => new Float32Array(m.n).fill(1), [m]);
+
   const draw = useCallback(() => {
     raf.current = 0;
     const canvas = canvasRef.current;
@@ -297,6 +369,22 @@ function MapView({ m }: { m: Model }) {
     const r0 = clamp(1.35 * Math.pow(v.k, 0.45), 1.2, 5.5) * (small ? 0.85 : 1);
     const fc = focus >= 0 ? m.chain[focus] : -1;
 
+    // Replay clock: what exists at time T, and what has only just appeared.
+    const R = rp.current;
+    const T = R.on ? R.t : Infinity;
+    const now = performance.now();
+    const motion = R.on && !reduced.current;
+    const settled = now - 1e6;
+    let busyUntil = 0;
+    const linkOn = (i: number) => m.lt[i] <= T;
+    if (R.on) {
+      for (let i = 0; i < m.la.length; i++) {
+        if (m.lt[i] > T) lSeen[i] = 0;
+        else if (lSeen[i] === 0) lSeen[i] = R.fresh ? settled : now;
+        if (motion && lSeen[i] + FLASH_MS > now) busyUntil = Math.max(busyUntil, lSeen[i] + FLASH_MS);
+      }
+    }
+
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
@@ -308,22 +396,40 @@ function MapView({ m }: { m: Model }) {
       const py = oy + m.y[i] * S;
       sx[i] = px;
       sy[i] = py;
+      if (R.on) {
+        if (m.pt[i] > T) {
+          pSeen[i] = 0;
+          codes[i] = 255;
+          continue;
+        }
+        if (pSeen[i] === 0) pSeen[i] = R.fresh ? settled : now;
+        const age = now - pSeen[i];
+        if (motion && age < POP_MS) {
+          const f = 1 - age / POP_MS;
+          pop[i] = 1 + 1.3 * f * f;
+          busyUntil = Math.max(busyUntil, pSeen[i] + POP_MS);
+        } else pop[i] = 1;
+      } else pop[i] = 1;
       const s = st[i];
       if (s === 0 || px < -pad || py < -pad || px > w + pad || py > h + pad) codes[i] = 255;
       else if (m.chain[i] < 0) codes[i] = s === 1 ? 0 : s === 2 ? 1 : 2;
       else codes[i] = s === 1 ? 3 : 4;
     }
-    if (fc >= 0) for (const i of m.chainPts[fc]) codes[i] = 5;
+    if (fc >= 0) for (const i of m.chainPts[fc]) if (m.pt[i] <= T) codes[i] = 5;
+    R.fresh = false;
+    R.busyUntil = busyUntil;
 
     const dots = (code: number, r: number) => {
       ctx.beginPath();
       for (let i = 0; i < m.n; i++) {
         if (codes[i] !== code) continue;
-        ctx.moveTo(sx[i] + r, sy[i]);
-        ctx.arc(sx[i], sy[i], r, 0, Math.PI * 2);
+        const rr = r * pop[i];
+        ctx.moveTo(sx[i] + rr, sy[i]);
+        ctx.arc(sx[i], sy[i], rr, 0, Math.PI * 2);
       }
       ctx.fill();
     };
+    const flash = (i: number) => (motion ? Math.max(0, 1 - (now - lSeen[i]) / FLASH_MS) : 0);
     const curve = (i: number) => {
       const a = m.la[i];
       const b = m.lb[i];
@@ -345,7 +451,7 @@ function MapView({ m }: { m: Model }) {
       ctx.globalAlpha = 0.07;
       ctx.beginPath();
       for (let i = 0; i < m.la.length; i++) {
-        if (m.lc[i] === fc && fc >= 0) continue;
+        if ((m.lc[i] === fc && fc >= 0) || !linkOn(i)) continue;
         if (st[m.la[i]] >= 2 && st[m.lb[i]] >= 2) continue;
         curve(i);
       }
@@ -353,7 +459,7 @@ function MapView({ m }: { m: Model }) {
       ctx.globalAlpha = 0.3;
       ctx.beginPath();
       for (let i = 0; i < m.la.length; i++) {
-        if (m.lc[i] === fc && fc >= 0) continue;
+        if ((m.lc[i] === fc && fc >= 0) || !linkOn(i) || flash(i) > 0) continue;
         if (st[m.la[i]] >= 2 && st[m.lb[i]] >= 2) curve(i);
       }
       ctx.stroke();
@@ -374,17 +480,34 @@ function MapView({ m }: { m: Model }) {
     ctx.fillStyle = c.accent;
     dots(4, r0 * 1.45);
 
+    // Links that have just appeared in a replay flash above the dots, then settle into the faint style.
+    if (links && motion) {
+      ctx.strokeStyle = c.accent;
+      for (let i = 0; i < m.la.length; i++) {
+        if (m.lc[i] === fc && fc >= 0) continue;
+        const f = linkOn(i) ? flash(i) : 0;
+        if (f <= 0 || st[m.la[i]] < 2 || st[m.lb[i]] < 2) continue;
+        ctx.globalAlpha = 0.3 + 0.65 * f;
+        ctx.lineWidth = 0.8 + 1.6 * f;
+        ctx.beginPath();
+        curve(i);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
     // The hovered or selected chain on top.
     if (fc >= 0) {
       ctx.strokeStyle = c.accent;
       ctx.globalAlpha = 0.95;
       ctx.lineWidth = 1.6;
       ctx.beginPath();
-      for (const i of m.chainLinks[fc]) curve(i);
+      for (const i of m.chainLinks[fc]) if (linkOn(i)) curve(i);
       ctx.stroke();
       const rr = r0 * 2;
       ctx.beginPath();
       for (const i of m.chainPts[fc]) {
+        if (m.pt[i] > T) continue;
         ctx.moveTo(sx[i] + rr, sy[i]);
         ctx.arc(sx[i], sy[i], rr, 0, Math.PI * 2);
       }
@@ -398,7 +521,7 @@ function MapView({ m }: { m: Model }) {
     // The point itself.
     let tipX = -1;
     let tipY = -1;
-    if (focus >= 0) {
+    if (focus >= 0 && m.pt[focus] <= T) {
       tipX = sx[focus];
       tipY = sy[focus];
       const r = (m.chain[focus] >= 0 ? r0 * 2 : r0 * 1.6) + 3.5;
@@ -437,11 +560,103 @@ function MapView({ m }: { m: Model }) {
         tip.style.visibility = "visible";
       }
     }
-  }, [m, codes, sx, sy]);
+  }, [m, codes, sx, sy, pSeen, lSeen, pop]);
 
   const requestDraw = useCallback(() => {
-    if (!raf.current) raf.current = requestAnimationFrame(draw);
+    // A running replay loop draws on its next frame anyway.
+    if (!raf.current && !loop.current) raf.current = requestAnimationFrame(draw);
   }, [draw]);
+
+  // ---- replay loop: runs while playing, or while new points and links are still settling ----
+  const tick = useCallback(
+    (now: number) => {
+      loop.current = 0;
+      const R = rp.current;
+      if (R.playing) {
+        const dt = Math.min(100, Math.max(0, now - R.last));
+        R.last = now;
+        if (reduced.current) {
+          // No motion: step a whole year at a time.
+          R.acc += dt;
+          if (R.acc >= YEAR_MS) {
+            R.acc = 0;
+            R.t = Math.min(m.tEnd, (Math.floor(R.t / 12) + 1) * 12);
+          }
+        } else {
+          R.t = Math.min(m.tEnd, R.t + (dt * 12) / YEAR_MS);
+        }
+        if (R.t >= m.tEnd) {
+          // Finished: back to the normal map with everything shown.
+          R.playing = false;
+          R.on = false;
+          R.t = m.tEnd;
+          setPlaying(false);
+          setReplayOn(false);
+        }
+      }
+      draw();
+      if (Math.floor(R.t) !== Math.floor(R.uiMonth)) {
+        R.uiMonth = R.t;
+        setTUi(R.t);
+      }
+      if (R.playing || R.busyUntil > now) loop.current = requestAnimationFrame(tick);
+    },
+    [draw, m],
+  );
+
+  const ensureLoop = useCallback(() => {
+    if (!loop.current) loop.current = requestAnimationFrame(tick);
+  }, [tick]);
+
+  const togglePlay = useCallback(() => {
+    const R = rp.current;
+    if (R.playing) {
+      R.playing = false;
+      setPlaying(false);
+      return;
+    }
+    if (!R.on || R.t >= m.tEnd) R.t = m.tStart;
+    if (!R.on) {
+      R.on = true;
+      setReplayOn(true);
+    }
+    R.playing = true;
+    R.last = performance.now();
+    R.acc = reduced.current ? YEAR_MS : 0; // with reduced motion, show the first year straight away
+    R.uiMonth = R.t;
+    setTUi(R.t);
+    setPlaying(true);
+    ensureLoop();
+  }, [ensureLoop, m]);
+
+  const scrub = useCallback(
+    (v: number) => {
+      const R = rp.current;
+      R.playing = false;
+      setPlaying(false);
+      if (!R.on) {
+        R.on = true;
+        R.fresh = true; // what is already on screen should not all pop at once
+        setReplayOn(true);
+      }
+      R.t = clamp(v, m.tStart, m.tEnd);
+      R.uiMonth = R.t;
+      setTUi(R.t);
+      ensureLoop();
+    },
+    [ensureLoop, m],
+  );
+
+  const showAll = useCallback(() => {
+    const R = rp.current;
+    R.playing = false;
+    R.on = false;
+    R.t = R.uiMonth = m.tEnd;
+    setPlaying(false);
+    setReplayOn(false);
+    setTUi(m.tEnd);
+    ensureLoop();
+  }, [ensureLoop, m]);
 
   // Sync React state into the renderer (before paint, so the tooltip never shows in the wrong place).
   useLayoutEffect(() => {
@@ -529,6 +744,7 @@ function MapView({ m }: { m: Model }) {
       const y0 = clamp(Math.floor((wy - wr) * g), 0, g - 1);
       const y1 = clamp(Math.floor((wy + wr) * g), 0, g - 1);
       const st = live.current.state;
+      const T = rp.current.on ? rp.current.t : Infinity;
       let best = -1;
       let bestD = Infinity;
       const wr2 = wr * wr;
@@ -538,7 +754,7 @@ function MapView({ m }: { m: Model }) {
           for (let j = start[cell]; j < start[cell + 1]; j++) {
             const i = items[j];
             const s = st[i];
-            if (s === 0) continue;
+            if (s === 0 || m.pt[i] > T) continue;
             const dx = m.x[i] - wx;
             const dy = m.y[i] - wy;
             const d = dx * dx + dy * dy;
@@ -596,7 +812,9 @@ function MapView({ m }: { m: Model }) {
       rm.removeEventListener("change", setRm);
       cancelAnimationFrame(raf.current);
       cancelAnimationFrame(anim.current);
+      cancelAnimationFrame(loop.current);
       raf.current = 0;
+      loop.current = 0;
     };
   }, [draw, requestDraw]);
 
@@ -746,6 +964,7 @@ function MapView({ m }: { m: Model }) {
     else if (e.key === "0") resetView();
     else if (e.key === "Escape") setSelected(-1);
     else if (e.key === "Enter" && selected >= 0) open(selected);
+    else if (e.key === " ") togglePlay();
     else handled = false;
     if (handled) {
       e.preventDefault();
@@ -765,6 +984,14 @@ function MapView({ m }: { m: Model }) {
   const nf = (n: number) => n.toLocaleString("en-GB");
   const zoomBtn =
     "inline-flex h-9 w-9 items-center justify-center rounded-md border border-rule bg-surface text-ink-2 hover:border-accent hover:text-accent transition-colors";
+
+  // ---- replay labels ----
+  const tNow = replayOn ? tUi : m.tEnd;
+  const yearNow = clamp(Math.floor((tNow - 1e-6) / 12), m.minYear, m.maxYear);
+  const monthNow = MONTHS[(((Math.floor(tNow - 1e-6) % 12) + 12) % 12)];
+  const ptsSoFar = replayOn ? countUpTo(m.ptSorted, tNow) : m.n;
+  const linksSoFar = replayOn ? countUpTo(m.ltSorted, tNow) : m.la.length;
+  const atEnd = tUi >= m.tEnd;
 
   return (
     <div className="space-y-3 min-w-0">
@@ -823,14 +1050,53 @@ function MapView({ m }: { m: Model }) {
         </div>
       </div>
 
+      {/* Replay the years */}
+      <div data-tour="map-replay" className="card p-3 sm:p-4 flex flex-wrap items-center gap-x-4 gap-y-3">
+        <button type="button" onClick={togglePlay} className={`${btnPrimary} shrink-0`}>
+          {playing ? <Pause aria-hidden className="h-4 w-4" /> : <Play aria-hidden className="h-4 w-4" />}
+          {playing ? "Pause" : replayOn && !atEnd ? "Resume" : "Replay the years"}
+        </button>
+        <div className="min-w-0">
+          <p className="font-serif text-3xl leading-none text-ink num">
+            {replayOn ? yearNow : `${m.minYear}–${m.maxYear}`}
+          </p>
+          <p className="mt-1 text-xs text-muted num">
+            {nf(ptsSoFar)} {ptsSoFar === 1 ? "concern" : "concerns"} · {nf(linksSoFar)} {linksSoFar === 1 ? "recurrence" : "recurrences"}
+            {replayOn ? " so far" : ""}
+          </p>
+        </div>
+        <div className="order-last w-full min-w-0 lg:order-none lg:w-auto lg:flex-1">
+          <input
+            type="range"
+            min={m.tStart}
+            max={m.tEnd}
+            step={1}
+            value={Math.min(m.tEnd, Math.floor(tNow))}
+            onChange={(e) => scrub(Number(e.target.value))}
+            aria-label="Replay position"
+            aria-valuetext={replayOn ? `${monthNow} ${yearNow}` : "All years"}
+            className="block w-full cursor-pointer accent-accent"
+          />
+          <div className="mt-0.5 flex justify-between text-xs text-muted num" aria-hidden>
+            <span>{m.minYear}</span>
+            <span>{m.maxYear}</span>
+          </div>
+        </div>
+        {replayOn && (
+          <button type="button" onClick={showAll} className={`${btnSecondary} ml-auto shrink-0`}>
+            Show all
+          </button>
+        )}
+      </div>
+
       {/* Canvas */}
-      <div ref={wrapRef} className="card relative overflow-hidden h-[60vh] sm:h-[70vh] min-h-[340px] max-h-[860px]">
+      <div ref={wrapRef} data-tour="map" className="card relative overflow-hidden h-[60vh] sm:h-[70vh] min-h-[340px] max-h-[860px]">
         <canvas
           ref={canvasRef}
           tabIndex={0}
           role="application"
           aria-roledescription="map"
-          aria-label="Hazard map. Arrow keys move the view, plus and minus zoom, 0 resets. Search above to list matching concerns below the map."
+          aria-label="Hazard map. Arrow keys move the view, plus and minus zoom, 0 resets, Space plays or pauses the replay. Search above to list matching concerns below the map."
           className="absolute inset-0 h-full w-full touch-none select-none cursor-grab focus-visible:outline-offset-[-2px]"
           onKeyDown={onKeyDown}
         />

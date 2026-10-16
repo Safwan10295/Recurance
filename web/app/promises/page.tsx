@@ -101,7 +101,7 @@ export default async function PromisesPage({ searchParams }: { searchParams: Pro
       {data.rows.length === 0 ? (
         <EmptyState title="No links match these filters">Try another organisation type or theme, or a shorter search.</EmptyState>
       ) : (
-        <ul className="space-y-4 p-0">
+        <ul className="space-y-4 p-0" data-tour="promise-list">
           {data.rows.map((it) => (
             <PromiseCard key={it.id} it={it} />
           ))}

@@ -25,6 +25,8 @@ On the site:
 - Promises, then the same concern: where a response stated an action and a later coroner raised the same concern.
 - Hazard map: every concern placed by meaning, with the recurrences drawn between them.
 - How Nemotron did the work: the funnel from archive to evidence, and the tokens and cost per model.
+- You be the judge: two concerns, years apart; decide if they are the same hazard, then see Nemotron Super's verdict.
+- A guided tour of the real pages, and a replay of the hazard map year by year.
 - Search from anywhere with Ctrl K.
 
 ## How Nemotron and Token Factory are used

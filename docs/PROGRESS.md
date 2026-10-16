@@ -190,3 +190,12 @@ Verified:
 4. During a publish, 40 consecutive page loads all returned 200.
 
 Spend: $5.11 of $20. The $5 live reserve and the $9.50 margin are untouched.
+
+## Phase 8: hands-on features for judges (2026-10-16)
+
+1. A guided tour of nine stops across the real pages, started from Start here or the sidebar. It ends if the reader navigates away, and the spotlighted feature stays usable.
+2. You be the judge: eight rounds from 64 published pairs, 16 for each verdict, with quotes verified and redacted. The player decides "same hazard or not", then sees Nemotron Super's verdict and reasoning. The closing screen explains why the site exists and how it keeps itself up to date, whether the player finishes or stops early.
+3. Replay the years on the hazard map: concerns and recurrence links appear month by month from 2013.
+4. Shares are rounded normally again, except that a share below 1 never shows as 100%.
+
+Verified in a browser at desktop and phone width: the game played through and stopped early, the map replay, and every tour stop. No browser errors and no sideways scrolling.
