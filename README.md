@@ -16,7 +16,16 @@ Built for the Nebius x NVIDIA Global AI Hackathon, Best Apps and Agents track.
 4. Links later concerns to earlier ones across coroners, areas and years.
 5. Judges each link with Nemotron, citing verbatim text from both reports.
 6. Searches the web (Tavily) for evidence that a promised action happened.
-7. Gives coroners, lawyers, families and safety teams a live pre-inquest brief.
+7. Gives coroners, lawyers, families and safety teams a live pre-inquest brief, showing each step the agent takes: model, tokens, time, cost and every verdict.
+
+On the site:
+
+- Check a report: the live agent, step by step.
+- Recurrence chains: each hazard as a story, report by report, with the gap between them to scale.
+- Promises, then the same concern: where a response stated an action and a later coroner raised the same concern.
+- Hazard map: every concern placed by meaning, with the recurrences drawn between them.
+- How Nemotron did the work: the funnel from archive to evidence, and the tokens and cost per model.
+- Search from anywhere with Ctrl K.
 
 ## How Nemotron and Token Factory are used
 
@@ -138,7 +147,7 @@ deploy/README.md has the steps for one Linux server with Docker Compose. A worke
 
 1. A link shows that a similar concern was raised again after a stated action. It does not say why, and it is not a finding that an organisation ignored a warning or caused a death.
 2. Every quote shown is checked by code as an exact substring of the source.
-3. Staff and family names are redacted. Coroners are named as public office holders. The deceased are referred to by the report title only.
+3. Staff and family names are redacted. Coroners are named as public office holders. The deceased are referred to by the report title only; in quotes their names become [the deceased].
 4. There are no rankings or league tables.
 5. Response documents are linked at judiciary.uk, not rehosted.
 

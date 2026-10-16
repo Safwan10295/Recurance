@@ -150,3 +150,43 @@ Not tested:
 2. The hosted brief with its own key.
 
 Spend: $5.10 of $20. The $5 live reserve and the $9.50 margin are untouched.
+
+## Phase 7: stricter redaction, the live agent trace and three showcase pages (2026-10-16)
+
+Pilot asked for better navigation, a stronger interface, and features that catch judges' eyes. Pilot chose all four proposed features and the strict reading of the deceased rule.
+
+1. Redaction (D24):
+   - the deceased are named by report title only; in quotes their names become [the deceased];
+   - untitled staff and family names next to a role word are redacted;
+   - the live brief's TypeScript redaction now matches the Python rules.
+2. Watch the agent: the live brief streams every step with its model, tokens, time and cost, the candidates it retrieved with their similarity, and each verdict, kept or dropped and why. A repeated input replays its saved trace (D25).
+3. Hazard map: every verified concern placed by meaning, from a t-SNE projection of the stored embeddings, cached and computed once with no model calls (D26). The recurrence links are drawn between points.
+4. Promises, then the same concern: the 508 links where a response stated an action and a later coroner raised the same concern.
+5. How Nemotron did the work: the archive-to-evidence funnel and per-model tokens, latency and cost, from aggregates of the cost ledger.
+6. Navigation and interface:
+   - a command palette (Ctrl K or /) with instant results;
+   - a theme toggle, icons, breadcrumbs on every page and loading states;
+   - an accessible mobile drawer;
+   - explainers on relation, confidence and other labels.
+7. Chain page: a vertical story timeline to scale, a compact evidence list, next steps and a share image.
+8. Fixes:
+   - acronyms restored in chain titles ("ACCT", "HMP Woodhill");
+   - themes grouped from 127 category spellings into 11;
+   - no ordering by report counts anywhere;
+   - search shows true totals;
+   - Recent loads in two queries instead of thirty;
+   - shares round down, so 99.6% shows as 99%;
+   - the publish no longer blocks page reads while it runs (D27).
+
+Verified:
+1. 54 Python tests and 6 TypeScript tests pass, including new redaction, theme, casing and map-layout tests.
+2. All 15 main pages return 200 at 1366 px and 375 px, light and dark, with no sideways scrolling and no browser errors.
+3. The live brief, run in a browser with the pipeline key under a $0.05 ceiling:
+   - an archive report: 2 earlier warnings, $0.0016;
+   - a replay of the same input;
+   - pasted concerns: 3 earlier warnings;
+   - phone width.
+   Total spend for these tests: $0.007.
+4. During a publish, 40 consecutive page loads all returned 200.
+
+Spend: $5.11 of $20. The $5 live reserve and the $9.50 margin are untouched.

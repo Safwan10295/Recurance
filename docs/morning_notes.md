@@ -1,18 +1,19 @@
 ## Where things stand
 
-1. The site reads PostgreSQL and works as a tool:
-   - Start here with a 60-second tour;
-   - Recent, Explore chains and tabbed chain pages;
-   - organisation and report pages, search;
-   - Check a report.
-2. To open it on this PC, double-click start_site.cmd, then go to http://localhost:3000.
-3. deploy/ holds the server package, and deploy/README.md the steps. The stack was built and run in Docker on this PC, so the server steps are known to work up to creating the VM.
-4. The smart motorways chain is /chains/c52cded99f756309. Chain keys no longer change when data is rebuilt, and old keys redirect.
+1. The site reads PostgreSQL and works as a tool. To open it on this PC, double-click start_site.cmd, then go to http://localhost:3000.
+2. New on 16 Oct:
+   - Check a report shows the agent's every step: model, tokens, time, cost and each verdict;
+   - three new pages: Promises then the same concern, the Hazard map, and How Nemotron did the work;
+   - a command palette (Ctrl K), a light and dark toggle, breadcrumbs and explainers;
+   - chains told as a story, report by report.
+3. Quotes now name the deceased by report title only: their names become [the deceased]. Untitled staff and family names are redacted too.
+4. deploy/ holds the server package, and deploy/README.md the steps. The stack was rebuilt and run in Docker on this PC with the new pages.
+5. The smart motorways chain is /chains/c52cded99f756309.
 
 ## Verified
 
 1. The whole pipeline ran on the real archive: scrape, parse, OCR, normalise, Stages A, B, C, D and F, chains, evaluation and publish.
-2. 49 Python tests and 5 TypeScript tests pass. They run offline, apart from one publish test that uses a throwaway schema in the local PostgreSQL.
+2. 54 Python tests and 6 TypeScript tests pass. They run offline, apart from one publish test that uses a throwaway schema in the local PostgreSQL.
 3. Every paid stage passed its 20-item pilot before its full run.
 4. In the Docker test:
    - every route answered;

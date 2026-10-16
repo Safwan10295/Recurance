@@ -1,5 +1,6 @@
-// Shown while a page's data loads, so navigation always gives immediate feedback.
-export default function Loading() {
+// Loading placeholder for list pages. Not used at the root: a root loading state would make
+// notFound() and redirect() answer 200, because the response starts streaming first.
+export default function PageSkeleton() {
   return (
     <div className="space-y-6" aria-busy="true" aria-label="Loading">
       <div className="space-y-3 border-b border-rule pb-6">

@@ -1,6 +1,6 @@
 # Token Factory and Nemotron feedback
 
-Notes for the Devpost feedback field, from building Recurrence Watch: about 6,400 coroners' reports, 15,000 extracted concerns, 1,500 response letters and 3,300 judged report pairs, all on Nebius Token Factory. Dated observations from the build on 15 Oct 2026.
+Notes for the Devpost feedback field, from building Recurrence Watch: 6,454 coroners' reports, 15,366 extracted concerns, 1,763 response letters and 4,061 judged report pairs, all on Nebius Token Factory. Dated observations from the build on 15 Oct 2026.
 
 ## What worked well
 
@@ -10,7 +10,7 @@ Notes for the Devpost feedback field, from building Recurrence Watch: about 6,40
 4. chat_template_kwargs pass straight through. enable_thinking switches Nemotron reasoning off for extraction, and low_effort cut Super's reasoning about five-fold on a simple prompt with the same answer.
 5. Nemotron 3 Nano copies verbatim quotes well. About 98% of extracted quotes were exact, or near-exact, substrings of the source across HTML, PDF and OCR text, at about $0.00012 per report.
 6. Nemotron 3 Super with low_effort reasoning cost about $0.00076 per recurrence judgement, below our planning estimate, and it was appropriately conservative about calling two concerns the same hazard.
-7. The rate-limit headers (limit, remaining, dynamic scale, period usage) let a client pace itself under both request and token limits, and across 13,004 paid calls in one night we recorded no failed calls and no 429s.
+7. The rate-limit headers (limit, remaining, dynamic scale, period usage) let a client pace itself under both request and token limits, and across about 13,900 paid calls we recorded no failed API calls and no 429s.
 8. Qwen3-Embedding-8B's dimensions parameter matches truncation of the full vector (cosine 0.99994 between 1,024 truncated to 256 and a direct 256 request), so one stored embedding serves several index sizes.
 
 ## Friction

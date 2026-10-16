@@ -147,3 +147,26 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 2. The worker publishes on first boot, then runs the incremental refresh weekly with a $0.50 ceiling per run, and republishes.
 3. Without a domain, Caddy gets a certificate for an sslip.io name on the server's IP.
 4. The whole stack was built and run locally in Docker on WSL before handing over: first-boot publish, every route, redirects, search, the paused brief and the restricted role all checked.
+
+## D24. The deceased named by report title only, in quotes too
+
+1. Rule 5 says the deceased are referred to by the report's published title only, with no added personal detail. About 509 shown quotes used the deceased's name in the coroner's own words.
+2. Pilot chose the strict reading. In displayed quotes, the deceased's full name or first name becomes [the deceased]. An honorific with a surname, or another first name with the deceased's surname, becomes [name redacted], since it may be a relative.
+3. A name next to a role word ("Jane Smith, the triage nurse", "his mother, Mary") is redacted as staff or family, and never treated as the deceased. Places and other people sharing a first name are left alone ("St John Ambulance", "John Radcliffe Hospital").
+4. Quotes are verified against the source before redaction, so verification is unaffected.
+
+## D25. The live brief shows its work
+
+1. The Apps and Agents track rewards visible agent behaviour. Each step now streams its model, tool, tokens, time and cost, the retrieved candidates with similarity, and each verdict with the reason it was kept or dropped.
+2. A saved brief keeps its trace and replays it, marked as a replay, so a repeated input still shows the agent's steps at no cost.
+3. Quotes in the trace from freshly fetched reports pass the same redaction as the brief.
+
+## D26. The hazard map is computed once, offline
+
+1. The 1,024-dimension concern embeddings are reduced with PCA to 50 dimensions, then t-SNE with a fixed seed, and scaled with one factor for both axes.
+2. The layout is cached by the set of concern ids, so a publish recomputes it only when new concerns arrive (about 3 minutes). No model calls are made.
+
+## D27. The publish never blocks page reads
+
+1. The schema step uses ALTER TABLE, which takes an exclusive lock. Inside the data transaction it blocked every page read for the whole publish.
+2. The schema now runs in its own short transaction, and the data load follows in a second one. Readers see the old rows until the new ones commit.

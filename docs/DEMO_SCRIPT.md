@@ -6,62 +6,56 @@ Before recording:
 
 1. Review the smart motorways dossier (python -m pipeline.cli review), then publish, so the chain's Dossier tab appears. The chain works without it.
 2. Use a browser window 1280 wide, light mode, zoom 110%.
-3. Run the brief once with the chosen report so the take is quick. For a live run on camera, choose a different report.
+3. For the live run, choose a report you have not run before, so the steps run live rather than replay. Have a second one ready.
 
 ## 0:00 to 0:20. The problem
 
-On screen: Start here.
+On screen: Start here. The card on the right tells the problem in a real case.
 
 Say:
 
-1. "When a death reveals a risk, a coroner writes a Prevention of Future Deaths report."
-2. "The organisation must reply with what it will change."
-3. "Years later, a similar death happens in front of a different coroner."
-4. "Nobody connects the record. Recurrence Watch does."
+1. "A coroner warns an organisation about a risk to life. It responds with what it will do."
+2. "Years later the same concern comes up again, in front of a different coroner."
+3. "In 99% of the links we found, the later report does not cite the earlier one. Recurrence Watch connects the record."
 
-Point to the three live numbers: verified chains, recent reports that repeat an earlier warning, and the share where the later coroner was different.
+## 0:20 to 1:05. One chain
 
-## 0:20 to 1:10. One chain
-
-On screen: the featured card "No hard shoulder on smart motorways causing unsafe stops", which opens /chains/c52cded99f756309.
+On screen: "See a recurrence", which opens /chains/c52cded99f756309.
 
 Say:
 
-1. On Summary: National Highways, 7 reports from 7 different coroners, 2019 to 2025. Move along the timeline strip.
-2. Open Evidence: read one pair of quotes side by side. "Both quotes are checked by code, word for word, against the original reports."
-3. Open Promises and follow-up: what the response said it would do, and what the web search found. "No evidence found is never treated as did not happen."
-4. Open How it was found: the scores, and which Nemotron model judged it.
+1. National Highways, 7 reports from 7 coroners, 2019 to 2025.
+2. Scroll the story: first warning, the response and its stated action, then "raised again" six times. The spacing grows with the time between reports.
+3. Open Evidence and expand one row: "Both quotes are checked by code, word for word, against the original reports."
 
-## 1:10 to 1:50. Check a report
+## 1:05 to 1:50. Watch the agent
 
-On screen: the "Check a report" button in the top bar.
+On screen: Check a report. Pick a report and press Check for earlier warnings.
 
 Say:
 
 1. "A coroner, family or lawyer preparing for an inquest starts here."
-2. Pick a report from the archive by name, or paste a web address.
-3. Let the steps tick through: organisation found, concerns extracted by Nemotron Nano, earlier concerns retrieved, Nemotron Super judging.
-4. Read one match: the earlier warning, what was promised, and the link to share the brief.
+2. As the steps light up: Nemotron Nano extracts the concerns; Qwen3 embeddings and pgvector search the organisation's earlier warnings; Nemotron Super judges the closest three, with reasoning.
+3. Point to one verdict that was kept and one that was dropped, and why.
+4. Point to the tokens and cost: "about a fifth of a cent".
 
-## 1:50 to 2:20. Evaluation and routing
+## 1:50 to 2:20. Promises and the map
 
-On screen: Evaluation, in the sidebar under "How we know".
-
-Say:
-
-1. The test set: pairs where coroners themselves cited the earlier report, with the citation hidden from the system.
-2. The chart: at the same number of shown links, TF-IDF found 34%, embeddings 41%, and the hybrid with the Nemotron judge 52%.
-3. In most shown links, the later coroner was different and did not cite the earlier report.
-4. The routing: Nano extracts, Super judges, Ultra drafts dossiers, all on Token Factory, for about $5 in total.
-
-## 2:20 to 2:45. Across organisations and what's new
-
-On screen: Explore chains, the "Across organisations" tab, then Recent.
+On screen: Promises, then again. Then the Hazard map.
 
 Say:
 
-1. "The same hazard raised with different organisations, checked the same way."
-2. "Every week the server reads new reports and links them. Here is what is new."
+1. "508 times, a response stated an action and a later coroner raised the same concern. It shows the concern came back, not why."
+2. On the map: "Every concern, placed by meaning. The lines are recurrences the judge confirmed." Hover a cluster, then click into a chain.
+
+## 2:20 to 2:45. How we know
+
+On screen: How Nemotron did the work, then Evaluation.
+
+Say:
+
+1. The funnel: 6,454 reports, 15,366 concerns, 4,061 pairs judged, 1,217 links shown, for about $5 on Token Factory. Nano reads, Super judges, Ultra drafts dossiers.
+2. The blind test: at the same number of shown links, TF-IDF found 34%, embeddings 41%, and the hybrid with the Nemotron judge 52% of the recurrences coroners themselves flagged.
 
 ## 2:45 to 3:00. Close
 
