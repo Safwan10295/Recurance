@@ -49,7 +49,8 @@ def tfidf_matrix(texts: list[str]):
 def build(tfidf_min: float = config.TFIDF_MIN, embed_min: float = config.EMBED_MIN,
           max_pairs_per_org: int = config.MAX_PAIRS_PER_ORG, national_top_k: int = config.NATIONAL_TOP_K,
           min_days: int = config.MIN_DAYS_APART, write: bool = True, text_override: dict[int, str] | None = None,
-          emb_override: dict[int, np.ndarray] | None = None) -> dict:
+          emb_override: dict[int, np.ndarray] | None = None, report_top_k: int = config.REPORT_ROUTE_TOP_K,
+          report_tfidf_min: float = config.REPORT_ROUTE_TFIDF_MIN) -> dict:
     """Build candidate pairs. text_override / emb_override let the blind test swap in masked texts."""
     conn = db.connect()
     rows = load_concerns(conn)
@@ -124,6 +125,47 @@ def build(tfidf_min: float = config.TFIDF_MIN, embed_min: float = config.EMBED_M
         cap = max(max_pairs_per_org, int(config.PAIRS_PER_REPORT * len(reps)))
         chosen = sorted(best.values(), key=lambda p: -p["hybrid_score"])[:cap]
         pairs.extend(chosen)
+
+    # Second route (D30): whole-report wording. Each later report's top earlier reports by report-level
+    # TF-IDF reach the judge even if no single concern pair passed the thresholds. Report texts are built
+    # from the same (possibly masked) concern texts, so the blind test stays blind.
+    if report_top_k > 0:
+        covered = {(rows[idx[p["earlier_concern_id"]]]["report_url"], rows[idx[p["later_concern_id"]]]["report_url"]) for p in pairs}
+        rep_urls = list(concerns_by_report)
+        ridx = {u: i for i, u in enumerate(rep_urls)}
+        R, _ = tfidf_matrix([" ".join(texts[i] for i in concerns_by_report[u]) for u in rep_urls])
+        rdate = {u: date.fromisoformat(rows[concerns_by_report[u][0]]["report_date"]).toordinal() for u in rep_urls}
+        for org, reps in org_reports.items():
+            reps = sorted(u for u in reps if u in ridx)
+            if len(reps) < 2:
+                continue
+            sim = (R[[ridx[u] for u in reps]] @ R[[ridx[u] for u in reps]].T).toarray()
+            for j, b in enumerate(reps):
+                cand = [(sim[i, j], a) for i, a in enumerate(reps)
+                        if rdate[b] - rdate[a] >= min_days and sim[i, j] >= report_tfidf_min]
+                for _s, a in sorted(cand, reverse=True)[:report_top_k]:
+                    if (a, b) in covered:
+                        continue
+                    covered.add((a, b))
+                    # The best concern pair between the two reports, by the same hybrid score.
+                    best_p = None
+                    for ia in concerns_by_report[a]:
+                        for ib in concerns_by_report[b]:
+                            e = float(E[ia] @ E[ib])
+                            t = float((X[ia] @ X[ib].T).toarray()[0, 0])
+                            h = 0.6 * e + 0.4 * t
+                            if best_p is None or h > best_p[0]:
+                                best_p = (h, ia, ib, e, t)
+                    h, ia, ib, e, t = best_p
+                    ra, rb = rows[ia], rows[ib]
+                    pairs.append({
+                        "earlier_concern_id": ra["id"], "later_concern_id": rb["id"], "organisation_id": org,
+                        "tfidf_score": t, "embed_score": e, "hybrid_score": h,
+                        "days_apart": _days(ra["report_date"], rb["report_date"]),
+                        "same_coroner": int((ra["coroner"] or "").strip().lower() == (rb["coroner"] or "").strip().lower()),
+                        "same_area": int((ra["area"] or "").strip().lower() == (rb["area"] or "").strip().lower()),
+                        "source": "report_route",
+                    })
 
     # One pair of reports may be shared by several organisations; keep the highest-scoring copy.
     dedup: dict[tuple[int, int], dict] = {}

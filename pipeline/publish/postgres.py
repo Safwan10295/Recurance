@@ -23,10 +23,9 @@ import yaml
 from .. import config, db
 from ..export import web
 from ..normalise.orgs import key as org_key
-from . import hazard_map
+from . import featured, hazard_map
 
 SCHEMA = config.ROOT / "pipeline" / "db" / "schema_publish.sql"
-FEATURED = Path(__file__).with_name("featured.yaml")
 PUB_TABLES = ["pub_meta", "pub_orgs", "pub_reports", "pub_report_orgs", "pub_responses", "pub_chains",
               "pub_chain_reports", "pub_links", "pub_systemic", "pub_brief_concerns", "pub_org_aliases",
               "pub_hazard_points", "pub_hazard_links"]
@@ -47,23 +46,6 @@ def _vec(b64: str) -> str:
     v = np.frombuffer(base64.b64decode(b64), dtype=np.int8).astype(np.float32)
     n = float(np.linalg.norm(v)) or 1.0
     return "[" + ",".join(f"{x / n:.5f}" for x in v) + "]"
-
-
-def featured_keys(chains: list[dict], details: dict[str, dict]) -> list[str]:
-    """Resolve featured.yaml (lists of report slugs) to current chain keys."""
-    spec = yaml.safe_load(FEATURED.read_text(encoding="utf-8")) if FEATURED.exists() else []
-    out = []
-    for item in spec or []:
-        want = set(item.get("reports", []))
-        best, score = None, 0
-        for c in chains:
-            slugs = {r["url"].rstrip("/").rsplit("/", 1)[-1] for r in details[c["key"]]["reports"]}
-            s = len(want & slugs)
-            if s > score or (s == score and best and c["n_reports"] > best["n_reports"]):
-                best, score = c, s
-        if best and score >= 2 and best["key"] not in out:
-            out.append(best["key"])
-    return out
 
 
 def pipeline_summary(conn, stats: dict) -> dict:
@@ -159,7 +141,8 @@ def build_rows(tmp: Path) -> dict:
     site = _read(tmp / "site.json", {})
     chains = _read(tmp / "chains.json", [])
     details = {c["key"]: _read(tmp / "chains" / f"{c['key']}.json") for c in chains}
-    feat = featured_keys(chains, details)
+    sel = featured.select(chains, details)  # the quality gate (featured.yaml, docs/FEATURED.md)
+    feat = sel["featured"]
 
     conn = db.connect()
     red = web.Redactor(conn)
@@ -259,6 +242,11 @@ def build_rows(tmp: Path) -> dict:
         "evaluation": _read(tmp / "evaluation.json", None),
         "brief_examples": _read(tmp / "brief_examples.json", []),
         "featured": feat,
+        "start_here": sel["start_here"],
+        "excluded_chains": sorted(sel["excluded"]),
+        "feature_gate": sel["gate"],
+        # Real agent runs recorded by scripts/precompute_briefs.py, replayed on the site at no cost.
+        "precomputed_briefs": _read(config.EXPORTS / "precomputed_briefs.json", {}),
         "published_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "last_refresh": last_refresh,
         "brief_dim": web.BRIEF_DIM,

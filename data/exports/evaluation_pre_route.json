@@ -1,0 +1,382 @@
+{
+ "generated_at": "2026-10-15T05:23:24+00:00",
+ "acknowledged": {
+  "total": 227,
+  "in_scope": 42,
+  "in_scope_6m": 29,
+  "evaluated": 29,
+  "by_evidence": {
+   "name": 219,
+   "ref": 8
+  }
+ },
+ "systems": [
+  {
+   "name": "TF-IDF only",
+   "description": "Report-level cosine, shown if at least 0.137 (equal-budget threshold)",
+   "recall_at_threshold": 0.3448275862068966,
+   "recall_at_5": 0.7586206896551724,
+   "shown_pairs": 1217,
+   "precision": null,
+   "hits": 10,
+   "n": 29,
+   "recall_ci95": [
+    0.199,
+    0.527
+   ]
+  },
+  {
+   "name": "Embeddings only",
+   "description": "Best concern pair cosine, shown if at least 0.726 (equal-budget threshold)",
+   "recall_at_threshold": 0.41379310344827586,
+   "recall_at_5": 0.6896551724137931,
+   "shown_pairs": 1217,
+   "precision": null,
+   "hits": 12,
+   "n": 29,
+   "recall_ci95": [
+    0.255,
+    0.593
+   ]
+  },
+  {
+   "name": "Hybrid + Nemotron Super judge",
+   "description": "Candidate rule, then judged; shown if identical or closely related, confident, quotes verified",
+   "recall_at_threshold": 0.5172413793103449,
+   "recall_at_5": 0.6896551724137931,
+   "shown_pairs": 1217,
+   "precision": null,
+   "hits": 15,
+   "n": 29,
+   "recall_ci95": [
+    0.344,
+    0.686
+   ]
+  }
+ ],
+ "thresholds": {
+  "tfidf_equal_budget": 0.13707133693801365,
+  "embedding_equal_budget": 0.7262049913406372
+ },
+ "lost_memory": {
+  "links": 1217,
+  "diff_coroner": 0.8356614626129828,
+  "diff_area": 0.7871815940838126,
+  "not_cited": 0.9876746096959738,
+  "all_three": 0.7280197206244864
+ },
+ "cost": {
+  "total": 5.1515,
+  "by_stage": {
+   "A": 0.7729,
+   "B": 0.2321,
+   "C": 3.0227,
+   "D": 0.966,
+   "F": 0.0352,
+   "dev": 0.1108,
+   "embed": 0.0117
+  },
+  "analysis_cost": 4.0395,
+  "chains": 618,
+  "per_chain": 0.00834,
+  "per_chain_analysis": 0.00654
+ },
+ "hand_labels": {
+  "status": "pending: no labels filled in yet",
+  "n_labelled": 0
+ },
+ "notes": [],
+ "misses": [
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 2 by meaning and 1 by wording among 341 earlier reports to the organisation",
+   "days_apart": 202,
+   "organisation": "Department of Health and Social Care",
+   "earlier": {
+    "title": "Donna Williamson",
+    "slug": "donna-williamson",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/donna-williamson/"
+   },
+   "later": {
+    "title": "Alex Malcolm",
+    "slug": "alex-malcolm",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/alex-malcolm/"
+   },
+   "found_by_tfidf": true,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 1 by meaning and 1 by wording among 2 earlier reports to the organisation",
+   "days_apart": 583,
+   "organisation": "HMP Long Lartin",
+   "earlier": {
+    "title": "David Kirsch",
+    "slug": "david-kirsch",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/david-kirsch/"
+   },
+   "later": {
+    "title": "Geoffrey Hutton",
+    "slug": "geoffrey-hutton",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/geoffrey-hutton/"
+   },
+   "found_by_tfidf": true,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "judge_rejected",
+   "reason": "Judged related (confidence 0.70): a related but different hazard",
+   "days_apart": 457,
+   "organisation": "Driver and Vehicle Licensing Agency",
+   "earlier": {
+    "title": "Geoffrey Toase and Michael Midgley: Prevention of Future Deaths Report",
+    "slug": "geoffrey-toase-and-michael-midgley-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/geoffrey-toase-and-michael-midgley-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Christopher Sampson: Prevention of future deaths report",
+    "slug": "christopher-sampson-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/christopher-sampson-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": true
+  },
+  {
+   "category": "judge_rejected",
+   "reason": "Judged related (confidence 0.80): a related but different hazard",
+   "days_apart": 1513,
+   "organisation": "Bedfordshire Police",
+   "earlier": {
+    "title": "Leon Briggs: Prevention of future deaths report",
+    "slug": "leon-briggs-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/leon-briggs-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Andrew McCleary: Prevention of future death report",
+    "slug": "andrew-mccleary-prevention-of-future-death-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/andrew-mccleary-prevention-of-future-death-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "judge_rejected",
+   "reason": "Judged related (confidence 0.80): a related but different hazard",
+   "days_apart": 1348,
+   "organisation": "Alternative Futures Group",
+   "earlier": {
+    "title": "Shona Campbell: Prevention of future deaths report",
+    "slug": "shona-campbell-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/shona-campbell-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Ruairi Stewart: Prevention of future deaths report",
+    "slug": "ruairi-stewart-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/ruairi-stewart-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 7 by meaning and 2 by wording among 586 earlier reports to the organisation",
+   "days_apart": 1523,
+   "organisation": "Department of Health and Social Care",
+   "earlier": {
+    "title": "Piotr Kierzkowski",
+    "slug": "piotr-kierzkowski",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/piotr-kierzkowski/"
+   },
+   "later": {
+    "title": "Timothy De Boos: Prevention of Future Deaths Report",
+    "slug": "timothy-de-boos-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/timothy-de-boos-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": true
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 12 by meaning and 1 by wording among 586 earlier reports to the organisation",
+   "days_apart": 281,
+   "organisation": "Department of Health and Social Care",
+   "earlier": {
+    "title": "Nicola Rayner: Prevention of future deaths report",
+    "slug": "nicola-rayner-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/nicola-rayner-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Timothy De Boos: Prevention of Future Deaths Report",
+    "slug": "timothy-de-boos-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/timothy-de-boos-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": true,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "judge_rejected",
+   "reason": "Judged related (confidence 0.80): a related but different hazard",
+   "days_apart": 883,
+   "organisation": "Care Quality Commission",
+   "earlier": {
+    "title": "Connor Wellsted: Prevention of future deaths report",
+    "slug": "connor-wellsted-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/connor-wellsted-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Mia Gauci-Lamport: Prevention of Future Deaths Report",
+    "slug": "mia-gauci-lamport-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/mia-gauci-lamport-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": true
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 2 by meaning and 1 by wording among 607 earlier reports to the organisation",
+   "days_apart": 1901,
+   "organisation": "Department of Health and Social Care",
+   "earlier": {
+    "title": "Deborah Headspeath",
+    "slug": "deborah-headspeath",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/deborah-headspeath/"
+   },
+   "later": {
+    "title": "Kim Robinson: Prevention of Future Deaths Report",
+    "slug": "kim-robinson-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/kim-robinson-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "judge_rejected",
+   "reason": "Judged related (confidence 0.80): a related but different hazard",
+   "days_apart": 213,
+   "organisation": "Royal College of Emergency Medicine",
+   "earlier": {
+    "title": "Daniel Klosi: Prevention of Future Deaths Report",
+    "slug": "daniel-klosi-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/daniel-klosi-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Billie Wicks: Prevention of Future Deaths Report",
+    "slug": "billie-wicks-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/billie-wicks-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 71 by meaning and 9 by wording among 312 earlier reports to the organisation",
+   "days_apart": 600,
+   "organisation": "East London NHS Foundation Trust",
+   "earlier": {
+    "title": "Freeda Glausiusz: Prevention of future deaths report",
+    "slug": "freeda-glausiusz-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/freeda-glausiusz-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Heather Findlay: Prevention of future deaths report",
+    "slug": "heather-findlay-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/heather-findlay-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 2 by meaning and 1 by wording among 89 earlier reports to the organisation",
+   "days_apart": 608,
+   "organisation": "Department for Transport",
+   "earlier": {
+    "title": "Louis Thorold: Prevention of Future Deaths Report",
+    "slug": "louis-thorold-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/louis-thorold-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Peter Westwell, Mary Cunningham, Grace Foulds, Anne Ferguson: Prevention of Future Deaths Report",
+    "slug": "peter-westwell-mary-cunningham-grace-foulds-anne-ferguson-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/peter-westwell-mary-cunningham-grace-foulds-anne-ferguson-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": true,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 94 by meaning and 29 by wording among 258 earlier reports to the organisation",
+   "days_apart": 568,
+   "organisation": "NHS England",
+   "earlier": {
+    "title": "Sarah Clarke: Prevention of future deaths report",
+    "slug": "sarah-clarke-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/sarah-clarke-prevention-of-future-deaths-report/"
+   },
+   "later": {
+    "title": "Alice Litman: Prevention of future deaths report",
+    "slug": "alice-litman-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/alice-litman-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": false
+  },
+  {
+   "category": "not_candidate",
+   "reason": "Never reached the judge: no single pair of concerns passed the candidate filter (similarity thresholds and the per-organisation pair cap), although as whole reports it ranked 9 by meaning and 2 by wording among 19 earlier reports to the organisation",
+   "days_apart": 1255,
+   "organisation": "College of Policing",
+   "earlier": {
+    "title": "Leroy Medford",
+    "slug": "leroy-medford",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/leroy-medford/"
+   },
+   "later": {
+    "title": "Neal Saunders: Prevention of future deaths report",
+    "slug": "neal-saunders-prevention-of-future-deaths-report",
+    "url": "https://www.judiciary.uk/prevention-of-future-death-reports/neal-saunders-prevention-of-future-deaths-report/"
+   },
+   "found_by_tfidf": false,
+   "found_by_embeddings": false
+  }
+ ],
+ "miss_summary": {
+  "not_candidate": 9,
+  "judge_rejected": 5
+ },
+ "models": [
+  {
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "calls": 4263,
+   "input_tokens": 4961626,
+   "output_tokens": 1909493,
+   "reasoning_tokens": 1146553,
+   "cost": 3.1131
+  },
+  {
+   "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+   "calls": 9454,
+   "input_tokens": 8701277,
+   "output_tokens": 2248801,
+   "reasoning_tokens": 0,
+   "cost": 1.0604
+  },
+  {
+   "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "calls": 79,
+   "input_tokens": 457615,
+   "output_tokens": 169519,
+   "reasoning_tokens": 0,
+   "cost": 0.9662
+  },
+  {
+   "model": "Qwen/Qwen3-Embedding-8B",
+   "calls": 318,
+   "input_tokens": 1187446,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "cost": 0.0117
+  }
+ ],
+ "report_generated_at": "2026-10-16T13:17:09+00:00"
+}

@@ -219,6 +219,28 @@ def cmd_label(a):
     labelling.interactive()
 
 
+def cmd_featured_report(a):
+    """Apply the featured gate to the current chains and write docs/FEATURED.md (no model calls)."""
+    import tempfile
+    from pathlib import Path
+
+    from .export import web
+    from .publish import featured
+
+    original = web.WEB_DATA
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            web.WEB_DATA = Path(td)
+            web.export()
+            chains = json.loads((Path(td) / "chains.json").read_text(encoding="utf-8"))
+            details = {c["key"]: json.loads((Path(td) / "chains" / f"{c['key']}.json").read_text(encoding="utf-8")) for c in chains}
+    finally:
+        web.WEB_DATA = original
+    sel = featured.select(chains, details)
+    featured.write_report(sel, {c["key"]: c for c in chains}, config.ROOT / "docs" / "FEATURED.md")
+    print(json.dumps({k: sel[k] for k in ("featured", "start_here")}, indent=1))
+
+
 def cmd_titles(a):
     from .judge.titles import generate
 
@@ -317,6 +339,7 @@ def main(argv=None):
     s.add_argument("--n", type=int, default=80)
     s.set_defaults(fn=cmd_label_prepare)
     sub.add_parser("label", help="interactive labelling for Pilot").set_defaults(fn=cmd_label)
+    sub.add_parser("featured-report", help="apply the featured gate and write docs/FEATURED.md").set_defaults(fn=cmd_featured_report)
     sub.add_parser("titles", help="short display titles for new or changed chains (Nano, cached)").set_defaults(fn=cmd_titles)
     sub.add_parser("export", help="export JSON for the web app").set_defaults(fn=cmd_export)
     sub.add_parser("publish", help="publish display-safe data to PostgreSQL (DATABASE_URL)").set_defaults(fn=cmd_publish)

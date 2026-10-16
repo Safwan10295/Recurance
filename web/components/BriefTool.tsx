@@ -4,6 +4,7 @@ import { ArrowRight, Check, Copy, FileText, Globe, Loader2, PenLine, RotateCcw, 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AgentTrace, { type Step } from "./brief/AgentTrace";
+import { PrintLink } from "./PrintButton";
 import { ConfidenceTag, QuotePair, RelationTag, btnPrimary, btnSecondary, fieldCls, formatDate, shortTitle, slugOf } from "./ui";
 import type { Relation } from "@/lib/types";
 
@@ -27,17 +28,24 @@ type Result = {
   searched?: number;
   cost?: number;
   notes: string[];
-  mode?: "agent" | "fixed";
+  mode?: "agent" | "fixed" | "archive";
 };
-type Example = { title: string; input: Record<string, string>; result: Result };
+type Example = { title: string; input: Record<string, string>; result: Result; why?: string };
+type ReplaySource = "precomputed" | "saved" | "archive" | null;
 type Suggestion = { url: string; slug: string; title: string; date: string };
 type Mode = "pick" | "url" | "text";
 
+// Each chip runs a real report whose brief was recorded from a live agent run: instant, at no cost.
 const EXAMPLES = [
-  { label: "A smart motorway death, 2023", term: "Levett" },
-  { label: "A railway platform death", term: "platform" },
-  { label: "An ambulance delay", term: "ambulance" },
+  { label: "A smart motorway death, 2023", slug: "david-levett-prevention-of-future-deaths-report", title: "David Levett: Prevention of future deaths report", date: "2023-04-18" },
+  { label: "A railway platform death, 2025", slug: "jody-robb-prevention-of-future-deaths-report", title: "Jody Robb: Prevention of Future Deaths Report", date: "2025-07-01" },
+  { label: "An ambulance delay, 2026", slug: "roman-barr-prevention-of-future-deaths-report-2", title: "Roman Barr: Prevention of future deaths report", date: "2026-04-03" },
 ];
+const REPLAY_LABEL: Record<Exclude<ReplaySource, null>, string> = {
+  precomputed: "Agent trace, replayed from a recorded run (no cost)",
+  saved: "Agent trace, replayed from the saved run",
+  archive: "From the archive (no live model call)",
+};
 
 export default function BriefTool({
   initialUrl,
@@ -63,7 +71,9 @@ export default function BriefTool({
   const [hash, setHash] = useState<string | null>(null);
   const [paused, setPaused] = useState<{ message: string; examples: Example[] } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [replay, setReplay] = useState(false);
+  const [replay, setReplay] = useState<ReplaySource>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [suggLoading, setSuggLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [elapsed, setElapsed] = useState<number | undefined>();
   const [loadingShared, setLoadingShared] = useState(false);
@@ -82,7 +92,7 @@ export default function BriefTool({
         if (d?.result) {
           setResult(d.result);
           setSteps(d.steps ?? []);
-          setReplay(true);
+          setReplay("saved");
           setHash(h);
         } else setPaused({ message: "That shared brief could not be found. It may have expired.", examples: [] });
       })
@@ -95,18 +105,21 @@ export default function BriefTool({
     if (mode !== "pick" || picked) return;
     if (term.trim().length < 2) {
       setSugg([]);
+      setSuggLoading(false);
       return;
     }
     const ctl = new AbortController();
+    setSuggLoading(true);
     const t = setTimeout(() => {
       fetch(`/api/reports/suggest?q=${encodeURIComponent(term)}`, { signal: ctl.signal })
         .then((r) => (r.ok ? r.json() : []))
         .then((s: Suggestion[]) => {
           setSugg(s);
           setActive(0);
+          setSuggLoading(false);
         })
         .catch(() => undefined);
-    }, 180);
+    }, 110);
     return () => {
       clearTimeout(t);
       ctl.abort();
@@ -127,7 +140,8 @@ export default function BriefTool({
       setResult(null);
       setPaused(null);
       setHash(null);
-      setReplay(false);
+      setReplay(null);
+      setNotice(null);
       started.current = Date.now();
       setElapsed(0);
       setTimeout(() => outRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -154,7 +168,10 @@ export default function BriefTool({
             buf = buf.slice(i + 1);
             if (!line) continue;
             const ev = JSON.parse(line);
-            if (ev.type === "replay") setReplay(true);
+            if (ev.type === "replay") {
+              setReplay(ev.source ?? "saved");
+              if (ev.message) setNotice(ev.message);
+            }
             else if (ev.type === "step")
               setSteps((s) => {
                 const at = s.findIndex((x) => x.id === ev.step.id);
@@ -267,6 +284,9 @@ export default function BriefTool({
                     aria-controls="brief-sugg"
                   />
                 </label>
+                {suggLoading && !picked && (
+                  <Loader2 size={15} className="absolute right-3 top-[2.15rem] animate-spin text-muted" aria-label="Searching" />
+                )}
                 {!picked && sugg.length > 0 && (
                   <ul id="brief-sugg" role="listbox" className="absolute z-20 mt-1 w-full card max-h-72 overflow-y-auto list-none p-1 shadow-[var(--shadow-lg)]">
                     {sugg.map((s, i) => (
@@ -317,15 +337,20 @@ export default function BriefTool({
           </button>
         </div>
 
-        {mode === "pick" && !picked && (
+        {mode === "pick" && (
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="text-muted">Try:</span>
             {EXAMPLES.map((ex) => (
               <button
-                key={ex.term}
+                key={ex.slug}
                 type="button"
-                onClick={() => setTerm(ex.term)}
-                className="rounded-full border border-rule bg-surface px-2.5 py-1 text-ink-2 hover:border-accent"
+                disabled={busy}
+                onClick={() => {
+                  setPicked({ slug: ex.slug, title: ex.title, date: ex.date, url: "" });
+                  setSugg([]);
+                  run({ reportSlug: ex.slug });
+                }}
+                className="rounded-full border border-rule bg-surface px-2.5 py-1 text-ink-2 hover:border-accent disabled:opacity-50"
               >
                 {ex.label}
               </button>
@@ -359,7 +384,7 @@ export default function BriefTool({
           <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-start">
             {steps.length > 0 ? (
               <div className="lg:sticky lg:top-20">
-                <AgentTrace steps={steps} elapsed={elapsed} replay={replay} />
+                <AgentTrace steps={steps} elapsed={elapsed} replayLabel={replay ? REPLAY_LABEL[replay] : undefined} />
               </div>
             ) : (
               <div />
@@ -378,7 +403,10 @@ export default function BriefTool({
                   <p className="card p-4 text-ink-2">{paused.message}</p>
                   {paused.examples.map((ex, i) => (
                     <div key={i} className="space-y-2">
-                      <p className="eyebrow">Example: {shortTitle(ex.title)}</p>
+                      <p className="eyebrow">
+                        Example, not your report: {shortTitle(ex.title)}
+                        {ex.why ? ` · ${ex.why}` : ""}
+                      </p>
                       <BriefView r={ex.result} />
                     </div>
                   ))}
@@ -391,7 +419,9 @@ export default function BriefTool({
               )}
               {result && (
                 <>
+                  {notice && <p className="card border-l-4 border-l-sand p-4 text-sm text-ink-2">{notice}</p>}
                   <div className="flex flex-wrap justify-end gap-2">
+                    {hash && <PrintLink href={`/print/brief?h=${hash}`} />}
                     {hash && (
                       <button
                         type="button"

@@ -135,6 +135,9 @@ export default function AppShell({ children, updated }: { children: React.ReactN
     };
   }, [open]);
 
+  // Printable briefs are standalone documents: no sidebar, header or footer.
+  if (path.startsWith("/print")) return <>{children}</>;
+
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[272px_1fr]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-surface focus:p-2">

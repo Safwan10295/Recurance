@@ -1,11 +1,38 @@
-# Featured chains shown first on the Start here page, in order. Each entry lists report slugs
-# (the last part of the judiciary.uk URL); publish picks the current chain containing them, so
-# this file survives chain key changes. These are the handoff's demo chains, all verified.
-- name: Smart motorways, live-lane breakdowns
-  reports: [jamil-ahmed-2, zoltan-torok-prevention-of-future-deaths-report, david-levett-prevention-of-future-deaths-report]
-- name: Unbarriered platform ends and live rail
-  reports: [taiyah-grace-peebles, jordan-aira, callum-evans]
-- name: Paraffin emollient fires
-  reports: [pauline-taylor-2, brian-bicat]
-- name: Online pharmacy self-certification
-  reports: [karl-willis, joseph-gingell]
+# What the site puts forward, and what it never puts forward. Read by `python -m pipeline.cli publish`.
+# A chain is named by a key (stable across rebuilds, D20) or by report slugs (resolved at publish time).
+# Every chain listed under featured or start_here must also pass the gate below; one that fails is
+# left out and reported in docs/FEATURED.md, which `python -m pipeline.cli featured-report` writes.
+# This is a curated list of clear examples, never a ranking of organisations.
+
+gate:
+  min_confidence: 0.85          # every link in the chain
+  relations: [identical, closely_related]
+
+# The home page's Featured recurrences, in order. The first is the "See a recurrence" button.
+featured:
+  - name: Public access to live rail at platform ends
+    key: e9aa6be219fee97a
+  - name: First aid and CPR training for prison officers
+    key: 998e88ba79779640
+  - name: Paraffin emollient fires
+    key: 38aced9ab658b30c
+  - name: Online pharmacy self-certification
+    key: 12c95ba862edb687
+  - name: Smart motorways, live-lane breakdowns
+    key: c52cded99f756309       # fails the gate (links at 0.80); kept in the hero timeline only
+
+# The "Start here" row on the chains page (six).
+start_here:
+  - {name: Public access to live rail at platform ends, key: e9aa6be219fee97a}
+  - {name: First aid and CPR training for prison officers, key: 998e88ba79779640}
+  - {name: Young drivers carrying peer-age passengers, key: c417186e4dd770e1}
+  - {name: No medical assessment for drivers over 70, key: 99c2c0c580138b15}
+  - {name: Patient records not shared across NHS trusts, key: e0f115a8cdac8df0}
+  - {name: Paraffin emollient fires, key: 38aced9ab658b30c}
+
+# Never featured anywhere (home page, latest recurrences, start here), with the reason. The chain pages stay.
+exclude:
+  - key: 7da06348598faa8d
+    reason: The quotes point in opposite directions (no VTE assessment made; an assessment carried out), so the link is not clear-cut.
+  - key: 5f48c27ba53d47f5
+    reason: Same earlier report as the excluded VTE chain; the later quote is about medication records, not the assessment.

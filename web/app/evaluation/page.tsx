@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import { RecallChart, type RecallDatum } from "@/components/charts/RecallChart";
 import { EmptyState, InfoTip, PageHeader, Section, StatTile, gapText, pct, shortTitle } from "@/components/ui";
 import { getMeta } from "@/lib/queries";
 
@@ -14,6 +16,8 @@ type SystemRow = {
   hits?: number;
   n?: number;
   recall_ci95?: [number, number];
+  /** True for a route added after the misses were seen. */
+  post_hoc?: boolean;
 };
 type Miss = {
   category: "not_candidate" | "judge_rejected" | "quotes" | "judge_error";
@@ -34,6 +38,8 @@ type Evaluation = {
   hand_labels: { status: string; n_labelled: number };
   misses?: Miss[];
   miss_summary?: Record<string, number>;
+  post_hoc?: unknown;
+  post_hoc_note?: string;
   models?: { model: string; calls: number; input_tokens: number; output_tokens: number; reasoning_tokens: number; cost: number }[];
 };
 
@@ -59,12 +65,25 @@ export default async function EvaluationPage() {
   const meta = await getMeta();
   const ev = meta.evaluation as unknown as Evaluation | null;
   if (!ev) return <EmptyState title="The evaluation has not been published yet" />;
-  const best = Math.max(...ev.systems.map((s) => s.recall_at_threshold ?? 0));
+  // Systems fixed before the test; a post-hoc route is shown but never counts as "best".
+  const preRegistered = ev.systems.filter((s) => !s.post_hoc);
+  const best = Math.max(...preRegistered.map((s) => s.recall_at_threshold ?? 0));
   const misses = ev.misses ?? [];
   const groups = (["not_candidate", "judge_rejected", "quotes", "judge_error"] as const).filter((c) => misses.some((m) => m.category === c));
-  const judge = ev.systems[ev.systems.length - 1];
+  const judge = preRegistered[preRegistered.length - 1];
+  const pairs = judge?.n ?? ev.acknowledged.in_scope_6m;
+  const chartData: RecallDatum[] = ev.systems.map((s) => ({
+    name: s.name,
+    recall: s.recall_at_threshold,
+    hits: s.hits,
+    n: s.n,
+    ci: s.recall_ci95,
+    postHoc: s.post_hoc === true,
+    highlight: !s.post_hoc && s.recall_at_threshold !== null && s.recall_at_threshold === best,
+  }));
+  const withPrecision = ev.hand_labels.n_labelled > 0 ? ev.systems.filter((s) => s.precision !== null && s.precision !== undefined) : [];
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <PageHeader
         crumbs={[{ href: "/", label: "Start here" }, { label: "Evaluation" }]}
         title="Evaluation"
@@ -72,63 +91,55 @@ export default async function EvaluationPage() {
       />
 
       <Section title="Finding recurrences the coroners flagged" tour="eval-chart">
-        <div className="card p-5 space-y-5">
+        <div className="card p-5 space-y-4">
           <p className="text-ink-2 text-sm max-w-3xl">
-            Test set: {ev.acknowledged.in_scope_6m} pairs where a later report itself names an earlier report to the same
-            organisation, at least six months apart. Blind test: the sentences naming the earlier report were removed
-            before the system ran. Each system was allowed to show the same number of links ({ev.systems[0]?.shown_pairs}).
-            No threshold was tuned on these pairs.
+            {ev.acknowledged.in_scope_6m} pairs where a later report names an earlier report to the same organisation, at
+            least six months apart. Blind test: those sentences were removed before the system ran. Each system shows the
+            same number of links ({ev.systems[0]?.shown_pairs}); no threshold was tuned on these pairs.
           </p>
-          <div className="space-y-5">
-            {ev.systems.map((s) => {
-              const r = s.recall_at_threshold ?? 0;
-              const ci = s.recall_ci95;
-              return (
-                <div key={s.name} className="space-y-1.5">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
-                    <span className="font-medium">{s.name}</span>
-                    <span className="num">
-                      <span className="font-serif text-lg">{s.recall_at_threshold === null ? "pending" : pct(r)}</span>
-                      {s.hits !== undefined && <span className="text-muted"> · {s.hits} of {s.n}</span>}
-                      {ci && (
-                        <span className="text-muted text-xs">
-                          {" "}
-                          · 95% range {pct(ci[0])} to {pct(ci[1])}
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="relative h-3 rounded-full bg-paper-2" role="img" aria-label={`${s.name}: ${pct(r)} recall`}>
-                    {ci && (
-                      <div
-                        className="absolute top-1/2 h-0.5 -translate-y-1/2 bg-ink-2/40"
-                        style={{ left: `${ci[0] * 100}%`, width: `${(ci[1] - ci[0]) * 100}%` }}
-                        aria-hidden
-                      />
-                    )}
-                    <div className={`h-full rounded-full ${r === best ? "bg-accent" : "bg-quote-bar"}`} style={{ width: `${Math.round(r * 100)}%` }} />
-                  </div>
-                  <p className="text-xs text-muted">{s.description}</p>
-                </div>
-              );
-            })}
+          <figure className="space-y-3">
+            <figcaption className="eyebrow">Recall: share of the {pairs} pairs found, with 95% range</figcaption>
+            <RecallChart data={chartData} pairs={pairs} id="eval-recall" />
+            {ev.post_hoc_note && <p className="text-xs text-muted max-w-3xl">{ev.post_hoc_note}</p>}
+          </figure>
+          <dl className="grid gap-x-4 gap-y-1 text-xs sm:grid-cols-[max-content_1fr]">
+            {ev.systems.map((s) => (
+              <div key={s.name} className="contents">
+                <dt className="font-medium text-ink-2">{s.name}</dt>
+                <dd className="text-muted mb-1.5 sm:mb-0">{s.description}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="border-t border-rule pt-3 space-y-1.5 text-xs text-muted">
+            <p className="flex flex-wrap items-center gap-1">
+              With only {pairs} pairs the ranges overlap: the ordering is consistent, but the gap is not yet statistically
+              settled.
+              <InfoTip text="The 95% range is a Wilson score interval: the band of recall values consistent with this many hits out of this many pairs." />
+            </p>
+            {withPrecision.length > 0 ? (
+              <p>
+                Precision (the share of shown links a person would accept), from {n(ev.hand_labels.n_labelled)} hand-labelled
+                links:{" "}
+                {withPrecision.map((s, i) => (
+                  <span key={s.name}>
+                    {i > 0 ? "; " : ""}
+                    {s.name} <span className="num text-ink-2">{pct(s.precision as number)}</span>
+                  </span>
+                ))}
+                .
+              </p>
+            ) : (
+              <p>Precision (the share of shown links a person would accept) needs hand labels. Status: {ev.hand_labels.status}.</p>
+            )}
           </div>
-          <p className="text-xs text-muted flex flex-wrap items-center gap-1">
-            With only {judge?.n ?? ev.acknowledged.in_scope_6m} pairs the ranges overlap: the ordering is consistent, but the
-            gap is not yet statistically settled.
-            <InfoTip text="The 95% range is a Wilson score interval: the band of recall values consistent with this many hits out of this many pairs." />
-          </p>
-          <p className="text-xs text-muted">
-            Precision (the share of shown links a person would accept) needs hand labels. Status: {ev.hand_labels.status}.
-          </p>
         </div>
       </Section>
 
       {misses.length > 0 && (
         <Section title="Where it fails">
-          <div className="card p-5 space-y-3">
+          <div className="card p-5 space-y-4">
             <p className="text-ink-2 text-sm max-w-3xl">
-              The Nemotron system missed {misses.length} of the {judge?.n ?? ev.acknowledged.in_scope_6m} pairs.{" "}
+              The Nemotron system missed {misses.length} of the {pairs} pairs:{" "}
               {groups.map((g, i) => (
                 <span key={g}>
                   {i > 0 ? (i === groups.length - 1 ? " and " : ", ") : ""}
@@ -139,33 +150,51 @@ export default async function EvaluationPage() {
               pairs each organisation sends to the judge. Large national bodies, with hundreds of earlier reports, are hit
               hardest. When the judge did see a pair and said no, it called it a related but different hazard.
             </p>
+            <details className="group border-t border-rule pt-3">
+              <summary className="flex w-fit cursor-pointer select-none items-center gap-1.5 text-sm text-accent list-none [&::-webkit-details-marker]:hidden">
+                <ChevronRight size={14} aria-hidden className="transition-transform group-open:rotate-90" />
+                <span className="group-open:hidden">Show all {misses.length} misses</span>
+                <span className="hidden group-open:inline">Hide the {misses.length} misses</span>
+              </summary>
+              <div className="space-y-4 pt-4">
+                {groups.map((g) => (
+                  <div key={g} className="space-y-1.5">
+                    <p className="eyebrow">
+                      {MISS_LABEL[g]} ({misses.filter((m) => m.category === g).length})
+                    </p>
+                    <ul className="divide-y divide-rule rounded-lg border border-rule list-none p-0">
+                      {misses
+                        .filter((m) => m.category === g)
+                        .map((m, i) => (
+                          <li key={i} className="p-3 space-y-1 text-sm">
+                            <p className="text-ink">
+                              <Link href={`/reports/${m.earlier.slug}`}>{shortTitle(m.earlier.title)}</Link> →{" "}
+                              <Link href={`/reports/${m.later.slug}`}>{shortTitle(m.later.title)}</Link>
+                              <span className="text-muted">
+                                {" "}
+                                · {m.organisation} · {gapText(m.days_apart)} apart
+                              </span>
+                            </p>
+                            <p className="text-ink-2">{m.reason}.</p>
+                            {(m.found_by_tfidf || m.found_by_embeddings) && (
+                              <p className="text-xs text-muted">
+                                Found by{" "}
+                                {m.found_by_tfidf && m.found_by_embeddings
+                                  ? "both baselines"
+                                  : m.found_by_tfidf
+                                    ? "the TF-IDF baseline"
+                                    : "the embeddings baseline"}
+                                .
+                              </p>
+                            )}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </details>
           </div>
-          {groups.map((g) => (
-            <div key={g} className="space-y-2">
-              <p className="eyebrow">
-                {MISS_LABEL[g]} ({misses.filter((m) => m.category === g).length})
-              </p>
-              <ul className="card divide-y divide-rule list-none p-0">
-                {misses
-                  .filter((m) => m.category === g)
-                  .map((m, i) => (
-                    <li key={i} className="p-3.5 space-y-1 text-sm">
-                      <p className="text-ink">
-                        <Link href={`/reports/${m.earlier.slug}`}>{shortTitle(m.earlier.title)}</Link> →{" "}
-                        <Link href={`/reports/${m.later.slug}`}>{shortTitle(m.later.title)}</Link>
-                        <span className="text-muted"> · {m.organisation} · {gapText(m.days_apart)} apart</span>
-                      </p>
-                      <p className="text-ink-2">{m.reason}.</p>
-                      {(m.found_by_tfidf || m.found_by_embeddings) && (
-                        <p className="text-xs text-muted">
-                          Found by {m.found_by_tfidf && m.found_by_embeddings ? "both baselines" : m.found_by_tfidf ? "the TF-IDF baseline" : "the embeddings baseline"}.
-                        </p>
-                      )}
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          ))}
         </Section>
       )}
 
@@ -176,7 +205,7 @@ export default async function EvaluationPage() {
           <StatTile value={pct(ev.lost_memory.not_cited)} label="did not cite the earlier report" />
           <StatTile value={pct(ev.lost_memory.all_three)} label="all three at once" />
         </div>
-        <p className="text-sm text-muted">Across {n(ev.lost_memory.links)} shown links.</p>
+        <p className="text-xs text-muted">Across {n(ev.lost_memory.links)} shown links.</p>
       </Section>
 
       <Section title="Cost on Nebius Token Factory">
@@ -189,7 +218,7 @@ export default async function EvaluationPage() {
           />
           <StatTile value={meta.site.n_reports.toLocaleString("en-GB")} label="reports analysed" />
         </div>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-3 lg:grid-cols-2">
           <div className="card overflow-x-auto">
             <table className="w-full text-sm num">
               <thead>
@@ -244,14 +273,14 @@ export default async function EvaluationPage() {
       </Section>
 
       <Section title="Other weak spots">
-        <ol className="card p-5 list-decimal pl-9 space-y-1.5 text-sm text-ink-2">
+        <ol className="card p-5 pl-9 list-decimal space-y-1 text-sm text-ink-2">
           <li>The acknowledged test set is small and favours coroners who write cross-references.</li>
           <li>Many acknowledged pairs are under six months apart and sit outside the six-month rule.</li>
           <li>Precision is pending hand labels.</li>
           <li>Linking is within one organisation, so recurrences after an unknown rename are missed.</li>
         </ol>
       </Section>
-      <section className="grid gap-3 sm:grid-cols-3 border-t border-rule pt-8">
+      <section className="grid gap-3 sm:grid-cols-3 border-t border-rule pt-6">
         <Link href="/nemotron" className="card card-link p-4 hover:no-underline">
           <span className="block font-medium text-ink">How Nemotron did the work →</span>
           <span className="block text-sm text-muted">Models, tokens and cost for every stage.</span>

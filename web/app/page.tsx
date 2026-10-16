@@ -30,7 +30,7 @@ async function counts() {
 }
 
 export default async function Home() {
-  const [meta, featured, recent, c] = await Promise.all([getMeta(), getFeatured(), listRecent({ months: 12, size: 3 }), counts()]);
+  const [meta, featured, recent, c] = await Promise.all([getMeta(), getFeatured(), listRecent({ months: 12, size: 3, clearOnly: true }), counts()]);
   const s = meta.site;
   const lead = featured[0];
   const leadChain = lead ? (await getChain(lead.key)).chain : null;

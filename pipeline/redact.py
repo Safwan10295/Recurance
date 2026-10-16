@@ -155,4 +155,7 @@ def redact(text: str | None, people: list[dict], coroners: set[str] | None = Non
     out = TITLE_RX.sub(_title, out)
     out = ROLE_BEFORE.sub(_role, out)
     out = ROLE_AFTER.sub(_role, out)
-    return redact_deceased(out, deceased_names)
+    out = redact_deceased(out, deceased_names)
+    # Source PDFs sometimes run words together ("Mr JohnClarke's"); a capitalised word glued to a
+    # redaction marker is the rest of the same name.
+    return re.sub(r"(\[name redacted\]|\[the deceased\])[A-Z][a-z'\-]+", r"\1", out)

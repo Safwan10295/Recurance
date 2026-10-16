@@ -59,6 +59,8 @@ def enrich() -> dict:
         "Embeddings only": sum(p["emb"] >= thr["embedding_equal_budget"] for p in pairs),
     }
     for s in ev["systems"]:
+        if s.get("post_hoc"):
+            continue  # scored on its own pairs file (scripts/eval_post_hoc.py)
         k = hits.get(s["name"], sum(bool(p.get("judge_shown")) for p in pairs))
         lo, hi = wilson(k, n)
         s["hits"], s["n"], s["recall_ci95"] = k, n, [round(lo, 3), round(hi, 3)]

@@ -104,7 +104,7 @@ function Items({ s }: { s: Step }) {
 }
 
 // The agent's plan as a vertical pipeline. Nodes light up as steps start and finish.
-export default function AgentTrace({ steps, elapsed, replay }: { steps: Step[]; elapsed?: number; replay?: boolean }) {
+export default function AgentTrace({ steps, elapsed, replayLabel }: { steps: Step[]; elapsed?: number; replayLabel?: string }) {
   const total = steps.reduce(
     (a, s) => ({ cost: a.cost + (s.cost ?? 0), tin: a.tin + (s.tokensIn ?? 0), tout: a.tout + (s.tokensOut ?? 0) + (s.reasoningTokens ?? 0) }),
     { cost: 0, tin: 0, tout: 0 },
@@ -113,7 +113,7 @@ export default function AgentTrace({ steps, elapsed, replay }: { steps: Step[]; 
   return (
     <div className="card p-4 sm:p-5" aria-live="polite">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <p className="eyebrow">{replay ? "Agent trace, replayed from the saved run" : "What the agent is doing"}</p>
+        <p className="eyebrow">{replayLabel ?? "What the agent is doing"}</p>
         {elapsed !== undefined && <p className="num text-xs text-muted">{secs(elapsed)}</p>}
       </div>
       <ol className="list-none p-0">

@@ -70,7 +70,7 @@ export interface BriefResult {
   searched: number;
   cost: number;
   notes: string[];
-  mode?: "agent" | "fixed";
+  mode?: "agent" | "fixed" | "archive";
 }
 
 const toVec = (v: ArrayLike<number>) => "[" + Array.from(v, (x) => x.toFixed(5)).join(",") + "]";

@@ -192,3 +192,33 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 4. If the loop fails, gives no tool call or hits a limit, the fixed pipeline runs instead, so a brief is always produced. LIVE_AGENT=off switches the agent off.
 5. The loop and checks are in web/lib/agent-core.ts, with no database or network imports, and are tested offline with a scripted fake model.
 6. In testing, the archive report for David Levett gave 4 verified earlier warnings in 5 rounds and 4 tool calls, for $0.0056. The fixed pipeline found 2 for the same report.
+
+## D30. A second candidate route, reported as post-hoc
+
+1. Most of the 14 missed test pairs never reached the judge: no single pair of concerns passed the candidate filter.
+2. The new route sends each later report's top 3 earlier reports to the same organisation, by whole-report wording (TF-IDF at 0.137 or above), to the judge. Each such report pair is judged on its best-scoring pair of concerns.
+3. The settings were chosen before any test result. The cut-off is the TF-IDF baseline's existing equal-budget threshold, and top 3 was picked from a dry-run cost estimate (482 new pairs, about $0.36). Nothing was tuned on the 29 pairs.
+4. Cost: $0.341 for 482 judged pairs. 153 were identical or closely related, and 99% of quotes were verified.
+5. Result on the blind test: 15 of 29, the same as before. One more test pair reached the judge, and was judged related at 0.80, so it is not shown.
+6. The Evaluation page shows this as a separate post-hoc row beside the original comparison, which is unchanged. No other set of coroner-acknowledged pairs exists, so it has not been validated on held-out pairs.
+7. The route stays because it adds verified links on the archive: shown links rose to 1,360 and chains to 666. 23 chain keys were redirected.
+
+## D31. A quality gate for what is put forward
+
+1. A chain is featured on the home page, or in the Start here row, only if every link is identical or closely related, at confidence 0.85 or above, with both quotes verified.
+2. The list is in pipeline/publish/featured.yaml. python -m pipeline.cli featured-report writes docs/FEATURED.md with the reason for each decision.
+3. The Worcestershire VTE chain is never featured. Its two quotes point in opposite directions. A second chain built on the same earlier report is excluded too.
+4. Smart motorways fails the gate (links at 0.80). It stays in the hero timeline only, which shows its own figures from the database.
+5. Latest recurrences on the home page show only links at the gate's confidence, from chains not on the exclusion list.
+6. The list is curated examples in a fixed order, not a ranking of organisations.
+
+## D32. A brief is never a dead end
+
+1. The three example chips run from briefs computed in advance with the pipeline key, and replay their trace at no cost. They are stored in pub_meta (precomputed_briefs).
+2. When the live brief is paused (no live key, a cap reached or the switch off), an archive report shows its own saved brief from the published links and responses, with the steps replayed and a notice saying so.
+3. Any other input gets the two most relevant precomputed examples, same organisation first, each labelled "Example, not your report" with the reason it was chosen.
+4. The reason for the pause is written to the server log (console.warn) with the reason code and what is missing. Keys are never logged.
+
+## D33. Ontario skipped
+
+1. The optional Ontario extension was skipped, as agreed in round 3. Its data terms are uncertain and its response duty differs. The time went to the brief fallback and the judge-facing pages instead.

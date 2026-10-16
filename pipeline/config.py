@@ -73,7 +73,7 @@ MAX_TOKENS = {
 # 788 credits the Tavily usage endpoint reported on 16 Oct 2026. The other 30% stays for the live agent.
 TAVILY_STAGE_F_CAP_CREDITS = 801
 # The demo chains (smart motorways, platform ends, emollient fires, online pharmacy). Keys are stable.
-FEATURED_CHAIN_KEYS = ["c52cded99f756309", "ede39b33e85d5106", "38aced9ab658b30c", "12c95ba862edb687"]
+FEATURED_CHAIN_KEYS = ["c52cded99f756309", "e9aa6be219fee97a", "38aced9ab658b30c", "12c95ba862edb687"]
 
 # Scraper politeness.
 SCRAPE_DELAY_SECONDS = 1.0
@@ -82,6 +82,11 @@ PFD_BASE = "https://www.judiciary.uk/prevention-of-future-death-reports/"
 # Linking thresholds (initial values; tuned against the coroner-acknowledged set).
 MIN_DAYS_APART = 182
 TFIDF_MIN = 0.25
+# Second candidate route (D30, post-hoc): per organisation, each later report's top earlier reports by
+# whole-report wording go to the judge even when no single concern pair passed the thresholds above.
+# The cut-off reuses the TF-IDF baseline's equal-budget threshold; nothing was tuned on the test pairs.
+REPORT_ROUTE_TOP_K = 3
+REPORT_ROUTE_TFIDF_MIN = 0.137
 EMBED_MIN = 0.62
 MAX_PAIRS_PER_ORG = 30
 PAIRS_PER_REPORT = 0.5  # larger organisations may keep up to half as many pairs as they have reports (D18)

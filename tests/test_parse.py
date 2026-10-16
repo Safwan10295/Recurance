@@ -142,3 +142,9 @@ def test_prefix_anchor_snaps_to_source_sentence():
     st, q = check_quote("The Network Rail Signaller has no means through which to relay the details of any discussions "
                         "with drivers to the train company Control", src)
     assert st == SNAPPED and q.endswith("pass this information on.") and verify_quote(q, src)
+
+
+def test_name_glued_to_a_redaction_marker_is_removed():
+    # Source PDFs sometimes run words together; the rest of the name must not survive.
+    out = redact("Officers involved in Mr [name redacted]Clarke's ACCT process", [], set(), {"X Y"})
+    assert "Clarke" not in out and "[name redacted] ACCT" in out

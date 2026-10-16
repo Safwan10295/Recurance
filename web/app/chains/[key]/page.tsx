@@ -2,6 +2,7 @@ import { ArrowRight, Building2, ChevronDown, ScanSearch } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import ChainStory from "@/components/ChainStory";
+import { PrintLink } from "@/components/PrintButton";
 import Tabs from "@/components/Tabs";
 import {
   Badge,
@@ -293,6 +294,9 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
             {chain.n_reports} reports · {year(chain.first_date)}–{year(chain.last_date)}
           </Badge>
           {chain.any_no_response && <Badge>No published response to an earlier report</Badge>}
+          <span className="ml-auto">
+            <PrintLink href={`/print/chains/${chain.key}`} />
+          </span>
         </div>
       </header>
       <Tabs tabs={tabs} />

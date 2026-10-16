@@ -52,6 +52,21 @@
     0.344,
     0.686
    ]
+  },
+  {
+   "name": "Hybrid + report route + Nemotron Super judge",
+   "description": "Adds a second candidate route: each later report's top 3 earlier reports by whole-report wording. Added after seeing the misses",
+   "recall_at_threshold": 0.5172413793103449,
+   "recall_at_5": 0.7241379310344828,
+   "shown_pairs": 1360,
+   "precision": null,
+   "hits": 15,
+   "n": 29,
+   "recall_ci95": [
+    0.344,
+    0.686
+   ],
+   "post_hoc": true
   }
  ],
  "thresholds": {
@@ -66,20 +81,20 @@
   "all_three": 0.7280197206244864
  },
  "cost": {
-  "total": 5.1515,
+  "total": 5.5068,
   "by_stage": {
    "A": 0.7729,
    "B": 0.2321,
-   "C": 3.0227,
+   "C": 3.367,
    "D": 0.966,
-   "F": 0.0352,
-   "dev": 0.1108,
+   "F": 0.0451,
+   "dev": 0.112,
    "embed": 0.0117
   },
-  "analysis_cost": 4.0395,
-  "chains": 618,
-  "per_chain": 0.00834,
-  "per_chain_analysis": 0.00654
+  "analysis_cost": 4.3838,
+  "chains": 666,
+  "per_chain": 0.00827,
+  "per_chain_analysis": 0.00658
  },
  "hand_labels": {
   "status": "pending: no labels filled in yet",
@@ -347,19 +362,19 @@
  "models": [
   {
    "model": "nvidia/nemotron-3-super-120b-a12b",
-   "calls": 4263,
-   "input_tokens": 4961626,
-   "output_tokens": 1909493,
-   "reasoning_tokens": 1146553,
-   "cost": 3.1131
+   "calls": 4749,
+   "input_tokens": 5492008,
+   "output_tokens": 2130299,
+   "reasoning_tokens": 1281159,
+   "cost": 3.4574
   },
   {
    "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
-   "calls": 9454,
-   "input_tokens": 8701277,
-   "output_tokens": 2248801,
+   "calls": 9593,
+   "input_tokens": 8842775,
+   "output_tokens": 2262014,
    "reasoning_tokens": 0,
-   "cost": 1.0604
+   "cost": 1.0715
   },
   {
    "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
@@ -372,11 +387,12 @@
   {
    "model": "Qwen/Qwen3-Embedding-8B",
    "calls": 318,
-   "input_tokens": 1187446,
+   "input_tokens": 1187784,
    "output_tokens": 0,
    "reasoning_tokens": 0,
    "cost": 0.0117
   }
  ],
- "report_generated_at": "2026-10-16T13:17:09+00:00"
+ "report_generated_at": "2026-10-16T18:43:03+00:00",
+ "post_hoc_note": "Post-hoc: the report route was added after seeing that most misses never reached the judge, so its result is not an independent test. It finds 15 of 29 (52%): 0 more than before, 0 fewer. It shows 1360 links; at that larger budget the baselines find tf-idf only 45%, embeddings only 52%. No other test set of coroner-acknowledged pairs exists, so it has not been validated on held-out pairs."
 }

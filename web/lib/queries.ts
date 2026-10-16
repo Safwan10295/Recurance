@@ -9,6 +9,9 @@ export interface Meta {
   evaluation: Record<string, unknown> | null;
   brief_examples: unknown[];
   featured: string[];
+  start_here?: string[];
+  excluded_chains?: string[];
+  feature_gate?: { min_confidence: number; relations: string[] };
   published_at: string;
   last_refresh: { finished?: string; new_reports?: number } | null;
 }
@@ -142,7 +145,9 @@ export interface RecentEntry {
   is_new: boolean;
 }
 
-export async function listRecent(opts: { months?: number; orgType?: string; page?: number; size?: number }) {
+// clearOnly: the home page's Latest recurrences show only clear-cut links (the featured gate's confidence,
+// never from an excluded chain; pipeline/publish/featured.yaml).
+export async function listRecent(opts: { months?: number; orgType?: string; page?: number; size?: number; clearOnly?: boolean }) {
   const months = opts.months ?? 12;
   const size = opts.size ?? 15;
   const page = Math.max(1, opts.page ?? 1);
@@ -152,7 +157,12 @@ export async function listRecent(opts: { months?: number; orgType?: string; page
     params.push(opts.orgType);
     typeSql = `AND c.org_type = $${params.length}`;
   }
-  return cached(`recent:${months}:${opts.orgType ?? ""}:${page}:${size}`, async () => {
+  if (opts.clearOnly) {
+    const m = await getMeta();
+    params.push(m.feature_gate?.min_confidence ?? 0.85, m.excluded_chains ?? []);
+    typeSql += ` AND l.confidence >= $${params.length - 1} AND NOT (c.key = ANY($${params.length}::text[]))`;
+  }
+  return cached(`recent:${months}:${opts.orgType ?? ""}:${page}:${size}:${opts.clearOnly ? 1 : 0}`, async () => {
     const base = `FROM pub_links l JOIN pub_chains c ON c.key = l.chain_key
       WHERE l.later_date >= (current_date - make_interval(months => $1::int)) ${typeSql}`;
     const totalRow = await q1<{ n: number }>(`SELECT COUNT(DISTINCT (l.later_url, c.org_id))::int n ${base}`, params);

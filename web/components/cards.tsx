@@ -1,16 +1,32 @@
 import Link from "next/link";
 import type { ChainSummary } from "@/lib/types";
 import type { RecentEntry } from "@/lib/queries";
+import DotTimeline from "./chains/DotTimeline";
 import { Badge, ConfidenceTag, QuotePair, Quote, RelationTag, formatDate, orgTypeLabel, year, shortTitle } from "./ui";
 
-export function ChainCard({ c }: { c: ChainSummary }) {
+type WithDates = ChainSummary & { dates?: string[] };
+
+function coronerCount(n: number): string {
+  return `${n} coroner${n === 1 ? "" : "s"}`;
+}
+
+function reportCount(n: number): string {
+  return `${n} report${n === 1 ? "" : "s"}`;
+}
+
+export function ChainCard({ c, dates }: { c: WithDates; dates?: string[] }) {
+  const ds = dates ?? c.dates ?? [];
+  const timeline = ds.length > 1;
   return (
     <Link href={`/chains/${c.key}`} className="card p-4 flex flex-col gap-2 hover:no-underline hover:border-accent transition-colors h-full">
       <span className="eyebrow">{c.org.name}</span>
       <span className="font-serif text-lg text-ink leading-snug">{c.hazard}</span>
-      <span className="text-sm text-ink-2 mt-auto">
-        {c.n_reports} reports · {year(c.first_date)}–{year(c.last_date)} ·{" "}
-        {c.coroners.length > 1 ? `${c.coroners.length} coroners` : "1 coroner"}
+      <span className="mt-auto block space-y-1.5">
+        {timeline && <DotTimeline dates={ds} />}
+        <span className="block text-sm text-ink-2 num">
+          {reportCount(c.n_reports)}
+          {timeline ? "" : ` · ${year(c.first_date)}–${year(c.last_date)}`} · {coronerCount(c.coroners.length)}
+        </span>
       </span>
       <span className="flex flex-wrap gap-1.5">
         <RelationTag relation={c.relation} />
@@ -19,12 +35,14 @@ export function ChainCard({ c }: { c: ChainSummary }) {
   );
 }
 
-export function ChainRow({ c }: { c: ChainSummary }) {
+export function ChainRow({ c, dates }: { c: WithDates; dates?: string[] }) {
+  const ds = dates ?? c.dates ?? [];
+  const timeline = ds.length > 1;
   return (
-    <li className="py-3.5">
-      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+    <li className="py-4">
+      <div className="grid gap-x-6 gap-y-2 sm:grid-cols-[minmax(0,1fr)_14rem]">
         <div className="min-w-0 space-y-0.5">
-          <Link href={`/chains/${c.key}`} className="font-serif text-lg text-ink">
+          <Link href={`/chains/${c.key}`} className="font-serif text-lg text-ink leading-snug">
             {c.hazard}
           </Link>
           <p className="text-sm text-ink-2">
@@ -34,14 +52,21 @@ export function ChainRow({ c }: { c: ChainSummary }) {
             · {orgTypeLabel(c.org.type)}
           </p>
         </div>
-        <div className="text-right text-sm text-ink-2 shrink-0">
+        <div className="text-sm text-ink-2 num space-y-1 sm:text-right">
           <div>
-            <strong className="text-ink">{c.n_reports}</strong> reports · {year(c.first_date)}–{year(c.last_date)}
+            <strong className="text-ink">{c.n_reports}</strong> {c.n_reports === 1 ? "report" : "reports"} ·{" "}
+            {coronerCount(c.coroners.length)}
+            {!timeline && (
+              <>
+                {" "}
+                · {year(c.first_date)}–{year(c.last_date)}
+              </>
+            )}
           </div>
-          <div className="text-muted">{c.coroners.length > 1 ? `${c.coroners.length} different coroners` : "same coroner"}</div>
+          {timeline && <DotTimeline dates={ds} className="max-w-xs sm:max-w-none" />}
         </div>
       </div>
-      <div className="flex flex-wrap gap-1.5 mt-2">
+      <div className="flex flex-wrap gap-1.5 mt-2.5">
         <RelationTag relation={c.relation} />
         <ConfidenceTag value={c.confidence} />
         {c.any_no_response && <Badge>No published response to an earlier report</Badge>}
