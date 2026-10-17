@@ -69,7 +69,7 @@ export default function HeroTimeline({
   const cap = captionIdx !== null ? reports[captionIdx] : null;
 
   return (
-    <div ref={ref} data-m="hero" data-state={state} className="rw-m card p-5 sm:p-6 shadow-[var(--shadow-lg)]" data-tour="problem">
+    <div ref={ref} data-m="hero" data-state={state} className="rw-m card p-5 sm:p-6 shadow-[var(--shadow-lg)] [contain:layout_paint]" data-tour="problem">
       <div className="mb-1 flex items-baseline justify-between gap-2">
         <p className="eyebrow">The problem, in a real case</p>
         <Link href={`/chains/${chainKey}`} className="text-xs">
@@ -86,52 +86,59 @@ export default function HeroTimeline({
         {formatDate(reports[reports.length - 1].date)}, from {allCoroners} coroners. Of the {nLater} later reports, {closing}.
       </p>
 
-      <svg viewBox={`0 0 ${W} 136`} className="mt-3 block h-auto w-full overflow-visible" aria-hidden>
-        <line x1={20} x2={W - 20} y1={BASE} y2={BASE} className="stroke-rule" strokeWidth={1} />
-        {years.map((y) => {
-          const { at, anchor } = yearLabel(y);
-          return (
-            <text key={y} x={at} y={BASE + 26} textAnchor={anchor} fontSize={15} className="fill-[var(--muted)] num">
-              {y}
-            </text>
-          );
-        })}
+      {/* Static axis and years in one SVG; every moving part is its own small layer that only changes opacity
+          and transform, so the browser composites the animation instead of repainting it each frame. */}
+      <div className="relative mt-3 w-full" style={{ aspectRatio: `${W} / 136` }}>
+        <svg viewBox={`0 0 ${W} 136`} className="absolute inset-0 h-full w-full overflow-visible" aria-hidden>
+          <line x1={20} x2={W - 20} y1={BASE} y2={BASE} className="stroke-rule" strokeWidth={1} />
+          {years.map((y) => {
+            const { at, anchor } = yearLabel(y);
+            return (
+              <text key={y} x={at} y={BASE + 26} textAnchor={anchor} fontSize={15} className="fill-[var(--muted)] num">
+                {y}
+              </text>
+            );
+          })}
+        </svg>
         {reports.slice(1).map((r, j) => {
           const i = j + 1;
           const xa = x(reports[0].date);
           const xb = x(r.date);
           const h = Math.min(86, 16 + (xb - xa) * 0.32);
           return (
-            <path
+            // Each arc reaches out from the first warning to its report.
+            <div
               key={`arc-${i}`}
-              d={`M ${xa} ${BASE} Q ${(xa + xb) / 2} ${BASE - h * 1.6} ${xb} ${BASE}`}
-              pathLength={1}
-              fill="none"
-              strokeWidth={focus === i ? 2 : 1.25}
-              className={`m-draw stroke-[var(--accent)] ${focus !== null && focus !== i ? "opacity-25" : "opacity-70"}`}
-              style={{ "--d": `${START + i * DOT_GAP + 120}ms`, "--dur": "760ms" } as React.CSSProperties}
-            />
+              aria-hidden
+              className="m-reach absolute inset-0"
+              style={{ "--d": `${START + i * DOT_GAP + 120}ms`, transformOrigin: `${(xa / W) * 100}% ${(BASE / 136) * 100}%` } as React.CSSProperties}
+            >
+              <svg viewBox={`0 0 ${W} 136`} className="h-full w-full overflow-visible">
+                <path
+                  d={`M ${xa} ${BASE} Q ${(xa + xb) / 2} ${BASE - h * 1.6} ${xb} ${BASE}`}
+                  fill="none"
+                  strokeWidth={focus === i ? 2 : 1.25}
+                  className={`stroke-[var(--accent)] transition-opacity duration-200 ${focus !== null && focus !== i ? "opacity-25" : "opacity-70"}`}
+                />
+              </svg>
+            </div>
           );
         })}
         {reports.map((r, i) => (
-          <g
+          <span
             key={`dot-${i}`}
-            className="m-pop cursor-default"
-            style={{ "--d": `${START + i * DOT_GAP}ms` } as React.CSSProperties}
+            aria-hidden
+            className="m-pop absolute flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 cursor-default items-center justify-center"
+            style={{ left: `${(x(r.date) / W) * 100}%`, top: `${(BASE / 136) * 100}%`, "--d": `${START + i * DOT_GAP}ms` } as React.CSSProperties}
             onMouseEnter={() => setFocus(i)}
             onMouseLeave={() => setFocus(null)}
           >
-            <circle cx={x(r.date)} cy={BASE} r={14} fill="transparent" />
-            <circle
-              cx={x(r.date)}
-              cy={BASE}
-              r={i === 0 ? 7 : 5.5}
-              strokeWidth={2}
-              className={`stroke-[var(--accent)] ${i === 0 ? "fill-[var(--accent)]" : "fill-[var(--surface)]"} ${focus === i ? "stroke-[3]" : ""}`}
+            <span
+              className={`block rounded-full border-2 border-accent ${i === 0 ? "h-3.5 w-3.5 bg-accent" : "h-3 w-3 bg-surface"} ${focus === i ? "ring-2 ring-accent/40" : ""}`}
             />
-          </g>
+          </span>
         ))}
-      </svg>
+      </div>
 
       <p className="min-h-5 text-xs text-muted num" aria-hidden>
         {cap ? `Report ${captionIdx! + 1} · ${month(cap.date)}${cap.area ? ` · ${cap.area}` : ""}${captionIdx === 0 ? " · first warning" : ""}` : " "}

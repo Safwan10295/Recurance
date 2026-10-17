@@ -21,7 +21,13 @@ export default function HundredDots({ notCited, diffCoroner, nLinks }: { notCite
   const { ref, state, done, replay } = useMotion<HTMLDivElement>("dots", { threshold: 0.4, durationMs: total });
 
   return (
-    <section ref={ref} data-state={state} className="rw-m card grid gap-6 p-5 sm:p-6 md:grid-cols-[auto_1fr] md:items-center" aria-labelledby="dots-heading">
+    <section
+      ref={ref}
+      data-state={state}
+      className="rw-m card grid gap-6 p-5 sm:p-6 md:grid-cols-[auto_1fr] md:items-center"
+      aria-labelledby="dots-heading"
+      style={{ "--t0": `${tintStart}ms` } as React.CSSProperties}
+    >
       <div
         className="grid w-fit grid-cols-10 gap-[6px]"
         role="img"
@@ -34,7 +40,7 @@ export default function HundredDots({ notCited, diffCoroner, nLinks }: { notCite
             <span
               key={i}
               className={`hd-dot h-3.5 w-3.5 rounded-full sm:h-4 sm:w-4 ${isDim ? "" : "hd-kept"} ${isRing ? "hd-ring" : ""}`}
-              style={{ "--d1": `${400 + i * DIM_STEP}ms`, "--d2": `${tintStart + i * TINT_STEP}ms` } as React.CSSProperties}
+              style={{ "--i": i } as React.CSSProperties}
             />
           );
         })}
@@ -43,22 +49,22 @@ export default function HundredDots({ notCited, diffCoroner, nLinks }: { notCite
         <h2 id="dots-heading" className="font-serif text-2xl leading-snug">
           Each dot is 1% of the {nLinks.toLocaleString("en-GB")} links found between reports
         </h2>
-        <dl className="space-y-3">
+        <div className="space-y-3">
           <div className="flex items-start gap-3">
             <span aria-hidden className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full bg-[var(--dot)]" />
             <div>
-              <dt className="font-serif text-3xl leading-none text-ink num">{pct(notCited)}</dt>
-              <dd className="mt-1 text-sm text-ink-2">dimmed: the later report does not cite the earlier one</dd>
+              <p className="font-serif text-3xl leading-none text-ink num">{pct(notCited)}</p>
+              <p className="mt-1 text-sm text-ink-2">dimmed: the later report does not cite the earlier one</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <span aria-hidden className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full bg-[var(--dot)] shadow-[inset_0_0_0_2.5px_var(--accent)]" />
             <div>
-              <dt className="font-serif text-3xl leading-none text-ink num">{pct(diffCoroner)}</dt>
-              <dd className="mt-1 text-sm text-ink-2">ringed: the later report came from a different coroner</dd>
+              <p className="font-serif text-3xl leading-none text-ink num">{pct(diffCoroner)}</p>
+              <p className="mt-1 text-sm text-ink-2">ringed: the later report came from a different coroner</p>
             </div>
           </div>
-        </dl>
+        </div>
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-muted">A link shows that a similar concern was raised again, not why.</p>
           <button

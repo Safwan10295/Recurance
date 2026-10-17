@@ -343,7 +343,8 @@ html[data-seen~="hero"] [data-m="hero"] .m-draw {
   box-shadow: inset 0 0 0 2.5px var(--accent);
 }
 .rw-m .hd-dot {
-  transition: background-color 380ms ease-out var(--d1, 0ms), box-shadow 420ms ease-out var(--d2, 0ms);
+  /* Delays from the dot's index (--i) and the tint start set on the section (--t0); steps match HundredDots.tsx. */
+  transition: background-color 380ms ease-out calc(400ms + var(--i, 0) * 34ms), box-shadow 420ms ease-out calc(var(--t0, 0ms) + var(--i, 0) * 18ms);
 }
 .js .rw-m[data-state="pre"] .hd-dot {
   background: var(--ink-2);
@@ -465,4 +466,26 @@ html[data-seen~="hero"] [data-m="hero"] .m-draw {
 }
 @media (prefers-reduced-motion: reduce) {
   .js .rw-m[data-state="pre"] .m-growy { transform: none; }
+}
+
+/* A1: the hero's arcs reach out from the first warning. Transform and opacity only, on their own layers. */
+.rw-m[data-state="run"] .m-reach {
+  will-change: transform, opacity;
+}
+.rw-m .m-reach {
+  transition: transform 760ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms), opacity 300ms ease-out var(--d, 0ms);
+}
+.js .rw-m[data-state="pre"] .m-reach {
+  opacity: 0;
+  transform: scaleX(0.02);
+}
+.rw-m[data-m="hero"][data-state="run"] .m-pop {
+  will-change: transform, opacity;
+}
+html[data-seen~="hero"] [data-m="hero"] .m-reach {
+  opacity: 1 !important;
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .rw-m[data-state="pre"] .m-reach { opacity: 1; transform: none; }
 }

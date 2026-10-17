@@ -296,7 +296,7 @@ export default function AppShell({ children, updated }: { children: React.ReactN
         </footer>
       </div>
 
-      <nav aria-label="Quick links" className="fixed inset-x-0 bottom-0 z-30 border-t border-rule bg-surface/95 backdrop-blur pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <nav aria-label="Quick links" className="fixed inset-x-0 bottom-0 z-30 border-t border-rule bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden">
         <ul className="grid list-none grid-cols-4 p-0">
           {TABS.map(({ href, label, icon: Icon }) => {
             const active = isActive(path, href);

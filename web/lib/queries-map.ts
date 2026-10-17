@@ -201,7 +201,7 @@ export async function getMapPreview(): Promise<{ plain: string; chained: string;
     "map-preview",
     async () => {
       const rows = await q<{ x: number; y: number; c: boolean }>(
-        `SELECT x, y, chain_key IS NOT NULL c FROM pub_hazard_points WHERE id % 16 = 0 OR (chain_key IS NOT NULL AND id % 4 = 0)`,
+        `SELECT x, y, chain_key IS NOT NULL c FROM pub_hazard_points WHERE id % 24 = 0 OR (chain_key IS NOT NULL AND id % 7 = 0)`,
       );
       if (!rows.length) return null;
       const seg = (r: { x: number; y: number }) => `M${(r.x * 100).toFixed(1)} ${(r.y * 100).toFixed(1)}h0`;

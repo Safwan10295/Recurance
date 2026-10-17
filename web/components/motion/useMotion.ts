@@ -92,8 +92,14 @@ export function useMotion<T extends HTMLElement | SVGElement = HTMLDivElement>(
         if (seen) {
           io.disconnect();
           if (session) markSeen(id);
-          setState("run");
-          setRuns((n) => n + 1);
+          // Start when the browser is idle (at most 700 ms later), so an animation never competes with hydration.
+          const go = () => {
+            setState("run");
+            setRuns((n) => n + 1);
+          };
+          const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+          if (w.requestIdleCallback) w.requestIdleCallback(go, { timeout: 700 });
+          else setTimeout(go, 0);
         }
       },
       { threshold: [0, 0.1, 0.25, threshold, 0.5, 1] },
