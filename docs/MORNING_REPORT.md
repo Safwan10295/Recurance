@@ -26,7 +26,7 @@ Tavily credits used by Stage F: 801 of its cap of 801 (ledger count; D28). The l
 3. Organisations after normalisation: 3832.
 4. Candidate pairs: 4543. Judged by Nemotron Super: 4543 (closely_related 1052, different 1472, identical 514, related 1505).
 5. Response documents read: 1763. Promises with verified quotes: 2276.
-6. Verified chains: 666. Dossiers drafted: 25, of which you have approved 2. Follow-up checks: 269.
+6. Verified chains: 666. Dossiers drafted: 25, of which you have approved 6. Follow-up checks: 269.
 
 Unique reports vs the expected 6,449: 6454 (+0.1%). The listing pages and sitemaps were cross-checked (docs/RESEARCH_LOG.md).
 
@@ -92,15 +92,11 @@ See docs/BLOCKERS.md for each note in full.
 
 Each step is written out in docs/SUBMISSION_CHECKLIST.md.
 
-1. Approve the featured dossiers that are waiting. Platform ends is among them again because its chain key changed when the second route added links.
-   - Run .venv\Scripts\python -m pipeline.cli dossiers-export.
-   - Read data/exports/dossiers_for_review.md.
-   - Run .venv\Scripts\python -m pipeline.cli review --featured. It offers the four waiting, platform ends first.
-2. Check the credit expiry date in the Token Factory console. It cannot be read from the API.
-3. Create the server (deploy/README.md) and a separate Token Factory key for it.
-4. Optional: label the 80 test pairs (.venv\Scripts\python -m pipeline.cli label) to fill in precision.
-5. Make the repo public when you submit. Its history was already purged; run the scan in the checklist first.
-6. Record the video from docs/VIDEO_SHOT_LIST.md and make it public on YouTube.
-7. Submit on Devpost with docs/DEVPOST_DRAFT.md and docs/FEEDBACK.md.
-8. After the hackathon, rotate the keys that were pasted into a chat.
+1. Check the credit expiry date in the Token Factory console. It cannot be read from the API.
+2. Create the server (deploy/README.md) and a separate Token Factory key for it.
+3. Optional: label the 80 test pairs (.venv\Scripts\python -m pipeline.cli label) to fill in precision.
+4. Make the repo public when you submit. Its history was already purged; run the scan in the checklist first.
+5. Record the video from docs/VIDEO_SHOT_LIST.md and make it public on YouTube.
+6. Submit on Devpost with docs/DEVPOST_DRAFT.md and docs/FEEDBACK.md.
+7. After the hackathon, rotate the keys that were pasted into a chat.
 

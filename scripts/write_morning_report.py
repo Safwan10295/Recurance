@@ -75,16 +75,12 @@ if blk.exists():
     L += ["- " + ln[3:] for ln in blk.read_text(encoding="utf-8").splitlines() if ln.startswith("## ")] + [""]
 L += ["## Things only you can do", "",
       "Each step is written out in docs/SUBMISSION_CHECKLIST.md.", "",
-      "1. Approve the featured dossiers that are waiting. Platform ends is among them again because its chain key changed when the second route added links.",
-      "   - Run .venv\Scripts\python -m pipeline.cli dossiers-export.",
-      "   - Read data/exports/dossiers_for_review.md.",
-      "   - Run .venv\Scripts\python -m pipeline.cli review --featured. It offers the four waiting, platform ends first.",
-      "2. Check the credit expiry date in the Token Factory console. It cannot be read from the API.",
-      "3. Create the server (deploy/README.md) and a separate Token Factory key for it.",
-      "4. Optional: label the 80 test pairs (.venv\Scripts\python -m pipeline.cli label) to fill in precision.",
-      "5. Make the repo public when you submit. Its history was already purged; run the scan in the checklist first.",
-      "6. Record the video from docs/VIDEO_SHOT_LIST.md and make it public on YouTube.",
-      "7. Submit on Devpost with docs/DEVPOST_DRAFT.md and docs/FEEDBACK.md.",
-      "8. After the hackathon, rotate the keys that were pasted into a chat.", ""]
+      "1. Check the credit expiry date in the Token Factory console. It cannot be read from the API.",
+      "2. Create the server (deploy/README.md) and a separate Token Factory key for it.",
+      "3. Optional: label the 80 test pairs (.venv\Scripts\python -m pipeline.cli label) to fill in precision.",
+      "4. Make the repo public when you submit. Its history was already purged; run the scan in the checklist first.",
+      "5. Record the video from docs/VIDEO_SHOT_LIST.md and make it public on YouTube.",
+      "6. Submit on Devpost with docs/DEVPOST_DRAFT.md and docs/FEEDBACK.md.",
+      "7. After the hackathon, rotate the keys that were pasted into a chat.", ""]
 (ROOT / "docs" / "MORNING_REPORT.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 print("wrote docs/MORNING_REPORT.md")
