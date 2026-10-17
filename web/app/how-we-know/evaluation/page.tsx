@@ -85,7 +85,7 @@ export default async function EvaluationPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        crumbs={[{ href: "/", label: "Start here" }, { label: "Evaluation" }]}
+        crumbs={[{ href: "/how-we-know", label: "How we know" }, { label: "Evaluation" }]}
         title="Evaluation"
         description="Does the system find recurrences that coroners themselves recognised, and does Nemotron add anything over simple baselines? Including where it fails."
       />
@@ -268,7 +268,7 @@ export default async function EvaluationPage() {
         </div>
         <p className="text-sm text-muted">
           Routing: Nano for extraction ({meta.site.models?.nano}), Super for judging ({meta.site.models?.super}), Ultra for
-          dossiers ({meta.site.models?.ultra}). <Link href="/nemotron">How Nemotron did the work →</Link>
+          dossiers ({meta.site.models?.ultra}). <Link href="/how-we-know">How Nemotron did the work →</Link>
         </p>
       </Section>
 
@@ -281,11 +281,11 @@ export default async function EvaluationPage() {
         </ol>
       </Section>
       <section className="grid gap-3 sm:grid-cols-3 border-t border-rule pt-6">
-        <Link href="/nemotron" className="card card-link p-4 hover:no-underline">
+        <Link href="/how-we-know" className="card card-link p-4 hover:no-underline">
           <span className="block font-medium text-ink">How Nemotron did the work →</span>
           <span className="block text-sm text-muted">Models, tokens and cost for every stage.</span>
         </Link>
-        <Link href="/methodology" className="card card-link p-4 hover:no-underline">
+        <Link href="/how-we-know/methodology" className="card card-link p-4 hover:no-underline">
           <span className="block font-medium text-ink">Methodology →</span>
           <span className="block text-sm text-muted">How links are made, safeguards and limits.</span>
         </Link>

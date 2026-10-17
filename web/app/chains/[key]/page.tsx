@@ -246,8 +246,8 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
         </table>
       </div>
       <p className="text-muted">
-        Judge model: {chain.links[0]?.model}. <Link href="/nemotron">How Nemotron did the work</Link> ·{" "}
-        <Link href="/methodology">Full methodology</Link>.
+        Judge model: {chain.links[0]?.model}. <Link href="/how-we-know">How Nemotron did the work</Link> ·{" "}
+        <Link href="/how-we-know/methodology">Full methodology</Link>.
       </p>
     </div>
   );
@@ -360,7 +360,7 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
       <p className="text-xs text-muted max-w-3xl mt-10">
         This shows that a similar concern was raised again after an earlier report. It does not say why, and it is not a
         finding about any organisation or person. To report an error, see the{" "}
-        <Link href="/methodology#corrections">corrections route</Link>.
+        <Link href="/how-we-know/methodology#corrections">corrections route</Link>.
       </p>
     </article>
   );

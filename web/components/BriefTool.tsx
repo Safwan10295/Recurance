@@ -215,16 +215,17 @@ export default function BriefTool({
       (mode === "url" && /^https:\/\/www\.judiciary\.uk\//.test(reportUrl.trim())) ||
       (mode === "text" && concerns.trim().length >= 40 && organisation.trim().length > 1));
 
-  const modeBtn = (m: Mode, label: string, Icon: typeof FileText) => (
+  const modeBtn = (m: Mode, label: string, short: string, Icon: typeof FileText) => (
     <button
       type="button"
       onClick={() => setMode(m)}
       aria-pressed={mode === m}
-      className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-2 text-sm font-medium transition-colors ${
+      className={`flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium transition-colors duration-200 ${
         mode === m ? "bg-surface text-ink shadow-sm" : "text-muted hover:text-ink"
       }`}
     >
-      <Icon size={15} aria-hidden /> <span>{label}</span>
+      <Icon size={15} aria-hidden /> <span className="sm:hidden">{short}</span>
+      <span className="hidden sm:inline">{label}</span>
     </button>
   );
 
@@ -246,9 +247,9 @@ export default function BriefTool({
         }}
       >
         <div className="flex gap-1 rounded-lg bg-paper-2 p-1" role="group" aria-label="How to give the report">
-          {modeBtn("pick", "Pick a report", FileText)}
-          {modeBtn("url", "Web address", Globe)}
-          {modeBtn("text", "Paste text", PenLine)}
+          {modeBtn("pick", "Pick a report", "Pick", FileText)}
+          {modeBtn("url", "Web address", "Address", Globe)}
+          {modeBtn("text", "Paste text", "Paste", PenLine)}
         </div>
 
         <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">

@@ -3,7 +3,7 @@
 import { ArrowRight, Building2, CornerDownLeft, FileText, Link2, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { NAV } from "./nav";
+import { ALL_PAGES } from "./nav";
 
 type Results = {
   chains: { key: string; hazard: string; org_name: string; n_reports: number }[];
@@ -65,7 +65,7 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
 
   const items: Item[] = useMemo(() => {
     const t = term.trim().toLowerCase();
-    const pages: Item[] = NAV.flatMap((g) => g.items)
+    const pages: Item[] = ALL_PAGES
       .filter((p) => !t || p.label.toLowerCase().includes(t) || p.hint.toLowerCase().includes(t))
       .map((p) => ({ href: p.href, label: p.label, sub: p.hint, kind: "page" }));
     const out: Item[] = [];

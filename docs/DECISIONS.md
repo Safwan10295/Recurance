@@ -246,3 +246,13 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 1. The examples must run instantly and show a real result, so they come from the 28 precomputed briefs.
 2. The ambulance report first chosen found no earlier warnings in its precomputed run: the agent picked the Department of Health and Social Care as its organisation. It was replaced by a 2026 young driver report that finds 4.
 3. The examples are a smart motorway report (coroner), a young driver report (solicitor or lawyer), a railway platform report (family) and a prison first aid report (safety team).
+
+## D37. Front-end round: navigation and a small motion system
+
+1. Nemotron, Evaluation and Methodology are one section, How we know, with a tab each: /how-we-know, /how-we-know/evaluation and /how-we-know/methodology. The old addresses redirect permanently (308), including anchors such as #corrections.
+2. The sidebar has 8 items. Check a report, You be the judge and Hazard map are marked as the main things to try. Organisations left the sidebar; it is reached from chain and report pages and from the command palette.
+3. The home page always tells the smart motorway case, in the hero and in How a warning gets lost. It is still not featured elsewhere (D31).
+4. The guided path strip (see a chain, watch the agent, check the evidence, see the cost) is rendered on the server. Dismissal is stored in localStorage and applied before paint, like the theme, so the strip never shifts the page.
+5. Phones get a bottom tab bar: Home, Check, Chains, Map.
+6. Animations use one hook and a few CSS classes (components/motion/useMotion.ts), with no animation library. An animation plays once when it scrolls into view and ends on a still frame. The start frame applies only when scripts run, so without them, with reduced motion, or for an animation already seen this session, the page shows the final frame. ?replay in the address plays everything again, for recording.
+7. Playwright is not added to package.json: it is far over the 30 KB limit for new dependencies without asking. The smoke tests are in the repo and run with a Playwright install outside the project (docs/UX_NOTES.md).

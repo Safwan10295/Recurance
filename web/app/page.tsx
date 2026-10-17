@@ -5,7 +5,6 @@ import {
   Cpu,
   FileWarning,
   Gavel,
-  Map,
   MessageSquareQuote,
   Repeat2,
   ScanSearch,
@@ -14,15 +13,18 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import AudienceCards from "@/components/AudienceCards";
+import CostOdometer from "@/components/CostOdometer";
 import HeroTimeline from "@/components/HeroTimeline";
+import HundredDots from "@/components/HundredDots";
 import { TourButton } from "@/components/shell/Tour";
 import { ChainCard, RecentCard } from "@/components/cards";
 import { InfoTip, Section, StatTile, btnPrimary, btnSecondary, formatDate, pct } from "@/components/ui";
 import { q1 } from "@/lib/db";
 import { GLOSSARY } from "@/lib/glossary";
 import { getChain, getFeatured, getMeta, listRecent } from "@/lib/queries";
+import { getMapPreview } from "@/lib/queries-map";
 
-// The hero timeline: smart motorways, seven reports over five years (D31: shown here only, not featured).
+// The home page always tells one case: smart motorways (N3). It is shown here, not featured (D31).
 const HERO_CHAIN = "c52cded99f756309";
 
 async function counts() {
@@ -35,65 +37,57 @@ async function counts() {
 }
 
 export default async function Home() {
-  const [meta, featured, recent, c] = await Promise.all([getMeta(), getFeatured(), listRecent({ months: 12, size: 3, clearOnly: true }), counts()]);
-  const s = meta.site;
-  const lead = featured[0];
-  const [leadChain, heroChain] = await Promise.all([
-    lead ? getChain(lead.key).then((r) => r.chain) : null,
+  const [meta, featured, recent, c, hero, preview] = await Promise.all([
+    getMeta(),
+    getFeatured(),
+    listRecent({ months: 12, size: 3, clearOnly: true }),
+    counts(),
     getChain(HERO_CHAIN).then((r) => r.chain).catch(() => null),
+    getMapPreview(),
   ]);
-  const leadPromises = leadChain ? leadChain.reports.slice(0, -1).reduce((n, r) => n + r.responses.reduce((m, rs) => m + rs.promises.length, 0), 0) : 0;
+  const s = meta.site;
+  const promises = hero ? hero.reports.slice(0, -1).reduce((n, r) => n + r.responses.reduce((m, rs) => m + rs.promises.length, 0), 0) : 0;
+  // Later reports in the hero chain that cite an earlier one.
+  const citedLater = hero ? new Set(hero.links.filter((l) => l.later_cites_earlier).map((l) => l.later)).size : 0;
 
   const problem: { icon: LucideIcon; title: string; body: string }[] = [
     {
       icon: FileWarning,
       title: "A coroner warns",
-      body: leadChain
-        ? `${formatDate(leadChain.first_date)}: a coroner tells ${leadChain.org.name} about a risk to life.`
-        : "A coroner writes to an organisation about a risk to life.",
+      body: hero ? `${formatDate(hero.first_date)}: a coroner tells ${hero.org.name} about a risk to life.` : "A coroner writes to an organisation about a risk to life.",
     },
     {
       icon: MessageSquareQuote,
       title: "The organisation responds",
-      body: leadChain && leadPromises ? `Its responses state ${leadPromises} specific actions.` : "Within 56 days it must reply with what it will do.",
+      body: hero && promises ? `Its responses state ${promises} specific actions.` : "Within 56 days it must reply with what it will do.",
     },
     {
       icon: Repeat2,
       title: "It happens again",
-      body: leadChain
-        ? `The same concern is raised ${leadChain.n_reports - 1} more times, by ${leadChain.coroners.length - 1} other coroners, up to ${leadChain.last_date.slice(0, 4)}.`
+      body: hero
+        ? `The same concern is raised ${hero.n_reports - 1} more times, by ${hero.coroners.length - 1} other coroners, up to ${hero.last_date.slice(0, 4)}.`
         : "Years later, a similar death, in front of a different coroner.",
     },
     {
       icon: Unlink,
       title: "Nobody joins it up",
       body:
-        leadChain && leadChain.links.length
-          ? `In ${leadChain.links.filter((l) => !l.later_cites_earlier).length} of the ${leadChain.links.length} links in this chain, the later report does not cite the earlier one.`
+        hero && hero.links.length
+          ? `In ${hero.links.filter((l) => !l.later_cites_earlier).length} of the ${hero.links.length} links in this chain, the later report does not cite the earlier one.`
           : "The later report rarely cites the earlier one.",
     },
   ];
 
-  const features: { href: string; icon: LucideIcon; title: string; body: string; stat: string }[] = [
-    { href: "/brief", icon: ScanSearch, title: "Watch the agent", body: "Give any report. See Nemotron extract, search, judge and verify, step by step.", stat: "Live on Token Factory" },
+  const more: { href: string; icon: LucideIcon; title: string; body: string; stat: string }[] = [
     { href: "/promises", icon: MessageSquareQuote, title: "Promises, then again", body: "Where a response stated an action and a later coroner raised the same concern.", stat: `${c.after_promise.toLocaleString("en-GB")} links` },
-    { href: "/map", icon: Map, title: "Hazard map", body: "Every concern placed by meaning, with the recurrences drawn between them.", stat: `${c.points.toLocaleString("en-GB")} concerns` },
-    { href: "/nemotron", icon: Cpu, title: "How Nemotron did the work", body: "Nano, Super and Ultra, the tokens they used and what it cost.", stat: `$${s.spend.total.toFixed(2)} in total` },
-    { href: "/judge", icon: Gavel, title: "You be the judge", body: "Two concerns, years apart. Same hazard or not? Compare your call with the model's.", stat: "8 rounds, about two minutes" },
     { href: "/recent", icon: Clock3, title: "Recent recurrences", body: "New reports from the last year that repeat a warning already given.", stat: `${recent.total} reports` },
-  ];
-
-  const tour = [
-    { title: "See one recurrence", body: "One hazard, one organisation, years of reports, with the exact words from each.", href: lead ? `/chains/${lead.key}` : "/chains", cta: "Open the chain" },
-    { title: "Watch the agent work", body: "Pick a report. Watch each step, model and verdict as it happens.", href: "/brief", cta: "Check a report" },
-    { title: "Read the promises", body: "Stated actions, followed by the same concern from a later coroner.", href: "/promises", cta: "Promises, then again" },
-    { title: "Check the evidence", body: "How often it finds recurrences the coroners flagged, against two baselines.", href: "/evaluation", cta: "Evaluation" },
+    { href: "/how-we-know", icon: Cpu, title: "How we know", body: "How Nemotron did the work, how well it does against baselines, and the safeguards.", stat: "Nemotron, evaluation, methodology" },
   ];
 
   return (
     <div className="space-y-14">
       {/* Hero */}
-      <section className="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-center">
+      <section className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
         <div className="space-y-5">
           <p className="eyebrow">Prevention of Future Deaths reports · England and Wales</p>
           <h1 className="font-serif text-[2rem] sm:text-[2.6rem] xl:text-[2.9rem] leading-[1.1] tracking-tight">
@@ -108,31 +102,84 @@ export default async function Home() {
             <Link href="/brief" className={`${btnPrimary} px-4 py-2.5`}>
               <ScanSearch size={17} aria-hidden /> Check a report
             </Link>
-            {lead && (
-              <Link href={`/chains/${lead.key}`} className={`${btnSecondary} px-4 py-2.5`}>
-                See a recurrence <ArrowRight size={16} aria-hidden />
-              </Link>
-            )}
+            <Link href={`/chains/${HERO_CHAIN}`} className={`${btnSecondary} px-4 py-2.5`}>
+              See a recurrence <ArrowRight size={16} aria-hidden />
+            </Link>
             <TourButton className={`${btnSecondary} px-4 py-2.5`}>
               <Compass size={16} aria-hidden /> Take the guided tour
             </TourButton>
           </div>
         </div>
 
-        {heroChain ? (
-          <HeroTimeline chain={heroChain} notCited={s.share_not_cited} diffCoroner={s.share_diff_coroner} nLinks={s.n_links} />
+        {hero ? (
+          <HeroTimeline
+            chainKey={hero.key}
+            hazard={hero.hazard}
+            orgName={hero.org.name}
+            reports={hero.reports.map((r) => ({ date: r.date, area: r.area, coroner: r.coroner }))}
+            citedLater={citedLater}
+          />
         ) : (
           <div data-tour="problem" />
         )}
       </section>
 
-      {/* The problem, step by step, in the lead featured chain */}
+      {/* The three things to try (N2) */}
+      <section aria-labelledby="try-heading" className="space-y-4">
+        <h2 id="try-heading" className="sr-only">
+          Try it
+        </h2>
+        <div className="grid gap-3 md:grid-cols-3">
+          <Link href="/brief" className="card card-link group flex flex-col gap-3 p-5 hover:no-underline">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-ink" aria-hidden>
+              <ScanSearch size={22} />
+            </span>
+            <span className="font-serif text-xl leading-snug text-ink">Check a report</span>
+            <span className="text-sm text-ink-2">Give any report. Watch Nemotron search, judge and verify, step by step, with every quote checked.</span>
+            <span className="mt-auto flex items-center justify-between pt-1 text-sm font-medium text-accent">
+              Watch the agent <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+            </span>
+          </Link>
+          <Link href="/judge" className="card card-link group flex flex-col gap-3 p-5 hover:no-underline">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-ink" aria-hidden>
+              <Gavel size={22} />
+            </span>
+            <span className="font-serif text-xl leading-snug text-ink">You be the judge</span>
+            <span className="text-sm text-ink-2">Two concerns, years apart. Same hazard or not? Then see what Nemotron Super decided, and why.</span>
+            <span className="mt-auto flex items-center justify-between pt-1 text-sm font-medium text-accent">
+              Play eight rounds <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+            </span>
+          </Link>
+          <Link href="/map" className="card card-link group flex flex-col overflow-hidden hover:no-underline">
+            {preview && (
+              <svg viewBox="-2 4 104 92" className="block h-32 w-full bg-paper-2/60 py-2" aria-hidden preserveAspectRatio="xMidYMid meet">
+                <path d={preview.plain} strokeWidth={1.1} strokeLinecap="round" className="stroke-[var(--dot)]" />
+                <path d={preview.chained} strokeWidth={1.3} strokeLinecap="round" className="stroke-[var(--accent)] opacity-60" />
+              </svg>
+            )}
+            <span className="flex flex-1 flex-col gap-2 p-5 pt-4">
+              <span className="font-serif text-xl leading-snug text-ink">Hazard map</span>
+              <span className="text-sm text-ink-2">
+                Every one of {c.points.toLocaleString("en-GB")} concerns, placed by meaning, with the recurrences drawn between them.
+              </span>
+              <span className="mt-auto flex items-center justify-between pt-1 text-sm font-medium text-accent">
+                Explore the map <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+              </span>
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      {/* A2: the share of links where memory was lost */}
+      <HundredDots notCited={s.share_not_cited} diffCoroner={s.share_diff_coroner} nLinks={s.n_links} />
+
+      {/* The problem, step by step, in the hero case */}
       <section className="space-y-3" aria-labelledby="problem-heading">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="problem-heading" className="font-serif text-2xl">How a warning gets lost</h2>
-          {lead && (
-            <Link href={`/chains/${lead.key}`} className="text-sm">
-              {lead.hazard} →
+          {hero && (
+            <Link href={`/chains/${hero.key}`} className="text-sm">
+              Read the smart motorway chain →
             </Link>
           )}
         </div>
@@ -164,37 +211,16 @@ export default async function Home() {
       <section className="space-y-3" data-tour="stats">
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatTile value={s.n_chains.toLocaleString("en-GB")} label="recurrence chains, every quote verified" href="/chains" />
-          <StatTile value={s.n_links.toLocaleString("en-GB")} label="links between reports, each with quotes from both" href="/recent" />
-          <StatTile value={pct(s.share_no_response)} label="of links where no published response to the earlier report was found" href="/methodology" />
+          <StatTile value={pct(s.share_no_response)} label="of links where no published response to the earlier report was found" href="/how-we-know/methodology" />
           <StatTile value={c.after_promise.toLocaleString("en-GB")} label="times a concern was raised again after a stated action" href="/promises" />
+          <Link href="/how-we-know" className="col-span-2 lg:col-span-1 hover:no-underline">
+            <CostOdometer total={s.spend.total} chains={s.n_chains} label="to read the whole archive on Token Factory" compact />
+          </Link>
         </div>
         <p className="flex items-center gap-1.5 text-xs text-muted">
           From {s.n_reports.toLocaleString("en-GB")} reports, 2013 to now. A link shows a concern was raised again, not why.
           <InfoTip text={GLOSSARY.after_promise} />
         </p>
-      </section>
-
-      {/* Showcase features */}
-      <section className="space-y-4">
-        <h2 className="font-serif text-2xl">Explore</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => {
-            const Icon = f.icon;
-            return (
-              <Link key={f.href} href={f.href} className="card card-link group flex flex-col gap-3 p-5 hover:no-underline">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent" aria-hidden>
-                  <Icon size={20} />
-                </span>
-                <span className="font-serif text-lg text-ink leading-snug">{f.title}</span>
-                <span className="text-sm text-ink-2">{f.body}</span>
-                <span className="mt-auto flex items-center justify-between pt-1 text-xs text-muted">
-                  <span className="num">{f.stat}</span>
-                  <ArrowRight size={15} className="text-accent transition-transform group-hover:translate-x-0.5" aria-hidden />
-                </span>
-              </Link>
-            );
-          })}
-        </div>
       </section>
 
       <Section title="Featured recurrences" action={<Link href="/chains">All {s.n_chains} chains →</Link>}>
@@ -220,23 +246,26 @@ export default async function Home() {
         </ul>
       </Section>
 
-      <section id="tour" className="space-y-4 scroll-mt-24">
-        <div>
-          <h2 className="font-serif text-2xl">The 60-second tour</h2>
-          <p className="text-ink-2 text-sm">Four stops. Each opens the real tool, not a mock-up.</p>
-        </div>
-        <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 list-none p-0">
-          {tour.map((t, i) => (
-            <li key={t.title}>
-              <Link href={t.href} className="card card-link flex h-full flex-col gap-2 p-4 hover:no-underline">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-accent-ink text-sm font-semibold num">{i + 1}</span>
-                <span className="font-semibold text-ink">{t.title}</span>
-                <span className="text-sm text-ink-2">{t.body}</span>
-                <span className="mt-auto text-sm font-medium text-accent">{t.cta} →</span>
+      <section className="space-y-4">
+        <h2 className="font-serif text-2xl">More to explore</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {more.map((f) => {
+            const Icon = f.icon;
+            return (
+              <Link key={f.href} href={f.href} className="card card-link group flex flex-col gap-3 p-5 hover:no-underline">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent" aria-hidden>
+                  <Icon size={20} />
+                </span>
+                <span className="font-serif text-lg text-ink leading-snug">{f.title}</span>
+                <span className="text-sm text-ink-2">{f.body}</span>
+                <span className="mt-auto flex items-center justify-between pt-1 text-xs text-muted">
+                  <span className="num">{f.stat}</span>
+                  <ArrowRight size={15} className="text-accent transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+                </span>
               </Link>
-            </li>
-          ))}
-        </ol>
+            );
+          })}
+        </div>
       </section>
 
       <section className="card p-5 sm:p-6 space-y-4">
@@ -260,7 +289,7 @@ export default async function Home() {
         </ol>
         <p className="border-t border-rule pt-3 text-sm text-muted">
           PFD Monitor groups concerns. The Preventable Deaths Tracker chases deadlines. Recurrence Watch tests whether
-          promises held. <Link href="/nemotron">How Nemotron did the work →</Link>
+          promises held. <Link href="/how-we-know">How Nemotron did the work →</Link>
         </p>
       </section>
     </div>

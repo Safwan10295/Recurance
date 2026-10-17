@@ -1,10 +1,11 @@
 "use client";
 
-import { Compass, Menu, ScanSearch, Search, X } from "lucide-react";
+import { Compass, Home, Link2, Map, Menu, ScanSearch, Search, X, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CommandPalette from "./CommandPalette";
+import GuidePath from "./GuidePath";
 import { NAV } from "./nav";
 import ThemeToggle from "./ThemeToggle";
 import Tour, { startTour } from "./Tour";
@@ -16,6 +17,14 @@ const BUILT_WITH: [string, string][] = [
   ["Tavily", "follow-up web search"],
   ["Postgres and pgvector", "search"],
   ["Next.js", "site"],
+];
+
+// Phones get the four most-used places as a bottom tab bar; everything else stays in the menu.
+const TABS: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/brief", label: "Check", icon: ScanSearch },
+  { href: "/chains", label: "Chains", icon: Link2 },
+  { href: "/map", label: "Map", icon: Map },
 ];
 
 function isActive(path: string, href: string) {
@@ -57,7 +66,18 @@ function NavList({ path, onNavigate }: { path: string; onNavigate?: () => void }
                       active ? "bg-accent-soft text-ink" : "text-ink-2 hover:bg-paper-2 hover:text-ink"
                     }`}
                   >
-                    <Icon size={16} aria-hidden className={`mt-0.5 shrink-0 ${active ? "text-accent" : "text-muted group-hover:text-ink-2"}`} />
+                    {it.primary ? (
+                      <span
+                        aria-hidden
+                        className={`-ml-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-colors duration-200 ${
+                          active ? "bg-accent text-accent-ink" : "bg-accent-soft text-accent group-hover:bg-accent group-hover:text-accent-ink"
+                        }`}
+                      >
+                        <Icon size={14} />
+                      </span>
+                    ) : (
+                      <Icon size={16} aria-hidden className={`mt-0.5 shrink-0 ${active ? "text-accent" : "text-muted group-hover:text-ink-2"}`} />
+                    )}
                     <span className="min-w-0">
                       <span className={`block text-sm ${active ? "font-semibold" : "font-medium"}`}>{it.label}</span>
                       <span className="block text-xs text-muted leading-snug">{it.hint}</span>
@@ -217,10 +237,10 @@ export default function AppShell({ children, updated }: { children: React.ReactN
             >
               <Menu size={18} aria-hidden />
             </button>
-            <Link href="/" className="lg:hidden hover:no-underline min-w-0">
+            <Link href="/" className="lg:hidden hover:no-underline shrink-0">
               <Wordmark compact />
             </Link>
-            <div className="hidden sm:flex flex-1">
+            <div className="hidden sm:flex flex-1 min-w-0">
               <SearchButton onOpen={() => setPalette(true)} />
             </div>
             <div className="ml-auto flex items-center gap-2">
@@ -242,10 +262,11 @@ export default function AppShell({ children, updated }: { children: React.ReactN
             </div>
           </div>
         </header>
+        <GuidePath path={path} />
         <main id="main" className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-9">
           {children}
         </main>
-        <footer className="border-t border-rule">
+        <footer className="border-t border-rule pb-16 lg:pb-0">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-muted space-y-1.5">
             <ul className="mb-3 flex flex-wrap items-center gap-1.5 p-0" aria-label="Built with">
               <li className="mr-1 eyebrow">Built with</li>
@@ -261,12 +282,32 @@ export default function AppShell({ children, updated }: { children: React.ReactN
             </p>
             <p>
               A link shows that a similar concern was raised again, not why. It is not a finding about any organisation or
-              person. <Link href="/methodology" className="underline underline-offset-2">Methodology and responsible use</Link> ·{" "}
-              <Link href="/methodology#corrections" className="underline underline-offset-2">Report an error</Link>
+              person. <Link href="/how-we-know/methodology" className="underline underline-offset-2">Methodology and responsible use</Link> ·{" "}
+              <Link href="/how-we-know/methodology#corrections" className="underline underline-offset-2">Report an error</Link>
             </p>
           </div>
         </footer>
       </div>
+
+      <nav aria-label="Quick links" className="fixed inset-x-0 bottom-0 z-30 border-t border-rule bg-surface/95 backdrop-blur pb-[env(safe-area-inset-bottom)] lg:hidden">
+        <ul className="grid list-none grid-cols-4 p-0">
+          {TABS.map(({ href, label, icon: Icon }) => {
+            const active = isActive(path, href);
+            return (
+              <li key={href}>
+                <Link
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] hover:no-underline ${active ? "text-accent font-semibold" : "text-muted"}`}
+                >
+                  <Icon size={19} aria-hidden />
+                  {label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
 }

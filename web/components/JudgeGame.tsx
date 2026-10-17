@@ -89,7 +89,13 @@ export default function JudgeGame({ pairs, facts }: { pairs: GamePair[]; facts: 
     shownAt.current = Date.now();
   }, [pairs]);
 
+  // Keep the game in view as rounds change, but never scroll on first load.
+  const firstRender = useRef(true);
   useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
     topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [stage, round]);
 

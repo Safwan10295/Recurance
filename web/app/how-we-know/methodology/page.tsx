@@ -11,7 +11,7 @@ export default async function Methodology() {
   const repo = process.env.REPO_URL;
   return (
     <article className="space-y-5 max-w-3xl">
-      <PageHeader crumbs={[{ href: "/", label: "Start here" }, { label: "Methodology" }]} title="Methodology and responsible use" description="How the links are made, what they mean, and what they do not mean." />
+      <PageHeader crumbs={[{ href: "/how-we-know", label: "How we know" }, { label: "Methodology" }]} title="Methodology and responsible use" description="How the links are made, what they mean, and what they do not mean." />
 
       <section className="card p-5 sm:p-6 space-y-3">
         <h2 className="font-serif text-xl">What a link means</h2>
@@ -104,7 +104,7 @@ export default async function Methodology() {
           <li>Linking is within one organisation. Renamed or merged bodies are linked only where a rename is known.</li>
           <li>Some older reports and responses are scanned images. They were read with OCR, which can introduce errors.</li>
           <li>Similarity search can miss a recurrence described in very different words.</li>
-          <li>The judge model can be wrong. Confidence is the model&apos;s own estimate, checked against a labelled sample on the <Link href="/evaluation">evaluation page</Link>.</li>
+          <li>The judge model can be wrong. Confidence is the model&apos;s own estimate, checked against a labelled sample on the <Link href="/how-we-know/evaluation">evaluation page</Link>.</li>
         </ol>
       </section>
 

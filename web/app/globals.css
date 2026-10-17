@@ -259,3 +259,104 @@
     animation: none;
   }
 }
+
+html[data-guide="off"] .guide-strip {
+  display: none;
+}
+
+/* Motion system (components/motion/useMotion.ts, D37). Calm: ease-out, no bounce, under 8 s in total.
+   Each element waits for its own --d delay. The start frame applies only when scripts run (.js),
+   so a page without them, reduced motion, or an animation already seen shows the final frame. */
+.rw-m .m-fade,
+.rw-m .m-pop,
+.rw-m .m-rise {
+  transition: opacity 480ms ease-out var(--d, 0ms), transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms);
+}
+.rw-m .m-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--dur, 800ms) ease-in-out var(--d, 0ms);
+}
+.rw-m .m-growx {
+  transform-origin: left center;
+  transition: transform var(--dur, 900ms) cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms);
+}
+.js .rw-m[data-state="pre"] .m-fade {
+  opacity: 0;
+}
+.js .rw-m[data-state="pre"] .m-pop {
+  opacity: 0;
+  transform: scale(0.4);
+}
+.js .rw-m[data-state="pre"] .m-rise {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.js .rw-m[data-state="pre"] .m-draw {
+  stroke-dashoffset: 1;
+}
+.js .rw-m[data-state="pre"] .m-growx {
+  transform: scaleX(0);
+}
+.rw-m .m-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.rw-m[data-state="pre"] *,
+.rw-m[data-state="still"] * {
+  transition: none !important;
+}
+html[data-seen~="hero"] [data-m="hero"] :is(.m-fade, .m-pop, .m-rise),
+html[data-seen~="map-intro"] [data-m="map-intro"] :is(.m-fade, .m-pop, .m-rise) {
+  opacity: 1 !important;
+  transform: none !important;
+}
+html[data-seen~="hero"] [data-m="hero"] .m-draw {
+  stroke-dashoffset: 0 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rw-m * {
+    transition: none !important;
+    animation: none !important;
+  }
+  .js .rw-m[data-state="pre"] :is(.m-fade, .m-pop, .m-rise) {
+    opacity: 1;
+    transform: none;
+  }
+  .js .rw-m[data-state="pre"] .m-draw {
+    stroke-dashoffset: 0;
+  }
+  .js .rw-m[data-state="pre"] .m-growx {
+    transform: none;
+  }
+}
+
+/* A2, the 100 dots: start dark, dim one by one, then gain a ring. */
+.hd-dot {
+  background: var(--dot);
+  box-shadow: none;
+}
+.hd-dot.hd-kept {
+  background: var(--ink-2);
+}
+.hd-dot.hd-ring {
+  box-shadow: inset 0 0 0 2.5px var(--accent);
+}
+.rw-m .hd-dot {
+  transition: background-color 380ms ease-out var(--d1, 0ms), box-shadow 420ms ease-out var(--d2, 0ms);
+}
+.js .rw-m[data-state="pre"] .hd-dot {
+  background: var(--ink-2);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .rw-m[data-state="pre"] .hd-dot {
+    background: var(--dot);
+  }
+  .js .rw-m[data-state="pre"] .hd-dot.hd-kept {
+    background: var(--ink-2);
+  }
+  .js .rw-m[data-state="pre"] .hd-dot.hd-ring {
+    box-shadow: inset 0 0 0 2.5px var(--accent);
+  }
+}

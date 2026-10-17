@@ -249,3 +249,15 @@ Verified:
 - 76 screenshots across every route, desktop and phone, light and dark, with no sideways scrolling and no browser errors.
 
 Spend by stage: A $0.77, B $0.23, C $3.37, D $0.97, F $0.05, dev $0.26, embeddings $0.01. Total $5.65 of $20. This round used $0.49 of its $4. The $5 live reserve and the $9.50 margin are untouched.
+
+## Phase 11: front-end round, navigation (2026-10-17)
+
+1. docs/UX_AUDIT.md: 108 screenshots (18 routes, 1440, 768 and 390 px, light and dark) and a warm Lighthouse baseline of 95 to 98 for performance and 100 for accessibility.
+2. How we know: one section with three tabs, old addresses redirected (D37).
+3. Sidebar down to 8 items, with the three main features marked. The same three are large cards under the home hero, the hazard map card with a muted preview of the real map.
+4. The home page tells the smart motorway case throughout.
+5. A dismissible Step 1 of 4 guided path, and a bottom tab bar on phones.
+6. The Check a report tabs no longer wrap on phones, and You be the judge no longer scrolls itself on first load.
+7. Started on the animations: the hero draws its chain (A1), the 100 dots (A2) and a cost odometer (A5) on the home page.
+
+No Nebius or Tavily spend.

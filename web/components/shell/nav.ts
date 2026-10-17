@@ -10,19 +10,21 @@ import {
   Map,
   MessageSquareQuote,
   ScanSearch,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 
-export type NavItem = { href: string; label: string; hint: string; icon: LucideIcon };
+export type NavItem = { href: string; label: string; hint: string; icon: LucideIcon; primary?: boolean };
 
+// Eight items. The three hands-on features are marked primary: they are what a first-time visitor should try.
 export const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: "Use the tool",
     items: [
       { href: "/", label: "Start here", hint: "What this is, in one minute", icon: Home },
-      { href: "/brief", label: "Check a report", hint: "Watch the agent find earlier warnings", icon: ScanSearch },
-      { href: "/judge", label: "You be the judge", hint: "Same hazard or not? Try it", icon: Gavel },
-      { href: "/recent", label: "Recent recurrences", hint: "New reports that repeat a warning", icon: Clock3 },
+      { href: "/brief", label: "Check a report", hint: "Watch the agent find earlier warnings", icon: ScanSearch, primary: true },
+      { href: "/judge", label: "You be the judge", hint: "Same hazard or not? Try it", icon: Gavel, primary: true },
+      { href: "/map", label: "Hazard map", hint: "Every concern, placed by meaning", icon: Map, primary: true },
     ],
   },
   {
@@ -30,19 +32,25 @@ export const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { href: "/chains", label: "Recurrence chains", hint: "Hazards raised again and again", icon: Link2 },
       { href: "/promises", label: "Promises, then again", hint: "Stated actions, then the same concern", icon: MessageSquareQuote },
-      { href: "/map", label: "Hazard map", hint: "Every concern, placed by meaning", icon: Map },
-      { href: "/organisations", label: "Organisations", hint: "Who received which warnings", icon: Building2 },
+      { href: "/recent", label: "Recent recurrences", hint: "New reports that repeat a warning", icon: Clock3 },
     ],
   },
   {
     group: "How we know",
-    items: [
-      { href: "/nemotron", label: "How Nemotron did the work", hint: "Models, tokens and cost", icon: Cpu },
-      { href: "/evaluation", label: "Evaluation", hint: "Accuracy against baselines", icon: BarChart3 },
-      { href: "/methodology", label: "Methodology", hint: "Method, safeguards, corrections", icon: BookOpen },
-    ],
+    items: [{ href: "/how-we-know", label: "How we know", hint: "Nemotron, evaluation, methodology", icon: ShieldCheck }],
   },
 ];
 
+// Every page the command palette can jump to, including those reached from inside a section.
+export const ALL_PAGES: NavItem[] = [
+  ...NAV.flatMap((g) => g.items),
+  { href: "/organisations", label: "Organisations", hint: "Who received which warnings", icon: Building2 },
+  { href: "/how-we-know", label: "How Nemotron did the work", hint: "Models, tokens and cost", icon: Cpu },
+  { href: "/how-we-know/evaluation", label: "Evaluation", hint: "Accuracy against baselines", icon: BarChart3 },
+  { href: "/how-we-know/methodology", label: "Methodology", hint: "Method, safeguards, corrections", icon: BookOpen },
+];
+
 // Runs before paint (inlined in the layout) so the page never flashes the wrong theme.
-export const THEME_SCRIPT = `try{var t=localStorage.getItem("rw-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+// Also, before paint: hides the guided path once dismissed, marks that scripts run (.js, so animations may
+// start from an empty frame), and lists animations already seen this session (they open on their final frame).
+export const THEME_SCRIPT = `try{var t=localStorage.getItem("rw-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;if(localStorage.getItem("rw-guide")==="off")document.documentElement.dataset.guide="off"}catch(e){}try{var d=document.documentElement;d.classList.add("js");if(!/[?&]replay/.test(location.search))d.dataset.seen=JSON.parse(sessionStorage.getItem("rw-seen")||"[]").join(" ")}catch(e){}`;

@@ -22,7 +22,7 @@ import type { ModelFamily, Totals } from "@/lib/queries-pipeline";
 export const metadata = { title: "How Nemotron did the work · Recurrence Watch" };
 export const dynamic = "force-dynamic";
 
-const CRUMBS = [{ href: "/", label: "Start here" }, { label: "How Nemotron did the work" }];
+const CRUMBS = [{ href: "/how-we-know", label: "How we know" }, { label: "Nemotron" }];
 
 const DEFAULT_IDS: Record<Exclude<ModelFamily, "other">, string> = {
   nano: "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
@@ -64,8 +64,8 @@ export default async function NemotronPage() {
       <div className="space-y-10">
         <PageHeader crumbs={CRUMBS} title="How Nemotron did the work" />
         <EmptyState title="The pipeline summary has not been published yet">
-          It appears after the next publish. Meanwhile, see the <Link href="/evaluation">evaluation</Link> or the{" "}
-          <Link href="/methodology">methodology</Link>.
+          It appears after the next publish. Meanwhile, see the <Link href="/how-we-know/evaluation">evaluation</Link> or the{" "}
+          <Link href="/how-we-know/methodology">methodology</Link>.
         </EmptyState>
       </div>
     );
@@ -411,10 +411,10 @@ export default async function NemotronPage() {
           </p>
         )}
         <div className="flex flex-wrap gap-2">
-          <Link href="/evaluation" className={btnSecondary}>
+          <Link href="/how-we-know/evaluation" className={btnSecondary}>
             Evaluation
           </Link>
-          <Link href="/methodology" className={btnSecondary}>
+          <Link href="/how-we-know/methodology" className={btnSecondary}>
             Methodology
           </Link>
         </div>
