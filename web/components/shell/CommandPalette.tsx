@@ -96,7 +96,7 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
   let lastKind = "";
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:pt-[12vh]" role="dialog" aria-modal="true" aria-label="Search and jump">
-      <button className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" aria-label="Close" onClick={onClose} />
+      <button className="fade-in absolute inset-0 bg-black/40 backdrop-blur-[2px]" aria-label="Close" onClick={onClose} />
       <div className="relative w-full max-w-xl card shadow-[var(--shadow-lg)] overflow-hidden fade-in">
         <div className="flex items-center gap-2 border-b border-rule px-3.5">
           <Search size={18} className="text-muted shrink-0" aria-hidden />

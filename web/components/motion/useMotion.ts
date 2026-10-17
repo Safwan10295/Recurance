@@ -85,14 +85,18 @@ export function useMotion<T extends HTMLElement | SVGElement = HTMLDivElement>(
     }
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
+        // Enough of it is visible, or it is taller than the screen and already fills half of it.
+        const seen = entries.some(
+          (e) => e.isIntersecting && (e.intersectionRatio >= threshold || e.intersectionRect.height >= window.innerHeight * 0.5),
+        );
+        if (seen) {
           io.disconnect();
           if (session) markSeen(id);
           setState("run");
           setRuns((n) => n + 1);
         }
       },
-      { threshold },
+      { threshold: [0, 0.1, 0.25, threshold, 0.5, 1] },
     );
     io.observe(el);
     return () => io.disconnect();

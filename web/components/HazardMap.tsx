@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Minus, Pause, Play, Plus, RotateCcw, Search, X } from "lucide-react";
 import type { HazardMapPayload } from "@/lib/queries-map";
+import { prefersReducedMotion, replayRequested } from "@/components/motion/useMotion";
 import { btnPrimary, btnSecondary, fieldCls, formatDate } from "@/components/ui";
 
 // ---------------------------------------------------------------------------
@@ -213,6 +214,23 @@ function readColors(): Colors {
 // Point states: 0 hidden, 1 dimmed, 2 shown, 3 search match
 // ---------------------------------------------------------------------------
 
+const INTRO_CHAIN = "c52cded99f756309"; // smart motorways, the case the home page tells
+const INTRO_SEEN = "rw-seen";
+function introSeen(): boolean {
+  try {
+    return JSON.parse(sessionStorage.getItem(INTRO_SEEN) || "[]").includes("map-intro");
+  } catch {
+    return false;
+  }
+}
+function markIntroSeen() {
+  try {
+    const s: string[] = JSON.parse(sessionStorage.getItem(INTRO_SEEN) || "[]");
+    if (!s.includes("map-intro")) sessionStorage.setItem(INTRO_SEEN, JSON.stringify([...s, "map-intro"]));
+  } catch {
+    /* storage blocked: the intro plays again next time */
+  }
+}
 const K_MIN = 0.8;
 const K_MAX = 60;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
@@ -346,6 +364,9 @@ function MapView({ m }: { m: Model }) {
   const [tUi, setTUi] = useState(m.tEnd);
   const rp = useRef({ on: false, playing: false, t: m.tEnd, last: 0, acc: 0, fresh: false, busyUntil: 0, uiMonth: m.tEnd });
   const loop = useRef(0);
+  // A8: the guided intro lights one chain (the smart motorways) and draws its lines; p is the drawing progress.
+  const intro = useRef({ chain: -1, p: 1 });
+  const [introOn, setIntroOn] = useState(false);
   // Wall-clock time each point or link appeared in the replay (0 = not shown yet), for the brief pop and flash.
   const pSeen = useMemo(() => new Float64Array(m.n), [m]);
   const lSeen = useMemo(() => new Float64Array(m.la.length), [m]);
@@ -367,7 +388,9 @@ function MapView({ m }: { m: Model }) {
     const oy = h / 2 - v.cy * S;
     const small = Math.min(w, h) < 480;
     const r0 = clamp(1.35 * Math.pow(v.k, 0.45), 1.2, 5.5) * (small ? 0.85 : 1);
-    const fc = focus >= 0 ? m.chain[focus] : -1;
+    const fc = focus >= 0 ? m.chain[focus] : intro.current.chain;
+    // While a chain is lit (hover, selection or the intro), everything else steps back.
+    const dim = fc >= 0 ? 0.3 : 1;
 
     // Replay clock: what exists at time T, and what has only just appeared.
     const R = rp.current;
@@ -448,7 +471,7 @@ function MapView({ m }: { m: Model }) {
     if (links) {
       ctx.strokeStyle = c.accent;
       ctx.lineWidth = 0.8;
-      ctx.globalAlpha = 0.07;
+      ctx.globalAlpha = 0.07 * dim;
       ctx.beginPath();
       for (let i = 0; i < m.la.length; i++) {
         if ((m.lc[i] === fc && fc >= 0) || !linkOn(i)) continue;
@@ -456,7 +479,7 @@ function MapView({ m }: { m: Model }) {
         curve(i);
       }
       ctx.stroke();
-      ctx.globalAlpha = 0.3;
+      ctx.globalAlpha = 0.3 * dim;
       ctx.beginPath();
       for (let i = 0; i < m.la.length; i++) {
         if ((m.lc[i] === fc && fc >= 0) || !linkOn(i) || flash(i) > 0) continue;
@@ -467,13 +490,13 @@ function MapView({ m }: { m: Model }) {
 
     // Dots, faintest first.
     ctx.fillStyle = c.dot;
-    ctx.globalAlpha = 0.28;
+    ctx.globalAlpha = 0.28 * dim;
     dots(0, r0);
     ctx.fillStyle = c.accent;
-    ctx.globalAlpha = 0.22;
+    ctx.globalAlpha = 0.22 * dim;
     dots(3, r0 * 1.3);
     ctx.fillStyle = c.dot;
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = dim;
     dots(1, r0);
     ctx.fillStyle = c.ink2;
     dots(2, r0 * 1.5);
@@ -498,12 +521,29 @@ function MapView({ m }: { m: Model }) {
 
     // The hovered or selected chain on top.
     if (fc >= 0) {
+      ctx.globalAlpha = 1;
       ctx.strokeStyle = c.accent;
       ctx.globalAlpha = 0.95;
       ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      for (const i of m.chainLinks[fc]) if (linkOn(i)) curve(i);
-      ctx.stroke();
+      const drawing = focus < 0 && intro.current.chain === fc && intro.current.p < 1;
+      if (drawing) {
+        // Each line draws from its earlier report to its later one, all at the intro's pace.
+        for (const i of m.chainLinks[fc]) {
+          if (!linkOn(i)) continue;
+          const L = Math.hypot((m.x[m.lb[i]] - m.x[m.la[i]]) * S, (m.y[m.lb[i]] - m.y[m.la[i]]) * S) * 1.15 + 4;
+          ctx.setLineDash([L, L]);
+          ctx.lineDashOffset = L * (1 - intro.current.p);
+          ctx.beginPath();
+          curve(i);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        ctx.lineDashOffset = 0;
+      } else {
+        ctx.beginPath();
+        for (const i of m.chainLinks[fc]) if (linkOn(i)) curve(i);
+        ctx.stroke();
+      }
       const rr = r0 * 2;
       ctx.beginPath();
       for (const i of m.chainPts[fc]) {
@@ -683,7 +723,7 @@ function MapView({ m }: { m: Model }) {
   );
 
   const animateTo = useCallback(
-    (target: { k: number; cx: number; cy: number }) => {
+    (target: { k: number; cx: number; cy: number }, dur = 260) => {
       cancelAnimationFrame(anim.current);
       const v = view.current;
       const t = { k: clamp(target.k, K_MIN, K_MAX), cx: clamp(target.cx, 0, 1), cy: clamp(target.cy, 0, 1) };
@@ -694,7 +734,6 @@ function MapView({ m }: { m: Model }) {
       }
       const from = { ...v };
       const t0 = performance.now();
-      const dur = 260;
       const step = (now: number) => {
         const p = Math.min(1, (now - t0) / dur);
         const e = 1 - Math.pow(1 - p, 3);
@@ -717,6 +756,71 @@ function MapView({ m }: { m: Model }) {
     [animateTo],
   );
   const resetView = useCallback(() => animateTo({ k: 1, cx: 0.5, cy: 0.5 }), [animateTo]);
+
+  // ---- A8: guided intro, once a session (or again with ?replay) ----
+  // Zooms to the smart motorway chain, draws its recurrence lines slowly, then hands the map back. About 6.5 s.
+  // Any pointer, wheel or key input ends it at once, leaving the view where the reader put it.
+  const introTimers = useRef<number[]>([]);
+  const introRaf = useRef(0);
+  const stopIntro = useCallback(() => {
+    introTimers.current.forEach(clearTimeout);
+    introTimers.current = [];
+    cancelAnimationFrame(introRaf.current);
+    if (intro.current.chain >= 0) {
+      intro.current = { chain: -1, p: 1 };
+      requestDraw();
+    }
+    setIntroOn(false);
+  }, [requestDraw]);
+
+  useEffect(() => {
+    const ci = m.chains.findIndex((c) => c[0] === INTRO_CHAIN);
+    if (ci < 0 || prefersReducedMotion() || (introSeen() && !replayRequested())) return;
+    markIntroSeen();
+    const pts = m.chainPts[ci];
+    let x0 = 1, x1 = 0, y0 = 1, y1 = 0;
+    for (const i of pts) {
+      x0 = Math.min(x0, m.x[i]); x1 = Math.max(x1, m.x[i]);
+      y0 = Math.min(y0, m.y[i]); y1 = Math.max(y1, m.y[i]);
+    }
+    const target = { k: clamp(0.42 / Math.max(x1 - x0, y1 - y0, 0.015), 1.5, 14), cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+    const at = (ms: number, fn: () => void) => introTimers.current.push(window.setTimeout(fn, ms));
+    intro.current = { chain: ci, p: 0 };
+    setIntroOn(true);
+    requestDraw();
+    at(500, () => animateTo(target, 1500));
+    at(2100, () => {
+      const t0 = performance.now();
+      const step = (now: number) => {
+        intro.current.p = Math.min(1, (now - t0) / 2200);
+        draw();
+        if (intro.current.p < 1) introRaf.current = requestAnimationFrame(step);
+      };
+      introRaf.current = requestAnimationFrame(step);
+    });
+    at(5200, () => animateTo({ k: 1, cx: 0.5, cy: 0.5 }, 1300));
+    at(6600, () => stopIntro());
+    return () => {
+      introTimers.current.forEach(clearTimeout);
+      cancelAnimationFrame(introRaf.current);
+    };
+    // Runs once per mount; the map data does not change while the page is open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!introOn) return;
+    const canvas = canvasRef.current;
+    const end = () => stopIntro();
+    canvas?.addEventListener("pointerdown", end);
+    canvas?.addEventListener("wheel", end, { passive: true });
+    window.addEventListener("keydown", end);
+    return () => {
+      canvas?.removeEventListener("pointerdown", end);
+      canvas?.removeEventListener("wheel", end);
+      window.removeEventListener("keydown", end);
+    };
+  }, [introOn, stopIntro]);
 
   const open = useCallback((i: number) => router.push(pointHref(m, i)), [router, m]);
 
@@ -1091,6 +1195,21 @@ function MapView({ m }: { m: Model }) {
 
       {/* Canvas */}
       <div ref={wrapRef} data-tour="map" className="card relative overflow-hidden h-[60vh] sm:h-[70vh] min-h-[340px] max-h-[860px]">
+        {introOn && (() => {
+          const c = m.chains[intro.current.chain];
+          return c ? (
+            <div className="fade-in pointer-events-auto absolute left-3 top-3 z-10 max-w-sm rounded-lg border border-rule bg-surface/95 p-3 text-sm shadow-[var(--shadow-lg)]">
+              <p className="eyebrow mb-1">One chain, drawn in</p>
+              <p className="text-ink">{c[1]}</p>
+              <p className="text-xs text-muted">
+                {c[2]}. Each line joins a later concern to an earlier one that Nemotron Super judged the same hazard.
+              </p>
+              <button type="button" onClick={stopIntro} className="mt-2 text-xs font-medium text-accent hover:underline">
+                Skip the intro
+              </button>
+            </div>
+          ) : null;
+        })()}
         <canvas
           ref={canvasRef}
           tabIndex={0}

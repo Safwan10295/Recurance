@@ -268,3 +268,12 @@ No Nebius or Tavily spend.
 2. How we know, Nemotron tab (A4, A5): a narrowing funnel from concerns extracted to chains, each step with its ledger cost and tokens, and the total spend as an odometer beside the cost per verified chain.
 3. Check it in the source (A6): every quote of a shown link, on chain pages, Recent, Promises and archive briefs, opens its source window with the quote lighting up word by word, then a check mark. The original link stays beside every quote.
 4. What surprised us (A10): four findings from the published data, each linked to its evidence: the quote match rate, the share of look-alike pairs the judge rejected, the test misses that never reached the judge, and the cost per chain.
+
+## Phase 11, continued: judge, map, chain story, redaction, micro touches (2026-10-17)
+
+1. You be the judge (A7): the model's verdict turns over gently, an agreement meter fills as you play, and the end screen reads "You agreed with Nemotron on X of Y" with a share card drawn in the browser that carries only the score.
+2. Hazard map (A8): a muted preview on the home page; on the map, a short guided intro (once a session, or with ?replay) that zooms to the smart motorway chain and draws its lines, then hands the map back. Any input skips it. Hovering a point lights its chain and dims the rest.
+3. Chain page (A9): each report reveals as it scrolls in, the gap line before it draws downwards and takes longer for longer gaps, and a quote bridge shows the words a later quote shares with the earlier one.
+4. Methodology (A11): grey bars sweep over the names in an invented sentence, then the redacted version appears.
+5. Micro touches (A12): pages fade in after a client navigation (not on first load), cards lift on hover, the theme crossfades through the View Transitions API where supported, the Ctrl K backdrop fades in, and the 404 and error pages are friendlier.
+6. Fixed: an animation on an element taller than the screen could stay on its start frame. It now starts once it fills half the screen.

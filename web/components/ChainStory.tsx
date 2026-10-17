@@ -1,4 +1,5 @@
 import { CircleDot, FileCheck2, FileQuestion, Repeat2, SearchCheck } from "lucide-react";
+import Reveal from "@/components/motion/Reveal";
 import Link from "next/link";
 import { ConfidenceTag, InfoTip, Quote, RelationTag, ReportLink, formatDate, gapText, slugOf } from "./ui";
 import { GLOSSARY } from "@/lib/glossary";
@@ -13,6 +14,22 @@ const FOLLOWUP: Record<Followup["classification"], { label: string; tone: string
 // Connector height grows with the time between reports (log scale), so long gaps look long.
 function gapHeight(days: number) {
   return Math.round(Math.min(120, Math.max(28, 22 * Math.log2(1 + days / 60))));
+}
+
+const STOP = new Set(
+  "about after again also among and any are been before being both but can could did does each from had has have into its may more most must not now only other our out over same should some such than that the their them then there these they this those through under upon very was were what when where which while who will with would your name redacted deceased".split(" "),
+);
+// A9, the quote bridge: words of four letters or more that both quotes use, in the later quote's order.
+function sharedWords(earlier: string, later: string, max = 6): string[] {
+  const norm = (w: string) => w.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const a = new Set(earlier.split(/\s+/).map(norm).filter((w) => w.length >= 4 && !STOP.has(w)));
+  const out: string[] = [];
+  for (const w of later.split(/\s+/)) {
+    const n = norm(w);
+    if (n.length >= 4 && !STOP.has(n) && a.has(n) && !out.some((x) => norm(x) === n)) out.push(w.replace(/[^\w'-]/g, ""));
+    if (out.length >= max) break;
+  }
+  return out;
 }
 
 // The chain as a story, top to bottom: first warning, the response and what it said it would do,
@@ -46,13 +63,21 @@ export default function ChainStory({ chain }: { chain: ChainDetail }) {
         const promises = r.responses.flatMap((rs) => rs.promises.map((p) => ({ ...p, pdf: rs.pdf_url })));
         return (
           <li key={r.url} className="relative">
+            <Reveal id={`story-${i}`}>
             {i > 0 && (
               <div className="flex items-center gap-3 pl-[13px]" style={{ height: gapHeight(days) }} aria-hidden={false}>
-                <span className="h-full w-px border-l-2 border-dashed border-rule" aria-hidden />
-                <span className="text-xs text-muted num">{gapText(days)} later</span>
+                {/* The gap draws downwards; a longer gap takes longer, so long silences read as long. */}
+                <span
+                  className="m-growy h-full w-px border-l-2 border-dashed border-rule"
+                  style={{ "--dur": `${Math.round(250 + gapHeight(days) * 7)}ms` } as React.CSSProperties}
+                  aria-hidden
+                />
+                <span className="m-fade text-xs text-muted num" style={{ "--d": "200ms" } as React.CSSProperties}>
+                  {gapText(days)} later
+                </span>
               </div>
             )}
-            <div className="flex gap-4">
+            <div className="m-rise flex gap-4" style={{ "--d": i > 0 ? `${Math.round(200 + gapHeight(days) * 7)}ms` : "0ms" } as React.CSSProperties}>
               <div className="flex flex-col items-center">
                 <span
                   className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
@@ -85,6 +110,24 @@ export default function ChainStory({ chain }: { chain: ChainDetail }) {
                   </div>
                 )}
                 {quote && <Quote text={quote} href={r.url} ctx={ctx} />}
+                {i > 0 && inLink?.later_quote && (() => {
+                  const words = sharedWords(inLink.earlier_quote, inLink.later_quote);
+                  if (words.length < 2) return null;
+                  return (
+                    <p className="flex flex-wrap items-center gap-1.5 pl-4 text-xs text-muted">
+                      <span>Repeated from the earlier report:</span>
+                      {words.map((w, k) => (
+                        <span
+                          key={w}
+                          className="m-rise rounded-full bg-accent-soft px-2 py-0.5 text-accent"
+                          style={{ "--d": `${Math.round(500 + gapHeight(days) * 7 + k * 90)}ms` } as React.CSSProperties}
+                        >
+                          {w}
+                        </span>
+                      ))}
+                    </p>
+                  );
+                })()}
 
                 {/* The organisation's response to this report */}
                 {!last || r.responses.length ? (
@@ -143,6 +186,7 @@ export default function ChainStory({ chain }: { chain: ChainDetail }) {
                 )}
               </div>
             </div>
+            </Reveal>
           </li>
         );
       })}

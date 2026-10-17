@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ShareCard from "./judge/ShareCard";
 import { btnPrimary, btnSecondary, formatDate, gapText, shortTitle } from "./ui";
 
 export type GamePair = {
@@ -134,6 +135,7 @@ export default function JudgeGame({ pairs, facts }: { pairs: GamePair[]; facts: 
           pair={deck[round]}
           round={round}
           total={deck.length}
+          answers={answers}
           revealed={revealed}
           onAnswer={answer}
           onNext={next}
@@ -195,10 +197,12 @@ function Round({
   onAnswer,
   onNext,
   onStop,
+  answers,
 }: {
   pair: GamePair;
   round: number;
   total: number;
+  answers: Answer[];
   revealed: Answer | null;
   onAnswer: (same: boolean | null) => void;
   onNext: () => void;
@@ -206,6 +210,9 @@ function Round({
 }) {
   const judgeSame = SAME.has(pair.relation);
   const agreed = revealed && revealed.same !== null ? revealed.same === judgeSame : null;
+  // The agreement meter: calls that matched the model's, out of calls made so far.
+  const made = answers.filter((a) => a.same !== null);
+  const matched = made.filter((a) => a.same === SAME.has(a.pair.relation)).length;
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -219,6 +226,17 @@ function Round({
               <span key={i} className={`h-1.5 w-6 rounded-full ${i < round || (i === round && revealed) ? "bg-accent" : i === round ? "bg-accent/40" : "bg-rule"}`} />
             ))}
           </div>
+        </div>
+        <div className="flex items-center gap-3" aria-live="polite">
+          <span className="text-sm text-ink-2">
+            Agreed with Nemotron: <span className="num text-ink">{matched}</span> of <span className="num">{made.length}</span>
+          </span>
+          <span className="block h-2 w-28 overflow-hidden rounded-full bg-paper-2" aria-hidden>
+            <span
+              className="block h-full rounded-full bg-accent transition-[width] duration-300 ease-out motion-reduce:transition-none"
+              style={{ width: `${made.length ? (matched / made.length) * 100 : 0}%` }}
+            />
+          </span>
         </div>
         <button type="button" onClick={onStop} className="text-sm text-muted hover:text-accent">
           Stop and see what this means →
@@ -259,7 +277,7 @@ function Round({
             </p>
           </div>
         ) : (
-          <div className="fade-in space-y-4 rounded-xl border border-accent/40 bg-accent-soft/50 p-4 sm:p-5">
+          <div className="flip-in space-y-4 rounded-xl border border-accent/40 bg-accent-soft/50 p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
               <Sparkles size={18} className="text-accent" aria-hidden />
               <span className="font-medium text-ink">Nemotron Super judged: {VERDICT[pair.relation]}</span>
@@ -321,7 +339,7 @@ function End({ answers, total, facts, onAgain }: { answers: Answer[]; total: num
         <h2 className="font-serif text-2xl sm:text-3xl leading-snug">
           {answered.length === 0
             ? "You saw how hard each call is."
-            : `You agreed with the judge on ${agreed} of ${answered.length} ${answered.length === 1 ? "pair" : "pairs"}.`}
+            : `You agreed with Nemotron on ${agreed} of ${answered.length} ${answered.length === 1 ? "pair" : "pairs"}.`}
         </h2>
         <p className="text-ink-2">
           You took about <span className="text-ink num">{Math.round(avg / 1000)} seconds</span> a pair. At that pace, reading
@@ -337,6 +355,8 @@ function End({ answers, total, facts, onAgain }: { answers: Answer[]; total: num
           )}
         </p>
       </div>
+
+      {answered.length > 0 && <ShareCard agreed={agreed} answered={answered.length} />}
 
       <section className="space-y-4">
         <h2 className="font-serif text-2xl">This is why we built Recurrence Watch</h2>

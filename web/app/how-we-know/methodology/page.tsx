@@ -1,4 +1,5 @@
 import Link from "next/link";
+import RedactionSweep from "@/components/RedactionSweep";
 import { PageHeader } from "@/components/ui";
 import { GLOSSARY } from "@/lib/glossary";
 import { getMeta } from "@/lib/queries";
@@ -96,6 +97,7 @@ export default async function Methodology() {
           <li>&quot;No published response found&quot; means none was attached to the report on judiciary.uk. A response may exist elsewhere.</li>
           <li>&quot;No evidence found&quot; from the web search does not mean an action did not happen.</li>
         </ol>
+        <RedactionSweep />
       </section>
 
       <section id="limits" className="card p-5 sm:p-6 space-y-3 scroll-mt-24">

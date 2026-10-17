@@ -16,6 +16,13 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
     } catch {}
   }, []);
   const apply = (m: Mode) => {
+    // Crossfade the whole page where the View Transitions API exists (and motion is welcome); otherwise switch.
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (doc.startViewTransition && !calm) doc.startViewTransition(() => set(m));
+    else set(m);
+  };
+  const set = (m: Mode) => {
     setMode(m);
     try {
       if (m === "system") {

@@ -114,6 +114,13 @@ function SearchButton({ onOpen, wide = true }: { onOpen: () => void; wide?: bool
 export default function AppShell({ children, updated }: { children: React.ReactNode; updated: string | null }) {
   const path = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
+  // Fade the page in after a client navigation, never on first load (so the first paint is not held back).
+  const [lastPath, setLastPath] = useState(path);
+  const [navigated, setNavigated] = useState(false);
+  if (path !== lastPath) {
+    setLastPath(path);
+    setNavigated(true);
+  }
   const [palette, setPalette] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const closePalette = useCallback(() => setPalette(false), []);
@@ -263,7 +270,7 @@ export default function AppShell({ children, updated }: { children: React.ReactN
           </div>
         </header>
         <GuidePath path={path} />
-        <main id="main" className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-9">
+        <main id="main" key={navigated ? path : "first"} className={`flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-9 ${navigated ? "page-in" : ""}`}>
           {children}
         </main>
         <footer className="border-t border-rule pb-16 lg:pb-0">
