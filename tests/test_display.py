@@ -33,3 +33,12 @@ def test_hazard_titles_never_say_causing():
     assert neutral("Fires caused by emollients") == "Fires from emollients"
     assert neutral("Lack of root cause analysis") == "Lack of root cause analysis"
     assert neutral("Causes of delay unclear") == "Causes of delay unclear"
+
+
+def test_dossier_narrative_tidied_after_redaction():
+    from pipeline.export.web import dossier_text, whole_sentences
+    assert whole_sentences("One sentence. Another that stops mid-wo") == "One sentence."
+    assert whole_sentences("Complete.") == "Complete."
+    assert dossier_text("No response was found for the 2018 [the deceased] report.") == "No response was found for the 2018 report."
+    assert dossier_text("Raised again in 2017 ([the deceased]), where staff") == "Raised again in 2017, where staff"
+    assert dossier_text("No response for the [the deceased], [the deceased] and [the deceased], or [the deceased] reports.") == "No response for those reports."

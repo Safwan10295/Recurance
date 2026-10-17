@@ -193,6 +193,29 @@ def quote_context(conn, url: str, quote: str | None, red: Redactor, n: int = CON
     return None
 
 
+def whole_sentences(text: str | None) -> str:
+    """Dossier narratives were stored with a length cap, so some stop mid-word; keep only whole sentences."""
+    t = (text or "").strip()
+    if not t or t[-1] in ".!?\"”)":
+        return t
+    cut = max(t.rfind(". "), t.rfind("? "), t.rfind("! "))
+    return t[: cut + 1] if cut > 0 else t
+
+
+def dossier_text(text: str | None) -> str | None:
+    """Model text names reports by the person who died; after redaction, drop those labels instead of
+    leaving "([the deceased])" behind: "the 2015 [the deceased] report" reads as "the 2015 report"."""
+    if not text:
+        return text
+    t = re.sub(r"\s*\((?:\[the deceased\]|\[name redacted\])[^)]*\)", "", text)
+    # "for the [the deceased], [the deceased] and [the deceased] reports" -> "for those reports"
+    t = re.sub(r"\bthe ((?:\[the deceased\][, ]*(?:and |or )?)+)reports\b", "those reports", t)
+    # "the 2015 [the deceased] report" -> "the 2015 report"
+    t = re.sub(r"(?:\[the deceased\](?:,| and| or|,? or|,? and)?\s*)+(reports?)\b", r"\1", t)
+    t = re.sub(r"\s{2,}", " ", t)
+    return re.sub(r"\s+([.,;:])", r"\1", t).strip()
+
+
 def report_card(conn, url: str) -> dict:
     r = conn.execute("SELECT url, title, report_date, coroner, area, ref, categories FROM reports WHERE url=?",
                      (url,)).fetchone()
@@ -346,7 +369,11 @@ def export(min_conf: float = DEFAULT_MIN_CONFIDENCE) -> dict:
         dossier_out = None
         if dossier and dossier["reviewed_by_human"] == 1:
             d = json.loads(dossier["ultra_output"])
-            d["narrative"] = red(d["narrative"], *urls)
+            d["narrative"] = dossier_text(red(whole_sentences(d["narrative"]), *urls))
+            d["questions"] = [dossier_text(red(q, *urls)) for q in d.get("questions", [])]
+            d["timeline"] = [{**t, "summary": dossier_text(red(t.get("summary"), *urls)),
+                              "quote": red(t.get("quote"), *urls) if t.get("quote") else None}
+                             for t in d.get("timeline", [])]
             dossier_out = d
         coroners = sorted({r["coroner"] for r in reports if r["coroner"]})
         summary = {
