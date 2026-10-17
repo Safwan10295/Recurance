@@ -41,6 +41,7 @@ export interface Pipeline {
 export interface EvaluationLite {
   systems?: { name: string; recall_at_threshold: number | null }[];
   cost?: { total: number; per_chain: number | null; chains: number };
+  miss_summary?: Record<string, number>;
 }
 
 export interface PipelinePage {

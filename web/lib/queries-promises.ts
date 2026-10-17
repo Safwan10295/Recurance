@@ -1,6 +1,6 @@
 import "server-only";
 import { cached, q, q1 } from "./db";
-import type { Relation } from "./types";
+import type { QuoteContext, Relation } from "./types";
 
 // Links where the organisation's response to the earlier report stated an action,
 // and a later report then raised the same or a closely related concern.
@@ -28,6 +28,8 @@ export interface PromiseLink {
   later: PromiseReport;
   earlier_quote: string;
   later_quote: string;
+  earlier_context: QuoteContext | null;
+  later_context: QuoteContext | null;
   promise_quote: string;
   promise_timescale: string | null;
   promise_pdf: string | null;
@@ -83,6 +85,8 @@ interface Row {
     explanation?: string | null;
     earlier_quote: string;
     later_quote: string;
+    earlier_context?: QuoteContext | null;
+    later_context?: QuoteContext | null;
     promise_quote: string;
     promise_timescale?: string | null;
     promise_pdf?: string | null;
@@ -149,6 +153,8 @@ export async function listPromiseLinks(f: PromiseFilter) {
       later: { url: r.later_url, slug: r.r_slug, title: r.r_title ?? "Later report", date: r.r_date, coroner: r.r_coroner, area: r.r_area },
       earlier_quote: r.payload.earlier_quote,
       later_quote: r.payload.later_quote,
+      earlier_context: r.payload.earlier_context ?? null,
+      later_context: r.payload.later_context ?? null,
       promise_quote: r.payload.promise_quote,
       promise_timescale: r.payload.promise_timescale ?? r.fb_timescale ?? null,
       promise_pdf: r.payload.promise_pdf ?? r.fb_pdf ?? null,

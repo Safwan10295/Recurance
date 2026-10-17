@@ -120,8 +120,8 @@ export function RecentCard({ it, open = false }: { it: RecentEntry; open?: boole
                 </span>
               </div>
               <QuotePair
-                earlier={{ label: `${e.e_title} (${year(e.e_date)})`, text: e.earlier_quote, href: e.earlier }}
-                later={{ label: `This report (${year(it.later.date)})`, text: e.later_quote, href: e.later }}
+                earlier={{ label: `${e.e_title} (${year(e.e_date)})`, text: e.earlier_quote, href: e.earlier, ctx: e.earlier_context }}
+                later={{ label: `This report (${year(it.later.date)})`, text: e.later_quote, href: e.later, ctx: e.later_context }}
               />
               {e.promise_quote ? (
                 <div className="space-y-1">

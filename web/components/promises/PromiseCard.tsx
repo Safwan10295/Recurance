@@ -75,7 +75,7 @@ export function PromiseCard({ it }: { it: PromiseLink }) {
       <div className="grid gap-2 xl:grid-cols-[minmax(0,1fr)_1.25rem_minmax(0,1fr)_1.25rem_minmax(0,1fr)] xl:gap-3">
         <Step n={1} label="Earlier report">
           <ReportMeta date={it.earlier.date} title={it.earlier.title} url={it.earlier.url} slug={it.earlier.slug} coroner={it.earlier.coroner} />
-          <Quote text={it.earlier_quote} />
+          <Quote text={it.earlier_quote} href={it.earlier.url} ctx={it.earlier_context} />
         </Step>
 
         <Connector />
@@ -97,7 +97,7 @@ export function PromiseCard({ it }: { it: PromiseLink }) {
         <Step n={3} label="Raised again">
           {gap && <p className="text-sm text-accent">{gap} later</p>}
           <ReportMeta date={it.later.date} title={it.later.title} url={it.later.url} slug={it.later.slug} coroner={it.later.coroner} />
-          <Quote text={it.later_quote} />
+          <Quote text={it.later_quote} href={it.later.url} ctx={it.later_context} />
           {it.same_coroner && <p className="text-xs text-muted">Same coroner as the earlier report.</p>}
         </Step>
       </div>

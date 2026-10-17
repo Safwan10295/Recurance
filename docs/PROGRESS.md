@@ -261,3 +261,10 @@ Spend by stage: A $0.77, B $0.23, C $3.37, D $0.97, F $0.05, dev $0.26, embeddin
 7. Started on the animations: the hero draws its chain (A1), the 100 dots (A2) and a cost odometer (A5) on the home page.
 
 No Nebius or Tavily spend.
+
+## Phase 11, continued: agent trace, funnel, source check, findings (2026-10-17)
+
+1. Check a report (A3): step cards slide in, each model or service has its own badge colour (Nano, Super, Qwen3, Tavily), token and cost counters tick up as steps finish, kept quotes get a small verified mark and dropped verdicts fade back with their reason. Replays use the recorded trace. The running step now breathes slowly rather than pinging.
+2. How we know, Nemotron tab (A4, A5): a narrowing funnel from concerns extracted to chains, each step with its ledger cost and tokens, and the total spend as an odometer beside the cost per verified chain.
+3. Check it in the source (A6): every quote of a shown link, on chain pages, Recent, Promises and archive briefs, opens its source window with the quote lighting up word by word, then a check mark. The original link stays beside every quote.
+4. What surprised us (A10): four findings from the published data, each linked to its evidence: the quote match rate, the share of look-alike pairs the judge rejected, the test misses that never reached the judge, and the cost per chain.

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { Relation } from "@/lib/types";
+import SourceCheck from "@/components/SourceCheck";
+import type { QuoteContext, Relation } from "@/lib/types";
 
 export const RELATION_LABEL: Record<Relation, string> = {
   identical: "Identical hazard",
@@ -69,7 +70,7 @@ export function ConfidenceTag({ value }: { value: number }) {
   );
 }
 
-export function Quote({ text, href, label }: { text: string; href?: string; label?: string }) {
+export function Quote({ text, href, label, ctx }: { text: string; href?: string; label?: string; ctx?: QuoteContext | null }) {
   return (
     <figure className="space-y-1.5">
       <blockquote className="quote">&ldquo;{text}&rdquo;</blockquote>
@@ -80,6 +81,7 @@ export function Quote({ text, href, label }: { text: string; href?: string; labe
           </a>
         </figcaption>
       )}
+      {ctx && href && <SourceCheck quote={text} ctx={ctx} href={href} />}
     </figure>
   );
 }
@@ -88,18 +90,18 @@ export function QuotePair({
   earlier,
   later,
 }: {
-  earlier: { label: string; text: string; href?: string };
-  later: { label: string; text: string; href?: string };
+  earlier: { label: string; text: string; href?: string; ctx?: QuoteContext | null };
+  later: { label: string; text: string; href?: string; ctx?: QuoteContext | null };
 }) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-1.5">
         <p className="eyebrow">{earlier.label}</p>
-        <Quote text={earlier.text} href={earlier.href} />
+        <Quote text={earlier.text} href={earlier.href} ctx={earlier.ctx} />
       </div>
       <div className="space-y-1.5">
         <p className="eyebrow">{later.label}</p>
-        <Quote text={later.text} href={later.href} />
+        <Quote text={later.text} href={later.href} ctx={later.ctx} />
       </div>
     </div>
   );
@@ -150,9 +152,9 @@ export function Stat({ value, label }: { value: string; label: string }) {
   return <StatTile value={value} label={label} />;
 }
 
-export function Section({ title, action, children, tour }: { title: string; action?: React.ReactNode; children: React.ReactNode; tour?: string }) {
+export function Section({ title, action, children, tour, id }: { title: string; action?: React.ReactNode; children: React.ReactNode; tour?: string; id?: string }) {
   return (
-    <section className="space-y-3" data-tour={tour}>
+    <section className="space-y-3 scroll-mt-28" data-tour={tour} id={id}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-serif text-xl">{title}</h2>
         {action && <div className="text-sm">{action}</div>}

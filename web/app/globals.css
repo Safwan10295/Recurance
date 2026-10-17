@@ -360,3 +360,67 @@ html[data-seen~="hero"] [data-m="hero"] .m-draw {
     box-shadow: inset 0 0 0 2.5px var(--accent);
   }
 }
+
+/* Model badges (components/ModelBadge.tsx): one muted hue per family, readable in both themes. */
+.badge-nano { background: #e2efec; color: #2c6358; }
+.badge-super { background: #e4e8f3; color: #3a4e7e; }
+.badge-ultra { background: #efe6ef; color: #6b4769; }
+.badge-qwen { background: #f2ebdd; color: #77602f; }
+.badge-tavily { background: #e7eee0; color: #4b6431; }
+.badge-code { background: var(--paper-2); color: var(--muted); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .badge-nano { background: #183330; color: #8fcbbd; }
+  :root:not([data-theme="light"]) .badge-super { background: #1d2538; color: #a5b6e3; }
+  :root:not([data-theme="light"]) .badge-ultra { background: #2c1f2c; color: #d1aed0; }
+  :root:not([data-theme="light"]) .badge-qwen { background: #2d2617; color: #d9c08a; }
+  :root:not([data-theme="light"]) .badge-tavily { background: #1f2a17; color: #b2cd92; }
+}
+:root[data-theme="dark"] .badge-nano { background: #183330; color: #8fcbbd; }
+:root[data-theme="dark"] .badge-super { background: #1d2538; color: #a5b6e3; }
+:root[data-theme="dark"] .badge-ultra { background: #2c1f2c; color: #d1aed0; }
+:root[data-theme="dark"] .badge-qwen { background: #2d2617; color: #d9c08a; }
+:root[data-theme="dark"] .badge-tavily { background: #1f2a17; color: #b2cd92; }
+
+/* Micro-animations, all under 300 ms (A3, A12). */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes land {
+  from { opacity: 0; transform: scale(1.45); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes settle-dim {
+  from { opacity: 1; }
+  to { opacity: 0.62; }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+.slide-in { animation: slide-in 280ms ease-out both; }
+.land { animation: land 260ms ease-out both; }
+.settle-dim { animation: settle-dim 280ms ease-out 320ms both; }
+.breathe { animation: breathe 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .slide-in, .land, .breathe { animation: none; }
+  .settle-dim { animation: none; opacity: 0.62; }
+}
+
+/* A6: the quoted words light up in order inside the source text. */
+@keyframes sweep {
+  from { background-color: transparent; }
+  to { background-color: var(--accent-soft); }
+}
+.sweep {
+  animation: sweep 220ms ease-out both;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.sweep-still {
+  animation: none;
+  background-color: var(--accent-soft);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sweep { animation: none; background-color: var(--accent-soft); }
+}

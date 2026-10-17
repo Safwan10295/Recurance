@@ -45,6 +45,8 @@ export async function archiveBrief(ref: { slug?: string; url?: string }): Promis
       explanation: l.payload.explanation ?? null,
       earlier_quote: l.payload.earlier_quote,
       later_quote: l.payload.later_quote,
+      earlier_context: l.payload.earlier_context ?? null,
+      later_context: l.payload.later_context ?? null,
       promises: promises.flatMap((p) => p.promises).slice(0, 3),
       chains: [{ key: l.chain_key, hazard: l.payload.hazard }],
     });

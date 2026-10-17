@@ -1,3 +1,4 @@
+import { familyOf } from "@/components/ModelBadge";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -29,12 +30,10 @@ export function share(part: number, whole: number): string {
 // ---------- a small label naming the model or method behind a step ----------
 
 export function ModelTag({ children, model = true }: { children: React.ReactNode; model?: boolean }) {
+  // The same family colours as the agent trace and the funnel (components/ModelBadge.tsx).
+  const fam = model && typeof children === "string" ? familyOf(children) : "code";
   return (
-    <span
-      className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium leading-tight ${
-        model ? "bg-accent-soft text-accent" : "bg-paper-2 text-ink-2"
-      }`}
-    >
+    <span className={`badge-${fam} inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium leading-tight`}>
       {children}
     </span>
   );

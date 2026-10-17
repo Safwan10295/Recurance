@@ -1,4 +1,5 @@
 import "server-only";
+import type { QuoteContext } from "./types";
 import { cached, q, q1 } from "./db";
 import { runAgent } from "./agent";
 import { JUDGE_SCHEMA, JUDGE_SYSTEM } from "./judge-prompt";
@@ -55,6 +56,9 @@ export interface BriefMatch {
   explanation: string | null;
   earlier_quote: string;
   later_quote: string;
+  // Archive briefs only: the published, redacted source window around each quote.
+  earlier_context?: QuoteContext | null;
+  later_context?: QuoteContext | null;
   promises: { id: number; quote: string; timescale: string | null }[];
   chains: { key: string; hazard: string }[];
   // From the agent's web check (Tavily): shown only with a verified quote; "not_found" never means "did not happen".

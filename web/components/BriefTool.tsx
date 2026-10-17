@@ -1,5 +1,6 @@
 "use client";
 
+import type { QuoteContext } from "@/lib/types";
 import { ArrowRight, Check, Copy, FileText, Globe, Loader2, PenLine, RotateCcw, ScanSearch } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,6 +16,8 @@ type Match = {
   explanation: string | null;
   earlier_quote: string;
   later_quote: string;
+  earlier_context?: QuoteContext | null; // archive briefs only: the published source window
+  later_context?: QuoteContext | null;
   promises: { id: number; quote: string; timescale: string | null }[];
   chains: ({ key: string; hazard: string } | string)[];
   followups?: { promise: string; classification: "evidence_found" | "not_found" | "contradicting"; source_url?: string; quote?: string }[];
@@ -517,7 +520,7 @@ function BriefView({ r }: { r: Result }) {
           </p>
           {m.explanation && <p className="text-ink">{m.explanation}</p>}
           <QuotePair
-            earlier={{ label: `Earlier report · ${formatDate(m.earlier.date)}`, text: m.earlier_quote, href: m.earlier.url }}
+            earlier={{ label: `Earlier report · ${formatDate(m.earlier.date)}`, text: m.earlier_quote, href: m.earlier.url, ctx: m.earlier_context }}
             later={{ label: "New report", text: m.later_quote }}
           />
           {m.promises.length > 0 ? (

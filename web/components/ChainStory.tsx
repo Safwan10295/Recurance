@@ -40,6 +40,7 @@ export default function ChainStory({ chain }: { chain: ChainDetail }) {
         const last = i === chain.reports.length - 1;
         const inLink = into.get(r.url);
         const quote = (i > 0 ? inLink?.later_quote : undefined) ?? outOf.get(r.url)?.earlier_quote;
+        const ctx = (i > 0 && inLink?.later_quote ? inLink.later_context : outOf.get(r.url)?.earlier_context) ?? null;
         const prevDate = i > 0 ? chain.reports[i - 1].date : null;
         const days = prevDate ? Math.round((Date.parse(r.date) - Date.parse(prevDate)) / 86400000) : 0;
         const promises = r.responses.flatMap((rs) => rs.promises.map((p) => ({ ...p, pdf: rs.pdf_url })));
@@ -83,7 +84,7 @@ export default function ChainStory({ chain }: { chain: ChainDetail }) {
                     {!inLink.same_coroner && <span className="text-xs text-muted">a different coroner</span>}
                   </div>
                 )}
-                {quote && <Quote text={quote} />}
+                {quote && <Quote text={quote} href={r.url} ctx={ctx} />}
 
                 {/* The organisation's response to this report */}
                 {!last || r.responses.length ? (

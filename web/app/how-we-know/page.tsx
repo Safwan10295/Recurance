@@ -13,8 +13,10 @@ import {
   ShieldCheck,
   Timer,
 } from "lucide-react";
-import { AgentSteps, Flow, IconItem, ModelTag, StackBar, compact, latency, money, n, share } from "@/components/nemotron/parts";
-import type { FlowStep, Segment } from "@/components/nemotron/parts";
+import { AgentSteps, IconItem, ModelTag, StackBar, compact, latency, money, n, share } from "@/components/nemotron/parts";
+import type { Segment } from "@/components/nemotron/parts";
+import CostOdometer from "@/components/CostOdometer";
+import Funnel, { type FunnelRow } from "@/components/nemotron/Funnel";
 import { EmptyState, PageHeader, Section, StatTile, btnPrimary, btnSecondary, pct } from "@/components/ui";
 import { byFamily, byStage, getPipelinePage } from "@/lib/queries-pipeline";
 import type { ModelFamily, Totals } from "@/lib/queries-pipeline";
@@ -83,44 +85,58 @@ export default async function NemotronPage() {
   const cacheHits = stages.reduce((a, s) => a + s.totals.cached, 0);
   const chains = f.chains ?? site?.n_chains ?? 0;
   const links = f.links ?? site?.n_links ?? 0;
-  const perChain = chains ? totalCost / chains : null;
   const ids = { ...DEFAULT_IDS, ...(site?.models ?? {}) } as Record<string, string>;
   const verifiedShare = f.concerns ? f.concerns_verified / f.concerns : 0;
 
-  // ---- 2. the flow ----
-  const flow: FlowStep[] = [
-    { label: "Reports read", count: f.reports, tag: "judiciary.uk + OCR", model: false, note: "Every PFD report since 2013." },
+  // A4: the narrowing funnel, with each step's ledger cost and tokens.
+  const st = (k: string) => stages.find((x) => x.stage === k)?.totals;
+  const [tA, tC, tE] = [st("A"), st("C"), st("embed")];
+  const funnelRows: FunnelRow[] = [
     {
       label: "Concerns extracted",
       count: f.concerns,
-      tag: "Nemotron Nano",
-      note: `From ${n(f.reports_with_concerns)} reports, each as an exact quote.`,
+      note: `From ${n(f.reports)} reports, with OCR for scanned ones. Each concern is an exact quote.`,
+      badges: ["Nemotron Nano"],
+      cost: tA?.cost ?? stageCost("A"),
+      tokensIn: tA?.input_tokens ?? 0,
+      tokensOut: (tA?.output_tokens ?? 0) + (tA?.reasoning_tokens ?? 0),
     },
     {
-      label: "Quotes verified",
+      label: "Quotes verified word for word",
       count: f.concerns_verified,
-      tag: "Word-for-word check",
-      model: false,
-      note: `${pct(verifiedShare)} found word for word in the source.`,
+      note: `${pct(verifiedShare)} of quotes were found word for word in the source.`,
+      badges: ["Exact-match check"],
+      cost: 0,
+      tokensIn: 0,
+      tokensOut: 0,
     },
     {
-      label: "Candidate pairs",
-      count: f.pairs,
-      tag: "TF-IDF + Qwen3",
-      note: "Same organisation, at least six months apart.",
+      label: "Pairs found and judged",
+      count: f.judged,
+      note: "Same organisation, at least six months apart, close in meaning or wording. Super decides whether it is the same hazard. The cost includes the evaluation runs.",
+      badges: ["Qwen3 + pgvector", "Nemotron Super"],
+      cost: (tE?.cost ?? 0) + (tC?.cost ?? stageCost("C")),
+      tokensIn: (tE?.input_tokens ?? 0) + (tC?.input_tokens ?? 0),
+      tokensOut: (tC?.output_tokens ?? 0) + (tC?.reasoning_tokens ?? 0),
     },
-    { label: "Pairs judged", count: f.judged, tag: "Nemotron Super", note: "Same hazard, or only the same topic?" },
-    {
-      label: "Links shown",
-      count: links,
-      tag: "Rules",
-      model: false,
-      note: "Identical or closely related, confident, both quotes verified.",
-    },
-    { label: "Chains", count: chains, tag: "Grouped", model: false, note: "One organisation, one hazard, over time." },
+    { label: "Links shown", count: links, note: "Identical or closely related, confident, both quotes verified.", badges: ["Rules"], cost: 0, tokensIn: 0, tokensOut: 0 },
+    { label: "Chains", count: chains, note: "One organisation, one hazard, over time.", badges: ["Grouped"], cost: 0, tokensIn: 0, tokensOut: 0 },
   ];
 
   const rel = f.relations ?? {};
+  const notSame = (rel.related ?? 0) + (rel.different ?? 0);
+  const ms = evaluation?.miss_summary ?? {};
+  const missTotal = Object.values(ms).reduce((a, b) => a + b, 0);
+  const surprises: { figure: string; text: string; href: string; cta: string }[] = [
+    { figure: pct(verifiedShare), text: "of the quotes Nano extracted were found word for word in the source. The rest are never shown.", href: "#funnel", cta: "See the funnel" },
+    ...(f.judged
+      ? [{ figure: share(notSame, f.judged), text: "of the pairs that looked alike were judged not the same hazard: related or different. That is why a judge is needed.", href: "#verdicts", cta: "See Super's verdicts" }]
+      : []),
+    ...(missTotal
+      ? [{ figure: `${ms.not_candidate ?? 0} of ${missTotal}`, text: "test pairs it missed never reached the judge. The next gain is in retrieval, not in the model.", href: "/how-we-know/evaluation#misses", cta: "See where it fails" }]
+      : []),
+    ...(chains ? [{ figure: money(totalCost / chains, true), text: `per verified chain, every stage counted, across ${n(chains)} chains.`, href: "#cost", cta: "See the cost" }] : []),
+  ];
   const relSegments: Segment[] = [
     { key: "identical", label: "Identical hazard", value: rel.identical ?? 0, fill: "var(--accent)" },
     { key: "closely_related", label: "Closely related", value: rel.closely_related ?? 0, fill: "var(--quote-bar)" },
@@ -208,18 +224,37 @@ export default async function NemotronPage() {
       <section className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <StatTile value={n(f.reports)} label="reports read, 2013 to now" />
         <StatTile value={hasLedger ? n(paidCalls) : "–"} label="paid model calls, every one in the cost ledger" />
-        <StatTile value={money(totalCost)} label="total spend on Token Factory, pilots included" />
-        <StatTile value={perChain !== null ? money(perChain, true) : "–"} label={`per verified chain (${n(chains)} chains), all stages counted`} />
+        <div className="col-span-2 scroll-mt-28" id="cost">
+          <CostOdometer total={totalCost} chains={chains} label="total spend on Token Factory, every stage and pilot, beside the cost per verified chain" />
+        </div>
       </section>
       </div>
 
+      {/* A10: findings worth leading with, each linked to its evidence below */}
+      <section aria-labelledby="surprised-heading" className="space-y-3">
+        <h2 id="surprised-heading" className="font-serif text-xl">What surprised us</h2>
+        <ul className="grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
+          {surprises.map((x) => (
+            <li key={x.href}>
+              <a href={x.href} className="card card-link group flex h-full flex-col gap-2 p-4 hover:no-underline">
+                <span className="font-serif text-3xl leading-none text-ink num">{x.figure}</span>
+                <span className="text-sm text-ink-2">{x.text}</span>
+                <span className="mt-auto pt-1 text-xs font-medium text-accent">
+                  {x.cta} <span aria-hidden className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* 2. Flow */}
-      <Section title="From archive to evidence" tour="funnel">
+      <Section title="From archive to evidence" tour="funnel" id="funnel">
         <Explainer>
           Each step narrows the archive. Small models do the reading, a larger one makes the judgement, and plain code
           checks every quote against the source.
         </Explainer>
-        <Flow steps={flow} />
+        <Funnel rows={funnelRows} />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="card p-4 space-y-1">
             <div className="eyebrow">Alongside</div>
@@ -250,7 +285,7 @@ export default async function NemotronPage() {
           </div>
         </div>
         {relTotal > 0 && (
-          <div className="card p-5 space-y-3">
+          <div className="card p-5 space-y-3 scroll-mt-28" id="verdicts">
             <div>
               <h3 className="font-medium">What Super decided</h3>
               <p className="text-sm text-ink-2">

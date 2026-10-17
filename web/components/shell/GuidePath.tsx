@@ -80,7 +80,10 @@ export default function GuidePath({ path }: { path: string }) {
         <span className="min-w-0 flex-1 truncate text-ink md:hidden">{GUIDE_STEPS[current].label}</span>
         {target && (
           <Link href={target.href} className="ml-auto inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:no-underline">
-            {here >= 0 ? "Next" : "Start"}<span className="hidden sm:inline">: {target.label}</span>
+            <span>
+              {here >= 0 ? "Next" : "Start"}
+              <span className="hidden sm:inline">: {target.label}</span>
+            </span>
             <ArrowRight size={14} aria-hidden />
           </Link>
         )}

@@ -1,4 +1,3 @@
-import VerifiedPanel from "@/components/VerifiedPanel";
 import { ArrowRight, Building2, ChevronDown, ScanSearch } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -134,12 +133,8 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
                   </div>
                   {l.explanation && <p className="text-ink-2">{l.explanation}</p>}
                   <QuotePair
-                    earlier={{ label: `${shortTitle(e.title)} · ${formatDate(e.date)}`, text: l.earlier_quote, href: e.url }}
-                    later={{ label: `${shortTitle(later.title)} · ${formatDate(later.date)}`, text: l.later_quote, href: later.url }}
-                  />
-                  <VerifiedPanel
-                    earlier={{ label: `Earlier · ${formatDate(e.date)}`, quote: l.earlier_quote, ctx: l.earlier_context, href: e.url }}
-                    later={{ label: `Later · ${formatDate(later.date)}`, quote: l.later_quote, ctx: l.later_context, href: later.url }}
+                    earlier={{ label: `${shortTitle(e.title)} · ${formatDate(e.date)}`, text: l.earlier_quote, href: e.url, ctx: l.earlier_context }}
+                    later={{ label: `${shortTitle(later.title)} · ${formatDate(later.date)}`, text: l.later_quote, href: later.url, ctx: l.later_context }}
                   />
                   {l.promise_quote && (
                     <div className="space-y-1">

@@ -136,7 +136,7 @@ export default async function EvaluationPage() {
       </Section>
 
       {misses.length > 0 && (
-        <Section title="Where it fails">
+        <Section title="Where it fails" id="misses">
           <div className="card p-5 space-y-4">
             <p className="text-ink-2 text-sm max-w-3xl">
               The Nemotron system missed {misses.length} of the {pairs} pairs:{" "}
