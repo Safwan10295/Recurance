@@ -17,7 +17,7 @@ Status as of 16 Oct 2026. "Pilot" marks steps only Pilot can do.
 
 | Item | Status |
 |---|---|
-| At least 3 human-reviewed chains with quotes, promises and follow-up | 2 approved (smart motorways, emollients). Pilot: run `.venv\Scripts\python -m pipeline.cli dossiers-export`, read data/exports/dossiers_for_review.md, then run `.venv\Scripts\python -m pipeline.cli review --featured` |
+| At least 3 human-reviewed chains with quotes, promises and follow-up | Done: 6 approved (smart motorways, emollients, platform ends, prison first aid, young drivers, patient records) |
 | Live brief works on a real new report within limits | Done, with the tool-calling agent and the fixed pipeline as fallback |
 | Evaluation shows the Nemotron stage beating the baselines, with numbers | Done, with 95% intervals and every miss explained. Precision waits on hand labels (optional) |
 | Total Nebius spend under $20, live reserve untouched | Done |
