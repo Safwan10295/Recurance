@@ -277,3 +277,14 @@ No Nebius or Tavily spend.
 4. Methodology (A11): grey bars sweep over the names in an invented sentence, then the redacted version appears.
 5. Micro touches (A12): pages fade in after a client navigation (not on first load), cards lift on hover, the theme crossfades through the View Transitions API where supported, the Ctrl K backdrop fades in, and the 404 and error pages are friendlier.
 6. Fixed: an animation on an element taller than the screen could stay on its start frame. It now starts once it fills half the screen.
+
+## Phase 11, finished: quality (2026-10-17)
+
+1. Lighthouse after the round, side by side with the build from its start: 95 to 97 for performance and 100 for accessibility on every main page (docs/UX_NOTES.md).
+2. The home timeline now animates on composited layers, and animations start when the browser is idle (D38).
+3. web/e2e/smoke.mjs: 17 browser tests for every route and every new interaction, all passing.
+4. The neutral badge colour was darkened to pass contrast; the 100-dots legend markup was fixed.
+5. docs/DEMO_SCRIPT.md and docs/VIDEO_SHOT_LIST.md rewritten for a one-pass recording, with the ?replay addresses.
+6. docs/UX_NOTES.md written.
+
+No Nebius or Tavily spend this round. Total still $5.65 of $20.

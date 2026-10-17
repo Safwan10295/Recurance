@@ -368,7 +368,7 @@ html[data-seen~="hero"] [data-m="hero"] .m-draw {
 .badge-ultra { background: #efe6ef; color: #6b4769; }
 .badge-qwen { background: #f2ebdd; color: #77602f; }
 .badge-tavily { background: #e7eee0; color: #4b6431; }
-.badge-code { background: var(--paper-2); color: var(--muted); }
+.badge-code { background: var(--paper-2); color: var(--ink-2); }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .badge-nano { background: #183330; color: #8fcbbd; }
   :root:not([data-theme="light"]) .badge-super { background: #1d2538; color: #a5b6e3; }

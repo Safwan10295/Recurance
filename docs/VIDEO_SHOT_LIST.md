@@ -1,27 +1,24 @@
-# Video shot list (under 3 minutes)
+# Video shot list (one pass, under 3 minutes)
 
-Built on docs/DEMO_SCRIPT.md. Every number on screen is read live from the database by the page itself; none is typed into the video.
+Built on docs/DEMO_SCRIPT.md, which has the words. This file has the addresses and clicks. Replace localhost:3000 with the demo address if recording against the server.
 
 Setup:
 
-1. Browser at 1280 by 800, light mode, zoom 110%, a private window, so no saved brief is replayed unless planned.
-2. Have the address bar hidden or tidy. Close other tabs.
-3. Choose the live report in advance: one you have not run before, from the last year, sent to an organisation with chains. Note its name for step 4.
-4. The smart motorways dossier is approved, so its Dossier tab appears. The platform-ends dossier needs approving again after its chain key changed (python -m pipeline.cli review --featured).
+1. A private window at 1280 by 800, light mode, zoom 110%.
+2. Hide the guided path strip once with its cross.
+3. Close other tabs. Keep the address bar tidy.
 
-| Time | Page and clicks | On screen | Voice |
+| Time | Address | Clicks | On screen |
 |---|---|---|---|
-| 0:00 to 0:08 | / (Start here), top of page | The headline, and the smart motorway timeline drawing itself report by report | "When a death reveals a risk, a coroner writes to the organisation that can act. It must reply with what it will do." |
-| 0:08 to 0:22 | / , stay on the hero card | Its two figures: links where the later report does not cite the earlier one, and links with a different coroner | "Years later the same concern comes back, before a different coroner. In most of the recurrences we found, the later coroner was different and did not cite the earlier report. The memory is lost." |
-| 0:22 to 0:30 | Click "See a recurrence" | /chains/c52cded99f756309, Summary tab | "One example: smart motorways, seven reports, seven coroners." |
-| 0:30 to 0:50 | Scroll the story slowly; open the Evidence tab, expand one row, then open "Verified word for word" | First warning, the response and its stated action, raised again six times; both quotes highlighted inside their source text | "Each link shows the exact words from both reports, checked by code word for word, with a relation and a confidence." |
-| 0:50 to 1:00 | Click "Check a report" in the top bar; pick the chosen report; press Check | The agent's steps begin | "Now a new report. An agent built on NVIDIA Nemotron, on Nebius Token Factory, investigates it." |
-| 1:00 to 1:35 | Stay on /brief while the trace fills | Round by round: Super choosing tools, the search results with similarity, judge_candidate kept and dropped, promises read, the web check | "Nemotron Super decides what to do next: search earlier warnings, judge each candidate, read what was promised, check the web with Tavily. Every quote is verified in code before it is shown." |
-| 1:35 to 1:50 | Scroll to the brief on the right | The earlier warnings, what was promised, any web evidence | "In under twenty seconds, for about half a cent: the earlier warnings, what was promised, and what we could find about what happened next." |
-| 1:50 to 2:10 | /evaluation | The three bars with their ranges; then scroll to "Where it fails" | "We tested it on recurrences that coroners themselves flagged, with the citation removed. At the same number of links, the Nemotron system found the most. And here is exactly where it fails." |
-| 2:10 to 2:25 | /nemotron, the funnel and model cards | Archive to evidence; Nano, Super, Ultra; tokens and cost | "Small models read, a larger one judges. The whole archive cost about five dollars." |
-| 2:25 to 2:40 | /chains?view=across, open one cluster; then /map, press "Replay the years" | The same hazard across organisations; the map filling year by year | "The same hazards come up across organisations too. Every concern, placed by meaning, with the recurrences drawn in." |
-| 2:40 to 2:55 | / , the "Who it is for" cards | Coroner, solicitor or lawyer, family, safety team | "For coroners before an inquest, for families, lawyers and safety teams. It updates itself every week." |
-| 2:55 to 3:00 | Hold on the home page | The wordmark | "PFD Monitor groups concerns. The Tracker chases deadlines. Recurrence Watch tests whether promises held." |
+| 0:00 | localhost:3000/?replay | None. Let the timeline finish (about 5 s) | The smart motorway chain draws itself; the coroner counter ticks up; the closing line appears with a Replay button |
+| 0:20 | same page | Scroll slowly to the 100 dots | 99 dots dim one at a time, then most gain a ring; the two shares beside them |
+| 0:35 | localhost:3000/chains/c52cded99f756309 | Click See a recurrence in the hero. Scroll the Summary story | Each report reveals as it scrolls in; long gaps draw for longer; the "Repeated from the earlier report" words rise in |
+| 0:50 | same page | Click "Check it in the source" under one quote | The source text opens; the quoted words light up in order; "Found word for word" lands, beside the link to judiciary.uk |
+| 1:00 | localhost:3000/brief | Click the chip "A smart motorway death, 2023" | The trace replays: step cards slide in with coloured model badges; token and cost counters tick; kept quotes get a verified mark; dropped verdicts fade with their reason; the brief appears on the right |
+| 1:40 | localhost:3000/judge | Start; click Same hazard or Not the same; then Stop and see what this means | The verdict turns over with Super's reason; the agreement meter fills; the end screen shows "You agreed with Nemotron on X of Y" and the share card |
+| 2:05 | localhost:3000/map?replay | None at first; after the intro, hover a point in a cluster | The view zooms to the smart motorway chain and draws its lines, then returns; on hover, that point's chain lights and the rest dims |
+| 2:25 | localhost:3000/how-we-know?replay | Scroll to What surprised us, then the funnel | The total spend rolls up beside the cost per chain; the four findings; each funnel step grows and narrows as it scrolls in, with its cost and tokens |
+| 2:42 | localhost:3000/how-we-know/evaluation | Click the Evaluation tab | The recall chart with 95% ranges; the post-hoc row kept apart |
+| 2:50 | localhost:3000/ | Click Start here in the sidebar | Close on the home page |
 
-If the live run is slow or paused, use the shared link of a brief recorded earlier (its trace replays, marked as a replay) and say so.
+If something stalls, every animation has a still final frame, and ?replay on the address plays it again cleanly.

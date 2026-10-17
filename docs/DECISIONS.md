@@ -256,3 +256,10 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 5. Phones get a bottom tab bar: Home, Check, Chains, Map.
 6. Animations use one hook and a few CSS classes (components/motion/useMotion.ts), with no animation library. An animation plays once when it scrolls into view and ends on a still frame. The start frame applies only when scripts run, so without them, with reduced motion, or for an animation already seen this session, the page shows the final frame. ?replay in the address plays everything again, for recording.
 7. Playwright is not added to package.json: it is far over the 30 KB limit for new dependencies without asking. The smoke tests are in the repo and run with a Playwright install outside the project (docs/UX_NOTES.md).
+
+## D38. Animations that cost almost nothing to run
+
+1. Moving parts change only opacity and transform, each on its own layer, so the browser composites them instead of repainting. The first home timeline repainted its drawing on every frame; the rework cut paint from about 1.5 s to 0.13 s under Lighthouse's CPU slowdown.
+2. An animation starts when the browser is idle after coming into view (at most 0.7 s later), so it never competes with page start-up.
+3. Lighthouse was compared side by side with the build from the start of the round, under the same machine conditions, because a busy laptop moved absolute scores by up to 20 points.
+4. The browser smoke tests check behaviour, not screenshots, so they need no snapshot updates when styling changes.
