@@ -14,7 +14,7 @@ html, body { background: #e9e7e1 !important; }
   --quote-bar: #9fb7b9;
   color-scheme: light;
   min-height: 100vh; padding: 20px 16px 48px; color: #18202c;
-  font-family: var(--font-source-sans), system-ui, sans-serif;
+  font-family: var(--font-figtree), system-ui, sans-serif;
 }
 .pb-toolbar { max-width: 800px; margin: 0 auto 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; }
 .pb-toolbar a.pb-back { color: #2f5d62; }
@@ -24,12 +24,12 @@ html, body { background: #e9e7e1 !important; }
   font-size: 13px; line-height: 1.5;
 }
 @media (max-width: 640px) { .pb-paper { padding: 24px 18px; } }
-.pb-paper h1, .pb-paper h2, .pb-paper h3 { font-family: var(--font-source-serif), Georgia, serif; color: #18202c; font-weight: 600; letter-spacing: -0.01em; }
+.pb-paper h1, .pb-paper h2, .pb-paper h3 { font-family: var(--font-figtree), system-ui, sans-serif; color: #18202c; font-weight: 600; letter-spacing: -0.01em; }
 .pb-paper h1 { font-size: 26px; line-height: 1.15; margin: 2px 0 6px; }
 .pb-paper h2 { font-size: 15.5px; margin: 0 0 6px; padding-bottom: 3px; border-bottom: 1px solid #d9d6cd; }
 .pb-paper h3 { font-size: 13.5px; margin: 0 0 2px; }
 .pb-eyebrow { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #5d6574; font-weight: 600; }
-.pb-hazard { font-family: var(--font-source-serif), Georgia, serif; font-size: 17px; line-height: 1.3; margin: 0 0 4px; color: #18202c; }
+.pb-hazard { font-family: var(--font-figtree), system-ui, sans-serif; font-size: 17px; line-height: 1.3; margin: 0 0 4px; color: #18202c; }
 .pb-meta { color: #4a5363; font-size: 12px; }
 .pb-head { border-bottom: 2px solid #18202c; padding-bottom: 10px; margin-bottom: 14px; }
 .pb-section { margin: 0 0 14px; break-inside: avoid; page-break-inside: avoid; }
@@ -37,7 +37,7 @@ html, body { background: #e9e7e1 !important; }
 .pb-item:last-child { margin-bottom: 0; }
 .pb-muted { color: #5d6574; }
 .pb-small { font-size: 11px; }
-.pb-quote { font-family: var(--font-source-serif), Georgia, serif; font-size: 13px; line-height: 1.45; color: #18202c; border-left: 2px solid #9fb7b9; padding: 0 0 0 9px; margin: 3px 0; }
+.pb-quote { font-family: var(--font-figtree), system-ui, sans-serif; font-size: 13px; line-height: 1.45; color: #18202c; border-left: 2px solid #9fb7b9; padding: 0 0 0 9px; margin: 3px 0; }
 .pb-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 6px; }
 @media (max-width: 640px) { .pb-pair { grid-template-columns: 1fr; } }
 .pb-list { list-style: none; margin: 0; padding: 0; }

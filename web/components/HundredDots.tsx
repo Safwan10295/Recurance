@@ -71,7 +71,7 @@ export default function HundredDots({ notCited, diffCoroner, nLinks }: { notCite
             type="button"
             onClick={replay}
             disabled={!done}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border border-rule px-2.5 py-1.5 text-xs text-muted transition-opacity duration-300 hover:border-accent hover:text-ink ${
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border border-rule px-2.5 py-1.5 text-xs text-muted transition-opacity duration-300 hover:border-ink hover:text-ink ${
               done ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >

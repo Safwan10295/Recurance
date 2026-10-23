@@ -41,6 +41,24 @@ export const NAV: { group: string; items: NavItem[] }[] = [
   },
 ];
 
+// The desktop icon rail (Spine design): seven places, short labels, the full name and hint as a tooltip.
+export type RailItem = { href: string; label: string; full: string; hint: string; icon: LucideIcon };
+export const RAIL: RailItem[] = [
+  { href: "/", label: "Home", full: "Start here", hint: "What this is, in one minute", icon: Home },
+  { href: "/brief", label: "Check", full: "Check a report", hint: "Watch the agent find earlier warnings", icon: ScanSearch },
+  { href: "/judge", label: "Judge", full: "You be the judge", hint: "Same hazard or not? Try it", icon: Gavel },
+  { href: "/map", label: "Map", full: "Hazard map", hint: "Every concern, placed by meaning", icon: Map },
+  { href: "/chains", label: "Repeats", full: "Repeated warnings", hint: "The same concern, raised again and again", icon: Link2 },
+  { href: "/promises", label: "Promises", full: "Promises, then again", hint: "Stated actions, then the same concern", icon: MessageSquareQuote },
+  { href: "/how-we-know", label: "How", full: "How we know", hint: "Nemotron, evaluation, methodology", icon: ShieldCheck },
+];
+// Phones get the first five as a bottom tab bar; Promises and How we know are in the search palette and page links.
+export const TABS: RailItem[] = RAIL.slice(0, 5);
+
+export function isActive(path: string, href: string) {
+  return href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
+}
+
 // Every page the command palette can jump to, including those reached from inside a section.
 export const ALL_PAGES: NavItem[] = [
   ...NAV.flatMap((g) => g.items),

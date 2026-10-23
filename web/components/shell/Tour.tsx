@@ -13,13 +13,13 @@ const STEPS: Step[] = [
     path: "/",
     target: "problem",
     title: "The problem, in a real case",
-    body: "Smart motorways: each dot is a coroner's report about the same concern, sent to the same organisation. Each arc joins a repeat back to the first warning.",
+    body: "Smart motorways. Distance down the page is time: each dot is a coroner's report about the same concern to the same organisation, and the space between two dots is the months between them.",
   },
   {
     path: "/",
     target: "stats",
     title: "How often the warning was lost",
-    body: "Each dot is 1% of the links found. In almost every one, the later report does not mention the earlier warning, and most came from a different coroner.",
+    body: "Across every link found: how often the later report did not mention the earlier warning, how often it came from a different coroner, and what reading the whole archive cost.",
   },
   {
     path: "/chains/c52cded99f756309",

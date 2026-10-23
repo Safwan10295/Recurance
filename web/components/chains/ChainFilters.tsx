@@ -48,7 +48,7 @@ function Chip({
       aria-current={active ? "true" : undefined}
       aria-label={active && removeLabel ? removeLabel : undefined}
       className={`inline-flex max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-sm hover:no-underline transition-colors ${
-        active ? "border-accent bg-accent text-accent-ink" : "border-rule bg-surface text-ink-2 hover:border-accent hover:text-ink"
+        active ? "border-accent bg-accent text-accent-ink" : "border-rule bg-surface text-ink-2 hover:border-ink hover:text-ink"
       }`}
     >
       <span className="truncate">{children}</span>

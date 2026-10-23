@@ -3,7 +3,8 @@ import ChainFilters, { RESULTS_ID, chainsHref, type ChainParams } from "@/compon
 import StartHere from "@/components/chains/StartHere";
 import SystemicList, { type Systemic } from "@/components/SystemicList";
 import { EmptyState, LinkTabs, PageHeader, Pagination } from "@/components/ui";
-import { chainFacets, getSystemic } from "@/lib/queries";
+import HundredDots from "@/components/HundredDots";
+import { chainFacets, getMeta, getSystemic } from "@/lib/queries";
 import { getStartHere, listChainsWithDates } from "@/lib/queries-chains";
 import Link from "next/link";
 
@@ -36,11 +37,12 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
   const filtered = Boolean(params.q || params.type || params.theme || params.relation || params.conf || params.min);
   const showStart = view === "same" && !filtered && f.page === 1;
 
-  const [data, facets, systemic, startHere] = await Promise.all([
+  const [data, facets, systemic, startHere, meta] = await Promise.all([
     listChainsWithDates(f),
     chainFacets(),
     getSystemic(),
     showStart ? getStartHere().catch(() => []) : Promise.resolve([]),
+    getMeta(),
   ]);
 
   return (
@@ -56,6 +58,11 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
           </>
         }
       />
+      {showStart && (
+        <div className="mb-8">
+          <HundredDots notCited={meta.site.share_not_cited} diffCoroner={meta.site.share_diff_coroner} nLinks={meta.site.n_links} />
+        </div>
+      )}
       <LinkTabs
         tabs={[
           { href: "/chains", label: "Same organisation", count: data.total, active: view === "same" },

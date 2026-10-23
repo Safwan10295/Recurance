@@ -91,18 +91,22 @@ try {
     await ctx.close();
   });
 
-  await test("the sidebar has 8 items with the three main features marked", async () => {
+  await test("the icon rail has the seven places, search and theme, and marks the current page", async () => {
     const ctx = await desk();
     const p = await page(ctx);
-    await p.goto(BASE + "/", { waitUntil: "networkidle" });
-    assert((await p.locator('aside nav[aria-label="Main"] li').count()) === 8, "sidebar item count");
+    await p.goto(BASE + "/chains", { waitUntil: "networkidle" });
+    const rail = p.locator('nav[aria-label="Main"]');
+    assert((await rail.locator("a.rail-item").count()) === 7, "rail link count");
+    assert(await rail.getByRole("button", { name: /Search/ }).isVisible(), "no search item");
+    assert(await rail.getByRole("button", { name: /theme/i }).isVisible(), "no theme item");
+    assert((await rail.locator('[aria-current="page"]').innerText()).includes("Repeats"), "wrong current item");
     await ctx.close();
   });
 
   await test("the guided path can be dismissed, and stays dismissed after a reload", async () => {
     const ctx = await desk();
     const p = await page(ctx);
-    await p.goto(BASE + "/", { waitUntil: "networkidle" });
+    await p.goto(BASE + "/chains", { waitUntil: "networkidle" });
     assert(await p.locator(".guide-strip").isVisible(), "strip not shown");
     await p.getByRole("button", { name: "Hide the guided path" }).click();
     assert(!(await p.locator(".guide-strip").isVisible()), "strip still shown");
@@ -118,22 +122,27 @@ try {
       await p.goto(BASE + "/", { waitUntil: "networkidle" });
       const bar = p.getByRole("navigation", { name: "Quick links" });
       assert((await bar.isVisible()) === want, `tab bar visible: ${!want}`);
-      if (want) assert((await bar.getByRole("link").count()) === 4, "not four tabs");
+      if (want) assert((await bar.getByRole("link").count()) === 5, "not five tabs");
       await ctx.close();
     }
   });
 
-  await test("the hero draws, ends on a still frame, and offers a replay", async () => {
+  await test("the spine draws every report, labelled without names, each linking into the chain", async () => {
     const ctx = await desk();
     const p = await page(ctx);
     await p.goto(BASE + "/?replay", { waitUntil: "networkidle" });
-    const hero = p.locator('[data-m="hero"]');
-    await p.waitForTimeout(7500);
-    assert(await hero.getByRole("button", { name: "Replay" }).isEnabled(), "no replay button at the end");
-    assert(/coroners/.test(await hero.innerText()), "no coroner counter");
-    await hero.getByRole("button", { name: "Replay" }).click();
-    await p.waitForTimeout(300);
-    assert((await hero.getAttribute("data-state")) === "run", "replay did not restart");
+    const spine = p.locator('[data-m="spine"]');
+    await p.waitForTimeout(3500);
+    assert((await spine.getAttribute("data-state")) === "run", "spine did not play");
+    const rows = spine.locator("ol").first().locator("li > a");
+    const n = await rows.count();
+    assert(n >= 2, `only ${n} reports`);
+    for (let i = 0; i < n; i++) {
+      const t = await rows.nth(i).innerText();
+      assert(new RegExp(`Report ${i + 1}(?!\\d)`).test(t), `row ${i + 1} reads "${t}"`);
+      assert((await rows.nth(i).getAttribute("href")).endsWith(`#report-${i + 1}`), `row ${i + 1} link`);
+    }
+    assert(/Raised in \d{4}\./.test(await p.locator("h1").innerText()), "headline");
     await ctx.close();
   });
 
@@ -144,16 +153,16 @@ try {
     const p = await page(c2);
     await p.goto(BASE + "/", { waitUntil: "networkidle" });
     await p.waitForTimeout(300);
-    assert((await p.locator('[data-m="hero"]').getAttribute("data-state")) === "still", "hero not still");
-    const op = await p.locator('[data-m="hero"] .m-pop').first().evaluate((e) => getComputedStyle(e).opacity);
-    assert(op === "1", `hero dot opacity ${op}`);
+    assert((await p.locator('[data-m="spine"]').getAttribute("data-state")) === "still", "spine not still");
+    const op = await p.locator('[data-m="spine"] .m-pop').first().evaluate((e) => getComputedStyle(e).opacity);
+    assert(op === "1", `spine dot opacity ${op}`);
     await c2.close();
   });
 
   await test("the 100 dots play when scrolled into view", async () => {
     const ctx = await desk();
     const p = await page(ctx);
-    await p.goto(BASE + "/", { waitUntil: "networkidle" });
+    await p.goto(BASE + "/chains", { waitUntil: "networkidle" });
     await p.locator("#dots-heading").scrollIntoViewIfNeeded();
     await p.waitForTimeout(1200);
     assert((await p.locator("#dots-heading").evaluate((e) => e.closest(".rw-m").dataset.state)) === "run", "dots did not start");

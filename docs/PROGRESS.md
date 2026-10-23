@@ -296,3 +296,12 @@ No Nebius or Tavily spend this round. Total still $5.65 of $20.
 3. Measured side by side with the previous build: home page performance 85 to 86 against 80 to 82 on the same machine, accessibility 100. 17 browser tests, 15 TypeScript and 67 Python tests pass.
 
 No Nebius or Tavily spend.
+
+## Phase 13: the Spine design (2026-10-23)
+
+1. Implemented design_handoff_spine: new tokens and Figtree, the icon rail and phone tab bar, and the spine hero built from real data (D40).
+2. Chain pages have an anchor per report, so each spine row opens its report.
+3. 17 browser tests updated for the rail, the five tabs and the spine; all pass, with 15 TypeScript and 67 Python tests.
+4. Lighthouse side by side with the previous build: home 98, chain page 96 to 97, Check a report 98 to 99; accessibility 100.
+
+No Nebius or Tavily spend.

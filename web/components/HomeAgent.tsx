@@ -155,7 +155,7 @@ export default function HomeAgent({
             type="button"
             onClick={replay}
             disabled={!done}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-rule px-2.5 py-1.5 text-xs text-muted hover:border-accent hover:text-ink"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-rule px-2.5 py-1.5 text-xs text-muted hover:border-ink hover:text-ink"
           >
             <RotateCcw size={13} aria-hidden /> Replay
           </button>

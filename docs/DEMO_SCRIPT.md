@@ -13,13 +13,13 @@ Every figure on screen is read from the database by the page. Read the figures o
 
 ## 0:00 to 0:35. The problem
 
-On screen: the home page. The smart motorway timeline draws itself, report by report, and the coroner counter ticks up. Scroll to the agent's recorded run, then to the 100 dots.
+On screen: the home page. The spine draws itself: seven reports to National Highways, the space between them the months that passed. Then scroll to the agent's recorded run.
 
 Say:
 
 1. "A coroner warns an organisation about a risk to life. It responds with what it will do."
 2. "Years later the same concern comes up again, in front of a different coroner. Here, seven coroners, and none cited the earlier report."
-3. Over the dots: "Across every link we found, the later report almost never cites the earlier one, and most came from a different coroner. Recurrence Watch connects the record."
+3. Point to the figures under the buttons: "Across every link we found, the later report almost never cites the earlier one, and most came from a different coroner. Recurrence Watch connects the record."
 
 ## 0:35 to 1:00. One chain
 

@@ -1083,11 +1083,11 @@ function MapView({ m }: { m: Model }) {
 
   const chip = (active: boolean) =>
     `inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-sm whitespace-nowrap transition-colors ${
-      active ? "bg-accent text-accent-ink border-accent" : "bg-surface text-ink-2 border-rule hover:border-accent"
+      active ? "bg-accent text-accent-ink border-accent" : "bg-surface text-ink-2 border-rule hover:border-ink"
     }`;
   const nf = (n: number) => n.toLocaleString("en-GB");
   const zoomBtn =
-    "inline-flex h-9 w-9 items-center justify-center rounded-md border border-rule bg-surface text-ink-2 hover:border-accent hover:text-accent transition-colors";
+    "inline-flex h-9 w-9 items-center justify-center rounded-md border border-rule bg-surface text-ink-2 hover:border-ink hover:text-accent transition-colors";
 
   // ---- replay labels ----
   const tNow = replayOn ? tUi : m.tEnd;

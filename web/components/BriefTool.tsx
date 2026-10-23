@@ -354,7 +354,7 @@ export default function BriefTool({
                   setSugg([]);
                   run({ reportSlug: ex.slug });
                 }}
-                className="rounded-full border border-rule bg-surface px-2.5 py-1 text-ink-2 hover:border-accent disabled:opacity-50"
+                className="rounded-full border border-rule bg-surface px-2.5 py-1 text-ink-2 hover:border-ink disabled:opacity-50"
               >
                 {ex.label}
               </button>

@@ -62,7 +62,7 @@ export default function ChainStory({ chain }: { chain: ChainDetail }) {
         const days = prevDate ? Math.round((Date.parse(r.date) - Date.parse(prevDate)) / 86400000) : 0;
         const promises = r.responses.flatMap((rs) => rs.promises.map((p) => ({ ...p, pdf: rs.pdf_url })));
         return (
-          <li key={r.url} className="relative">
+          <li key={r.url} id={`report-${i + 1}`} className="relative scroll-mt-24">
             <Reveal id={`story-${i}`}>
             {i > 0 && (
               <div className="flex items-center gap-3 pl-[13px]" style={{ height: gapHeight(days) }} aria-hidden={false}>

@@ -18,7 +18,7 @@ export function ChainCard({ c, dates }: { c: WithDates; dates?: string[] }) {
   const ds = dates ?? c.dates ?? [];
   const timeline = ds.length > 1;
   return (
-    <Link href={`/chains/${c.key}`} className="card p-4 flex flex-col gap-2 hover:no-underline hover:border-accent transition-colors h-full">
+    <Link href={`/chains/${c.key}`} className="card p-4 flex flex-col gap-2 hover:no-underline hover:border-ink transition-colors h-full">
       <span className="eyebrow">{c.org.name}</span>
       <span className="font-serif text-lg text-ink leading-snug">{c.hazard}</span>
       <span className="mt-auto block space-y-1.5">

@@ -271,3 +271,11 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 3. The home page lost its repeated sections (the problem row, audience cards, figure tiles, latest repeats, how it works). The audience cards moved to Check a report, where each opens a brief.
 4. "Recurrence chains" reads "Repeated warnings" wherever a visitor sees it; the addresses are unchanged.
 5. The replayed trace starts empty and builds only in view. Rendering it on the server and clearing it on load had added a one-second task at start-up; measured side by side with the previous build, the home page now scores higher than before.
+
+## D40. The Spine design (design_handoff_spine)
+
+1. The site takes the Spine palette (near-black ink, grey-green paper, one moss accent), Figtree throughout, and flat surfaces with borders instead of shadows. All text pairs were checked at 4.5:1 or better in both themes before the change.
+2. Navigation is a dark icon rail on screens 900px and wider (search, seven places, theme), and a top bar with a five-tab bar on phones. Promises and How we know are in the rail, the search palette and page links; Recent repeats and Organisations are in the palette and page links.
+3. The home hero is the smart motorway chain as a vertical spine: distance down the page is time, at 9px a month (tightened for a long chain). The headline year, the counts, the gaps and the cited or not-cited tags all come from the chain's own data. Rows read "Report N", the month and the coroner area, never a name, and each opens that report on the chain page.
+4. Kept from earlier rounds, below the hero: the plain three-line explanation of the coroner system, and the agent's recorded run. The 100 dots moved to the Repeated warnings page, since the hero now carries those figures.
+5. Measured side by side with the previous build on an idle machine, every page tested is as fast or faster (home 98 against 97, chain page 96 to 97 against 94 to 95, Check a report 98 to 99 against 95 to 96), accessibility 100.

@@ -135,12 +135,12 @@ export function PageHeader({
 export function StatTile({ value, label, href }: { value: React.ReactNode; label: string; href?: string }) {
   const inner = (
     <>
-      <div className="font-serif text-3xl text-ink">{value}</div>
+      <div className="font-serif text-3xl font-bold tracking-tight text-ink num">{value}</div>
       <div className="text-sm text-muted mt-1 leading-snug">{label}</div>
     </>
   );
   return href ? (
-    <Link href={href} className="card p-4 block hover:no-underline hover:border-accent transition-colors">
+    <Link href={href} className="card p-4 block hover:no-underline hover:border-ink transition-colors">
       {inner}
     </Link>
   ) : (
@@ -184,9 +184,9 @@ export function ButtonLink({ href, children, primary }: { href: string; children
 // ---- Shared controls, so every page uses the same buttons, fields and tabs ----
 
 export const btnPrimary =
-  "inline-flex items-center justify-center gap-1.5 rounded-md bg-accent text-accent-ink px-3.5 py-2 text-sm font-medium hover:no-underline hover:bg-accent-strong transition-colors disabled:opacity-50";
+  "inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary text-primary-ink px-3.5 py-2 text-sm font-semibold hover:no-underline hover:bg-primary-hover transition-colors disabled:opacity-50";
 export const btnSecondary =
-  "inline-flex items-center justify-center gap-1.5 rounded-md border border-rule bg-surface text-ink px-3.5 py-2 text-sm font-medium hover:no-underline hover:border-accent transition-colors";
+  "inline-flex items-center justify-center gap-1.5 rounded-lg border border-rule bg-surface text-ink px-3.5 py-2 text-sm font-semibold hover:no-underline hover:border-ink transition-colors";
 export const fieldCls =
   "w-full rounded-md border border-rule bg-surface px-2.5 py-1.5 text-sm text-ink focus:border-accent focus:outline-none";
 
@@ -239,7 +239,7 @@ export function InfoTip({ text, label = "What does this mean?" }: { text: string
       <button
         type="button"
         aria-label={label}
-        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-rule text-[10px] leading-none text-muted hover:border-accent hover:text-accent focus:border-accent"
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-rule text-[10px] leading-none text-muted hover:border-ink hover:text-accent focus:border-accent"
       >
         ?
       </button>

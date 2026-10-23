@@ -33,7 +33,7 @@ export default async function Methodology() {
           ["#api", "Open data API"],
           ["#corrections", "Corrections"],
         ].map(([href, label]) => (
-          <a key={href} href={href} className="rounded-full border border-rule bg-surface px-3 py-1 text-ink-2 hover:no-underline hover:border-accent">
+          <a key={href} href={href} className="rounded-full border border-rule bg-surface px-3 py-1 text-ink-2 hover:no-underline hover:border-ink">
             {label}
           </a>
         ))}

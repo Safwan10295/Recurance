@@ -39,7 +39,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <p className="eyebrow">Try</p>
           <div className="flex flex-wrap gap-2 text-sm">
             {["smart motorway", "ligature", "ambulance handover", "emollient", "level crossing", "mental health beds"].map((s) => (
-              <Link key={s} href={`/search?q=${encodeURIComponent(s)}`} className="rounded-full border border-rule bg-surface px-3 py-1 text-ink-2 hover:no-underline hover:border-accent">
+              <Link key={s} href={`/search?q=${encodeURIComponent(s)}`} className="rounded-full border border-rule bg-surface px-3 py-1 text-ink-2 hover:no-underline hover:border-ink">
                 {s}
               </Link>
             ))}

@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
+import { Figtree } from "next/font/google";
 import AppShell from "@/components/shell/AppShell";
 import { THEME_SCRIPT } from "@/components/shell/nav";
 import { formatDate } from "@/components/ui";
 import { getMeta } from "@/lib/queries";
 import "./globals.css";
 
-const sans = Source_Sans_3({ subsets: ["latin"], variable: "--font-source-sans", display: "swap" });
-const serif = Source_Serif_4({ subsets: ["latin"], variable: "--font-source-serif", display: "swap" });
+const figtree = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-figtree", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL || "http://localhost:3000"),
@@ -27,7 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     updated = null;
   }
   return (
-    <html lang="en-GB" className={`${sans.variable} ${serif.variable}`} suppressHydrationWarning>
+    <html lang="en-GB" className={figtree.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
