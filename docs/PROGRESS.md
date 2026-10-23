@@ -305,3 +305,4 @@ No Nebius or Tavily spend.
 4. Lighthouse side by side with the previous build: home 98, chain page 96 to 97, Check a report 98 to 99; accessibility 100.
 
 No Nebius or Tavily spend.
+5. Afterwards: the spine shows each report's quote on hover or focus, honest tags for reports with no link into them, a highlight on arrival at a report, a matching tab icon and share-preview images (D41). 18 browser tests pass.

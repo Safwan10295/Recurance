@@ -50,7 +50,12 @@ export type MotionState = "pre" | "run" | "still";
 
 export function useMotion<T extends HTMLElement | SVGElement = HTMLDivElement>(
   id: string,
-  { session = false, threshold = 0.35, durationMs = 0 }: { session?: boolean; threshold?: number; durationMs?: number } = {},
+  {
+    session = false,
+    threshold = 0.35,
+    durationMs = 0,
+    stillOnHash = false,
+  }: { session?: boolean; threshold?: number; durationMs?: number; stillOnHash?: boolean } = {},
 ) {
   const ref = useRef<T>(null);
   const [state, setState] = useState<MotionState>("pre");
@@ -72,7 +77,9 @@ export function useMotion<T extends HTMLElement | SVGElement = HTMLDivElement>(
   }, [id]);
 
   useEffect(() => {
-    if (prefersReducedMotion() || (session && seenList().includes(id) && !replayRequested())) {
+    // Arriving at an anchor (#report-3) means the reader came for that content: show it at once, not mid-animation.
+    const viaAnchor = stillOnHash && typeof window !== "undefined" && window.location.hash.length > 1;
+    if (prefersReducedMotion() || viaAnchor || (session && seenList().includes(id) && !replayRequested())) {
       setState("still");
       setDone(true);
       return;
@@ -106,7 +113,7 @@ export function useMotion<T extends HTMLElement | SVGElement = HTMLDivElement>(
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [id, session, threshold]);
+  }, [id, session, threshold, stillOnHash]);
 
   // Mark the end, so a component can show its closing line or replay button.
   useEffect(() => {

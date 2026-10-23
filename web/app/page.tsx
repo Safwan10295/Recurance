@@ -47,6 +47,26 @@ export default async function Home() {
   const cites = (url: string) => !!hero?.links.some((l) => l.later === url && l.later_cites_earlier);
   const citedLater = reports.slice(1).filter((r) => cites(r.url)).length;
   const years = hero ? Math.round((Date.parse(hero.last_date) - Date.parse(hero.first_date)) / (365.25 * 86_400_000)) : 0;
+  // What each report said: the quote of the strongest link into it (or, for the first, out of it), with that link's
+  // relation and confidence, so every quote shown keeps its verdict and its source.
+  // A report that no later link points back from (only forward to later reports) takes its quote from that forward
+  // link, and gets no cited or not-cited tag: with no link into it, whether it cited anything is unknown.
+  const spine = reports.map((r) => {
+    const links = hero?.links ?? [];
+    const best = <T extends { confidence: number }>(ls: T[]) => [...ls].sort((a, b) => b.confidence - a.confidence)[0];
+    const into = best(links.filter((l) => l.later === r.url));
+    const out = best(links.filter((l) => l.earlier === r.url));
+    const link = into ?? out;
+    return {
+      date: r.date,
+      area: r.area,
+      cites: into ? cites(r.url) : null,
+      url: r.url,
+      quote: into ? into.later_quote : out ? out.earlier_quote : null,
+      relation: link?.relation ?? null,
+      confidence: link?.confidence ?? null,
+    };
+  });
   const lede = hero
     ? `${hero.hazard}. ${cap(word(hero.coroners.length))} coroners, ${word(years)} years. ${
         citedLater === 0 ? "None of the later reports cited the first." : `${cap(word(citedLater))} of the later reports cited an earlier one.`
@@ -78,6 +98,8 @@ export default async function Home() {
       {hero && (
         <section className="mx-auto grid max-w-[1360px] gap-x-14 gap-y-8 px-[18px] pb-14 pt-6 min-[900px]:px-10 min-[1180px]:grid-cols-[minmax(0,1fr)_600px] min-[1180px]:grid-rows-[auto_1fr] xl:px-16">
           <div className="flex flex-col gap-6 min-[1180px]:col-start-1 min-[1180px]:row-start-1 min-[1180px]:pt-[72px]">
+            {/* On desktop the rail shows only the logo, so the name is said once here; phones have it in the top bar. */}
+            <p className="eyebrow m-0 hidden min-[900px]:block">Recurrence Watch · coroners&apos; reports, England and Wales</p>
             <span className="inline-flex items-center gap-2 self-start rounded-full border border-rule bg-surface px-3.5 py-1.5 text-[13.5px] font-semibold">
               <Building2 size={14} aria-hidden /> {hero.org.name} · {reports.length} reports
             </span>
@@ -94,7 +116,7 @@ export default async function Home() {
           </div>
 
           <div className="min-[1180px]:col-start-2 min-[1180px]:row-span-2 min-[1180px]:row-start-1">
-            <SpineTimeline chainKey={hero.key} reports={reports.map((r) => ({ date: r.date, area: r.area, cites: cites(r.url) }))} />
+            <SpineTimeline chainKey={hero.key} reports={spine} />
           </div>
 
           <div className="flex flex-col gap-6 min-[1180px]:col-start-1 min-[1180px]:row-start-2">

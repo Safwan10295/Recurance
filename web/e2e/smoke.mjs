@@ -146,6 +146,24 @@ try {
     await ctx.close();
   });
 
+  await test("pointing at a spine report shows its quote with its verdict and source", async () => {
+    const ctx = await desk();
+    const p = await page(ctx);
+    await p.goto(BASE + "/?replay", { waitUntil: "networkidle" });
+    await p.waitForTimeout(3500);
+    const rows = p.locator('[data-m="spine"] ol').first().locator("li > a");
+    for (const i of [0, 2]) {
+      await rows.nth(i).hover();
+      const panel = p.locator('[data-m="spine"] figure');
+      await panel.waitFor({ timeout: 2000 });
+      const t = await panel.innerText();
+      assert(new RegExp(`Report ${i + 1}(?!\\d)`, "i").test(t), `panel for row ${i + 1} reads "${t.slice(0, 60)}"`);
+      assert(/“/.test(t) && /Confidence/.test(t), `row ${i + 1}: quote or confidence missing`);
+      assert(await panel.locator('a[href*="judiciary.uk"]').count(), `row ${i + 1}: no source link`);
+    }
+    await ctx.close();
+  });
+
   await test("reduced motion shows final frames straight away", async () => {
     const ctx = await desk();
     await ctx.close();

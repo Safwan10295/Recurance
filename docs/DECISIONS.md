@@ -279,3 +279,10 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 3. The home hero is the smart motorway chain as a vertical spine: distance down the page is time, at 9px a month (tightened for a long chain). The headline year, the counts, the gaps and the cited or not-cited tags all come from the chain's own data. Rows read "Report N", the month and the coroner area, never a name, and each opens that report on the chain page.
 4. Kept from earlier rounds, below the hero: the plain three-line explanation of the coroner system, and the agent's recorded run. The 100 dots moved to the Repeated warnings page, since the hero now carries those figures.
 5. Measured side by side with the previous build on an idle machine, every page tested is as fast or faster (home 98 against 97, chain page 96 to 97 against 94 to 95, Check a report 98 to 99 against 95 to 96), accessibility 100.
+
+## D41. Touches on top of the Spine design
+
+1. Pointing at a report on the spine (or tabbing to it) shows what that report said: the quote from its strongest link, with the link's relation, confidence and the source. A report that no later report links back to takes its quote from its link forward.
+2. A report with no link pointing into it gets no cited or not-cited tag, because whether it cited anything is unknown. Previously it read "Not cited".
+3. Following a spine row to the chain page shows that report at once with a brief highlight, instead of the scroll-in animation, on a full load or a navigation inside the site.
+4. The site name sits above the hero on desktop, where the rail shows only the logo. The browser tab icon and both share-preview images use the Spine colours and Figtree (bundled under its open licence in web/assets/fonts).

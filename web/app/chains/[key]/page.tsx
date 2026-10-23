@@ -1,3 +1,4 @@
+import ArrivalHighlight from "@/components/ArrivalHighlight";
 import { ArrowRight, Building2, ChevronDown, ScanSearch } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -93,6 +94,7 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
           <p className="text-xs text-muted">Spacing grows with the time between reports.</p>
         </div>
         <ChainStory chain={chain} />
+        <ArrivalHighlight />
       </section>
     </div>
   );

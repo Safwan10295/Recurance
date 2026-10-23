@@ -586,3 +586,25 @@ html[data-seen~="spine"] [data-m="spine"] :is(.m-fade, .m-pop, .m-rise) {
 html[data-seen~="spine"] [data-m="spine"] .m-growy {
   transform: none !important;
 }
+
+/* Arriving at a report from the home spine (#report-N): a brief, quiet highlight so the reader sees where they landed. */
+@keyframes arrive {
+  from { background-color: var(--accent-soft); }
+  to { background-color: transparent; }
+}
+li[id^="report-"].arrival {
+  border-radius: 12px;
+  animation: arrive 1.6s ease-out 0.2s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  li[id^="report-"].arrival { animation: none; outline: 2px solid var(--accent); outline-offset: 4px; }
+}
+
+/* Arrived at a report anchor: the chain story is shown in place from the first paint (set before paint in nav.ts). */
+html.arrived .rw-m :is(.m-fade, .m-pop, .m-rise) {
+  opacity: 1 !important;
+  transform: none !important;
+}
+html.arrived .rw-m .m-growy {
+  transform: none !important;
+}
