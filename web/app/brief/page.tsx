@@ -1,3 +1,4 @@
+import AudienceCards from "@/components/AudienceCards";
 import BriefTool from "@/components/BriefTool";
 import { PageHeader } from "@/components/ui";
 import { q1 } from "@/lib/db";
@@ -37,6 +38,9 @@ export default async function BriefPage({ searchParams }: { searchParams: Promis
         initialOrg={org ? { id: org.id, name: org.name } : undefined}
         autoRun={sp.run === "1" && !!report}
       />
+      <div className="mt-14">
+        <AudienceCards />
+      </div>
     </div>
   );
 }

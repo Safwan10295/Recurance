@@ -13,7 +13,7 @@ Every figure on screen is read from the database by the page. Read the figures o
 
 ## 0:00 to 0:35. The problem
 
-On screen: the home page. The smart motorway timeline draws itself, report by report, and the coroner counter ticks up. Then scroll to the 100 dots.
+On screen: the home page. The smart motorway timeline draws itself, report by report, and the coroner counter ticks up. Scroll to the agent's recorded run, then to the 100 dots.
 
 Say:
 
@@ -23,7 +23,7 @@ Say:
 
 ## 0:35 to 1:00. One chain
 
-On screen: See a recurrence. The story reveals as you scroll; long gaps take longer to draw. Open "Check it in the source" on one quote.
+On screen: "See a repeated warning". The story reveals as you scroll; long gaps take longer to draw. Open "Check it in the source" on one quote.
 
 Say:
 

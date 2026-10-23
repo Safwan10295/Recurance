@@ -288,3 +288,11 @@ No Nebius or Tavily spend.
 6. docs/UX_NOTES.md written.
 
 No Nebius or Tavily spend this round. Total still $5.65 of $20.
+
+## Phase 12: a clearer home page (2026-10-23)
+
+1. Plain explanation of the coroner system at the top, the agent's real run on the home page with a by-hand comparison, and a shorter page (D39).
+2. "Repeated warnings" replaces "Recurrence chains" in what visitors see; audience cards moved to Check a report.
+3. Measured side by side with the previous build: home page performance 85 to 86 against 80 to 82 on the same machine, accessibility 100. 17 browser tests, 15 TypeScript and 67 Python tests pass.
+
+No Nebius or Tavily spend.

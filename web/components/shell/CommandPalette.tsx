@@ -13,7 +13,7 @@ type Results = {
 type Item = { href: string; label: string; sub?: string; kind: "page" | "chain" | "report" | "org" | "search" };
 
 const KIND_ICON = { page: ArrowRight, chain: Link2, report: FileText, org: Building2, search: Search } as const;
-const KIND_LABEL = { page: "Pages", chain: "Recurrence chains", report: "Reports", org: "Organisations", search: "" } as const;
+const KIND_LABEL = { page: "Pages", chain: "Repeated warnings", report: "Reports", org: "Organisations", search: "" } as const;
 const short = (t: string) => t.replace(/\s*[:\-–]\s*Prevention of future deaths? report\s*$/i, "");
 
 // Ctrl+K, Cmd+K or "/" from anywhere: jump to any page, chain, report or organisation.

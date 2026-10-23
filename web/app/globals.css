@@ -489,3 +489,11 @@ html[data-seen~="hero"] [data-m="hero"] .m-reach {
 @media (prefers-reduced-motion: reduce) {
   .js .rw-m[data-state="pre"] .m-reach { opacity: 1; transform: none; }
 }
+
+/* Home agent replay: before it plays, the result waits (only when scripts run, so it is never lost without them). */
+.js .rw-m[data-state="pre"] .home-agent-result {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .rw-m[data-state="pre"] .home-agent-result { opacity: 1; }
+}

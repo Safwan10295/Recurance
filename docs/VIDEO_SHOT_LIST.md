@@ -11,8 +11,8 @@ Setup:
 | Time | Address | Clicks | On screen |
 |---|---|---|---|
 | 0:00 | localhost:3000/?replay | None. Let the timeline finish (about 5 s) | The smart motorway chain draws itself; the coroner counter ticks up; the closing line appears with a Replay button |
-| 0:20 | same page | Scroll slowly to the 100 dots | 99 dots dim one at a time, then most gain a ring; the two shares beside them |
-| 0:35 | localhost:3000/chains/c52cded99f756309 | Click See a recurrence in the hero. Scroll the Summary story | Each report reveals as it scrolls in; long gaps draw for longer; the "Repeated from the earlier report" words rise in |
+| 0:20 | same page | Scroll to "The agent checks a real report", let the run play (about 7 s), then scroll on to the 100 dots | The recorded run steps through, the three earlier warnings appear with their quotes; then 99 dots dim one at a time and most gain a ring |
+| 0:35 | localhost:3000/chains/c52cded99f756309 | Click "See a repeated warning" in the hero. Scroll the Summary story | Each report reveals as it scrolls in; long gaps draw for longer; the "Repeated from the earlier report" words rise in |
 | 0:50 | same page | Click "Check it in the source" under one quote | The source text opens; the quoted words light up in order; "Found word for word" lands, beside the link to judiciary.uk |
 | 1:00 | localhost:3000/brief | Click the chip "A smart motorway death, 2023" | The trace replays: step cards slide in with coloured model badges; token and cost counters tick; kept quotes get a verified mark; dropped verdicts fade with their reason; the brief appears on the right |
 | 1:40 | localhost:3000/judge | Start; click Same hazard or Not the same; then Stop and see what this means | The verdict turns over with Super's reason; the agreement meter fills; the end screen shows "You agreed with Nemotron on X of Y" and the share card |

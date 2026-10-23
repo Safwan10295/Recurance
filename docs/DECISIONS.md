@@ -263,3 +263,11 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 2. An animation starts when the browser is idle after coming into view (at most 0.7 s later), so it never competes with page start-up.
 3. Lighthouse was compared side by side with the build from the start of the round, under the same machine conditions, because a busy laptop moved absolute scores by up to 20 points.
 4. The browser smoke tests check behaviour, not screenshots, so they need no snapshot updates when styling changes.
+
+## D39. A home page a judge can follow in one read
+
+1. The page opens with how the coroner system works, in three plain lines, then one line on what Recurrence Watch found. Judges may not know what a Prevention of Future Deaths report is.
+2. The second section replays the real recorded agent run for a 2023 smart motorway report, step by step, with the time, the cost and the number of earlier concerns a person would have had to read. The result shows the matched quotes with links to the originals.
+3. The home page lost its repeated sections (the problem row, audience cards, figure tiles, latest repeats, how it works). The audience cards moved to Check a report, where each opens a brief.
+4. "Recurrence chains" reads "Repeated warnings" wherever a visitor sees it; the addresses are unchanged.
+5. The replayed trace starts empty and builds only in view. Rendering it on the server and clearing it on load had added a one-second task at start-up; measured side by side with the previous build, the home page now scores higher than before.

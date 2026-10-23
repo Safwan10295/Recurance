@@ -73,7 +73,7 @@ export default function HeroTimeline({
       <div className="mb-1 flex items-baseline justify-between gap-2">
         <p className="eyebrow">The problem, in a real case</p>
         <Link href={`/chains/${chainKey}`} className="text-xs">
-          Open the chain →
+          See every report →
         </Link>
       </div>
       <p className="font-serif text-lg leading-snug text-ink">{hazard}</p>

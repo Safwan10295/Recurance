@@ -30,9 +30,9 @@ export const NAV: { group: string; items: NavItem[] }[] = [
   {
     group: "Explore the record",
     items: [
-      { href: "/chains", label: "Recurrence chains", hint: "Hazards raised again and again", icon: Link2 },
+      { href: "/chains", label: "Repeated warnings", hint: "The same concern, raised again and again", icon: Link2 },
       { href: "/promises", label: "Promises, then again", hint: "Stated actions, then the same concern", icon: MessageSquareQuote },
-      { href: "/recent", label: "Recent recurrences", hint: "New reports that repeat a warning", icon: Clock3 },
+      { href: "/recent", label: "Recent repeats", hint: "New reports that repeat a warning", icon: Clock3 },
     ],
   },
   {

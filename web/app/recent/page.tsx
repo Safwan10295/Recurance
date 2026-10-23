@@ -3,7 +3,7 @@ import AutoForm from "@/components/AutoForm";
 import { EmptyState, PageHeader, Pagination, btnPrimary, fieldCls, orgTypeLabel } from "@/components/ui";
 import { listRecent } from "@/lib/queries";
 
-export const metadata = { title: "Recent recurrences · Recurrence Watch" };
+export const metadata = { title: "Recent repeats · Recurrence Watch" };
 
 const TYPES = ["nhs_trust", "national_body", "police", "council", "prison", "ambulance", "commissioner", "company", "other"];
 
@@ -17,8 +17,8 @@ export default async function RecentPage({ searchParams }: { searchParams: Promi
   return (
     <div>
       <PageHeader
-        crumbs={[{ href: "/", label: "Start here" }, { label: "Recent recurrences" }]}
-        title="Recent recurrences"
+        crumbs={[{ href: "/", label: "Start here" }, { label: "Recent repeats" }]}
+        title="Recent repeats"
         description={
           <>
             New coroners&apos; reports that raise a concern already raised with the same organisation. Newest first. Each

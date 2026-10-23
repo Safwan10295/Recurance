@@ -13,13 +13,13 @@ const STEPS: Step[] = [
     path: "/",
     target: "problem",
     title: "The problem, in a real case",
-    body: "Smart motorways: each dot is a coroner's report on the same concern to the same organisation, and each arc joins a repeat back to the first warning.",
+    body: "Smart motorways: each dot is a coroner's report about the same concern, sent to the same organisation. Each arc joins a repeat back to the first warning.",
   },
   {
     path: "/",
     target: "stats",
-    title: "What Recurrence Watch found",
-    body: "Every report and response since 2013, read and linked. The figures are read from the database at each publish, and every quote is checked word for word against the source.",
+    title: "How often the warning was lost",
+    body: "Each dot is 1% of the links found. In almost every one, the later report does not mention the earlier warning, and most came from a different coroner.",
   },
   {
     path: "/chains/c52cded99f756309",

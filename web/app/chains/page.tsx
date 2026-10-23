@@ -7,7 +7,7 @@ import { chainFacets, getSystemic } from "@/lib/queries";
 import { getStartHere, listChainsWithDates } from "@/lib/queries-chains";
 import Link from "next/link";
 
-export const metadata = { title: "Recurrence chains · Recurrence Watch" };
+export const metadata = { title: "Repeated warnings · Recurrence Watch" };
 
 export default async function ChainsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
@@ -46,12 +46,13 @@ export default async function ChainsPage({ searchParams }: { searchParams: Promi
   return (
     <div>
       <PageHeader
-        crumbs={[{ href: "/", label: "Start here" }, { label: "Recurrence chains" }]}
-        title="Recurrence chains"
+        crumbs={[{ href: "/", label: "Start here" }, { label: "Repeated warnings" }]}
+        title="Repeated warnings"
         description={
           <>
-            A chain is one hazard raised with one organisation in two or more reports, at least six months apart. Every link
-            is judged identical or closely related by Nemotron Super, and both quotes are checked word for word.
+            Each one is a single concern, raised with the same organisation in two or more coroners&apos; reports at least six
+            months apart. Nemotron Super judged every match to be the same or a closely related hazard, and both quotes are
+            checked word for word against the reports.
           </>
         }
       />

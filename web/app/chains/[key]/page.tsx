@@ -280,7 +280,7 @@ export default async function ChainPage({ params }: { params: Promise<{ key: str
       <header className="space-y-3 pb-5 mb-2">
         <Breadcrumbs
           items={[
-            { href: "/chains", label: "Recurrence chains" },
+            { href: "/chains", label: "Repeated warnings" },
             { href: `/organisations/${chain.org.id}`, label: chain.org.name },
             { label: orgTypeLabel(chain.org.type) },
           ]}

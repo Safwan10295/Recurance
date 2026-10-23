@@ -49,7 +49,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       {none && <EmptyState title="Nothing found">Try fewer or different words.</EmptyState>}
       {res.chains.length > 0 && (
         <Section
-          title={`Recurrence chains (${shown(res.chains.length, res.totals.chains)})`}
+          title={`Repeated warnings (${shown(res.chains.length, res.totals.chains)})`}
           action={res.totals.chains > res.chains.length ? <Link href={`/chains?q=${encodeURIComponent(term)}`}>See all {res.totals.chains} →</Link> : undefined}
         >
           <ul className="card px-4 divide-y divide-rule list-none">

@@ -44,7 +44,7 @@ export default async function OrgPage({
       </div>
       <LinkTabs
         tabs={[
-          { href: `/organisations/${org.id}`, label: "Recurrence chains", count: chains.length, active: view === "chains" },
+          { href: `/organisations/${org.id}`, label: "Repeated warnings", count: chains.length, active: view === "chains" },
           { href: `/organisations/${org.id}?view=reports`, label: "Reports and responses", count: reports.total, active: view === "reports" },
         ]}
       />

@@ -22,7 +22,7 @@ export default function NotFound() {
           <ScanSearch size={16} aria-hidden /> Check a report
         </Link>
         <Link href="/chains" className={`${btnSecondary} px-4 py-2.5`}>
-          <Link2 size={16} aria-hidden /> Recurrence chains
+          <Link2 size={16} aria-hidden /> Repeated warnings
         </Link>
       </div>
       <p className="text-sm text-muted">
