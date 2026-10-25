@@ -5,7 +5,7 @@ import { q1 } from "@/lib/db";
 import { getOrg } from "@/lib/queries";
 
 export const metadata = {
-  title: "Check a report · Recurrence Watch",
+  title: "Check a report · Recurance",
   description: "Watch an agent built on NVIDIA Nemotron find earlier coroners' warnings to the same organisation, with verified quotes.",
 };
 

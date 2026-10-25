@@ -4,7 +4,7 @@ import { q1 } from "@/lib/db";
 import { getMeta } from "@/lib/queries";
 
 export const metadata = {
-  title: "You be the judge · Recurrence Watch",
+  title: "You be the judge · Recurance",
   description: "Two coroners' concerns, years apart. Same hazard or not? Compare your call with NVIDIA Nemotron Super's.",
 };
 export const dynamic = "force-dynamic";
@@ -35,7 +35,7 @@ export default async function JudgePage() {
       <PageHeader
         crumbs={[{ href: "/", label: "Start here" }, { label: "You be the judge" }]}
         title="You be the judge"
-        description="The hardest step in Recurrence Watch is deciding whether two concerns are really the same hazard. Try it yourself, then see what Nemotron Super decided."
+        description="The hardest step in Recurance is deciding whether two concerns are really the same hazard. Try it yourself, then see what Nemotron Super decided."
       />
       {pairs.length < 8 ? (
         <EmptyState title="The game is not available just now">It needs the next data publish.</EmptyState>

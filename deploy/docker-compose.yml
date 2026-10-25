@@ -1,4 +1,4 @@
-# Recurrence Watch on one server: Postgres + pgvector, web app, pipeline worker, Caddy (HTTPS).
+# Recurance on one server: Postgres + pgvector, web app, pipeline worker, Caddy (HTTPS).
 # Run from this folder:  docker compose --env-file .env up -d --build
 # See deploy/README.md for the full steps.
 

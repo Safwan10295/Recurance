@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Back up Recurrence Watch on the server: a PostgreSQL dump and an archive of data/ (the source of truth).
+# Back up Recurance on the server: a PostgreSQL dump and an archive of data/ (the source of truth).
 # Run from deploy/:  bash backup.sh      Keeps the last 7 of each in ~/rw-backups. Copy them off the server too.
 set -euo pipefail
 cd "$(dirname "$0")"

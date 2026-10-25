@@ -1,4 +1,4 @@
-"""Recurrence Watch pipeline: one entry point.
+"""Recurance pipeline: one entry point.
 
 Usage: python -m pipeline.cli <command> [options]
 

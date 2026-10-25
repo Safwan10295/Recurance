@@ -75,7 +75,7 @@ export function Toolbar({ back }: { back?: { href: string; label: string } }) {
 export function DocHeader({ subject, organisation, address }: { subject: React.ReactNode; organisation: string | null; address: string }) {
   return (
     <header className="pb-head">
-      <p className="pb-eyebrow">Recurrence Watch · prevention of future deaths reports</p>
+      <p className="pb-eyebrow">Recurance · prevention of future deaths reports</p>
       <h1>Pre-inquest brief</h1>
       <div className="pb-hazard">{subject}</div>
       <p className="pb-meta">
@@ -87,7 +87,7 @@ export function DocHeader({ subject, organisation, address }: { subject: React.R
         <span className="pb-label">Generated:</span> {formatDate(new Date().toISOString())}
       </p>
       <p className="pb-meta">
-        Recurrence Watch · <a href={address}>{address.replace(/^https?:\/\//i, "")}</a>
+        Recurance · <a href={address}>{address.replace(/^https?:\/\//i, "")}</a>
       </p>
     </header>
   );

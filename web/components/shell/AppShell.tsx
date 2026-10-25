@@ -1,6 +1,6 @@
 "use client";
 
-import { Repeat2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import GuidePath from "./GuidePath";
 import { RAIL, TABS, isActive } from "./nav";
 import ThemeToggle from "./ThemeToggle";
 import Tour from "./Tour";
+import { LogoMark, Wordmark } from "@/components/shell/Logo";
 
 const BUILT_WITH: [string, string][] = [
   ["NVIDIA Nemotron", "Nano, Super and Ultra"],
@@ -67,11 +68,11 @@ export default function AppShell({ children, updated }: { children: React.ReactN
       >
         <Link
           href="/"
-          title="Recurrence Watch, start here"
-          aria-label="Recurrence Watch, start here"
-          className="mb-[18px] flex h-10 w-10 items-center justify-center rounded-xl bg-accent-bright text-[#161a17] hover:no-underline"
+          title="Recurance, start here"
+          aria-label="Recurance, start here"
+          className="mb-[18px] flex h-11 w-11 items-center justify-center rounded-xl hover:no-underline"
         >
-          <Repeat2 size={20} strokeWidth={2} aria-hidden />
+          <LogoMark size={44} />
         </Link>
         <button type="button" onClick={openPalette} title="Search reports, hazards and organisations (Ctrl K)" className="rail-item">
           <span className="rail-pill">
@@ -99,8 +100,8 @@ export default function AppShell({ children, updated }: { children: React.ReactN
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Phone top bar */}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-rule bg-paper px-[18px] min-[900px]:hidden">
-          <Link href="/" className="text-base font-bold tracking-tight text-ink hover:no-underline">
-            Recurrence Watch
+          <Link href="/" aria-label="Recurance, start here" className="hover:no-underline">
+            <Wordmark />
           </Link>
           <div className="ml-auto flex items-center gap-1">
             <button

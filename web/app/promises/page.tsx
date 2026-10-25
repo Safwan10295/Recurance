@@ -5,7 +5,7 @@ import { EmptyState, InfoTip, PageHeader, Pagination, StatTile, btnPrimary, fiel
 import { GLOSSARY } from "@/lib/glossary";
 import { listPromiseLinks, promiseFacets, promiseSummary } from "@/lib/queries-promises";
 
-export const metadata = { title: "Promises, then the same concern · Recurrence Watch" };
+export const metadata = { title: "Promises, then the same concern · Recurance" };
 export const dynamic = "force-dynamic";
 
 const SIZE = 12;

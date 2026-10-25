@@ -99,7 +99,7 @@ export default async function Home() {
         <section className="mx-auto grid max-w-[1360px] gap-x-14 gap-y-8 px-[18px] pb-14 pt-6 min-[900px]:px-10 min-[1180px]:grid-cols-[minmax(0,1fr)_600px] min-[1180px]:grid-rows-[auto_1fr] xl:px-16">
           <div className="flex flex-col gap-6 min-[1180px]:col-start-1 min-[1180px]:row-start-1 min-[1180px]:pt-[72px]">
             {/* On desktop the rail shows only the logo, so the name is said once here; phones have it in the top bar. */}
-            <p className="eyebrow m-0 hidden min-[900px]:block">Recurrence Watch · coroners&apos; reports, England and Wales</p>
+            <p className="eyebrow m-0 hidden min-[900px]:block">Recurance · coroners&apos; reports, England and Wales</p>
             <span className="inline-flex items-center gap-2 self-start rounded-full border border-rule bg-surface px-3.5 py-1.5 text-[13.5px] font-semibold">
               <Building2 size={14} aria-hidden /> {hero.org.name} · {reports.length} reports
             </span>
@@ -193,7 +193,7 @@ export default async function Home() {
             ))}
           </ol>
           <p className="max-w-3xl text-lg text-ink">
-            Recurrence Watch read all {s.n_reports.toLocaleString("en-GB")} reports since 2013 and found{" "}
+            Recurance read all {s.n_reports.toLocaleString("en-GB")} reports since 2013 and found{" "}
             {s.n_chains.toLocaleString("en-GB")} concerns raised again with the same organisation, each shown in the exact words of
             both reports.
           </p>
@@ -257,7 +257,7 @@ export default async function Home() {
             })}
           </div>
           <p className="text-sm text-muted">
-            Other tools group coroners&apos; concerns by theme or track reply deadlines. Recurrence Watch asks a different question:
+            Other tools group coroners&apos; concerns by theme or track reply deadlines. Recurance asks a different question:
             did the same concern come back to the same organisation after it replied?
           </p>
         </section>

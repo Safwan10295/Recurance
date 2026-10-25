@@ -286,3 +286,11 @@ Each entry: what was decided, why, and whether it departs from the handoff.
 2. A report with no link pointing into it gets no cited or not-cited tag, because whether it cited anything is unknown. Previously it read "Not cited".
 3. Following a spine row to the chain page shows that report at once with a brief highlight, instead of the scroll-in animation, on a full load or a navigation inside the site.
 4. The site name sits above the hero on desktop, where the rail shows only the logo. The browser tab icon and both share-preview images use the Spine colours and Figtree (bundled under its open licence in web/assets/fonts).
+
+## D42. The name is Recurance
+
+Pilot renamed the project from Recurrence Watch to Recurance, spelled that way on purpose as a brand.
+
+1. Every reader-facing name changed: page titles, the header, share images, print briefs, the judge share card, README, Devpost draft and deploy notes. Earlier entries in this log keep the old name as written at the time.
+2. The repository, its folder, package names and the user-agent strings sent to judiciary.uk are unchanged. Renaming the GitHub repository would change its address, and nobody reads the user agents.
+3. The new mark is a lowercase r drawn as the timeline: the stem ends in the first warning, the arm loops round to a second dot, the same warning raised again. It replaces the generic repeat icon, and pairs with a lowercase wordmark in Figtree ExtraBold (components/shell/Logo.tsx, app/icon.svg, both share images).

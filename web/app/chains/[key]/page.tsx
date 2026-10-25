@@ -31,9 +31,9 @@ import type { ChainDetail, Followup } from "@/lib/types";
 export async function generateMetadata({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
   const { chain } = await getChain(key);
-  if (!chain) return { title: "Chain · Recurrence Watch" };
+  if (!chain) return { title: "Chain · Recurance" };
   const description = `${chain.org.name}: a similar concern raised in ${chain.n_reports} coroners' reports, ${year(chain.first_date)} to ${year(chain.last_date)}, with verified quotes.`;
-  return { title: `${chain.hazard} · Recurrence Watch`, description, openGraph: { title: chain.hazard, description } };
+  return { title: `${chain.hazard} · Recurance`, description, openGraph: { title: chain.hazard, description } };
 }
 
 const FOLLOWUP_LABEL: Record<Followup["classification"], string> = {

@@ -1,4 +1,4 @@
-# Running Recurrence Watch on a server
+# Running Recurance on a server
 
 One Linux server runs four containers with Docker Compose:
 

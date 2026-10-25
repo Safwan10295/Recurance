@@ -10,7 +10,7 @@ const figtree = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL || "http://localhost:3000"),
-  title: "Recurrence Watch",
+  title: "Recurance",
   description:
     "Links coroners' Prevention of Future Deaths reports across years, coroners and areas, and shows where a concern recurred after a stated action.",
 };

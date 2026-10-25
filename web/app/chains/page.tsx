@@ -8,7 +8,7 @@ import { chainFacets, getMeta, getSystemic } from "@/lib/queries";
 import { getStartHere, listChainsWithDates } from "@/lib/queries-chains";
 import Link from "next/link";
 
-export const metadata = { title: "Repeated warnings · Recurrence Watch" };
+export const metadata = { title: "Repeated warnings · Recurance" };
 
 export default async function ChainsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;

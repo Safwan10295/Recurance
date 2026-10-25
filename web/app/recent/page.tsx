@@ -3,7 +3,7 @@ import AutoForm from "@/components/AutoForm";
 import { EmptyState, PageHeader, Pagination, btnPrimary, fieldCls, orgTypeLabel } from "@/components/ui";
 import { listRecent } from "@/lib/queries";
 
-export const metadata = { title: "Recent repeats · Recurrence Watch" };
+export const metadata = { title: "Recent repeats · Recurance" };
 
 const TYPES = ["nhs_trust", "national_body", "police", "council", "prison", "ambulance", "commissioner", "company", "other"];
 

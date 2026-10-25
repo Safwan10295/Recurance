@@ -1,7 +1,7 @@
 import HazardMap from "@/components/HazardMap";
 import { PageHeader } from "@/components/ui";
 
-export const metadata = { title: "Hazard map · Recurrence Watch" };
+export const metadata = { title: "Hazard map · Recurance" };
 
 export default function MapPage() {
   return (

@@ -7,7 +7,7 @@ import { getReport } from "@/lib/queries";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const r = await getReport(slug);
-  return { title: r ? `${shortTitle(r.title)} · Recurrence Watch` : "Report · Recurrence Watch" };
+  return { title: r ? `${shortTitle(r.title)} · Recurance` : "Report · Recurance" };
 }
 
 export default async function ReportPage({ params }: { params: Promise<{ slug: string }> }) {

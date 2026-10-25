@@ -4,7 +4,7 @@ import { RecallChart, type RecallDatum } from "@/components/charts/RecallChart";
 import { EmptyState, InfoTip, PageHeader, Section, StatTile, gapText, pct, shortTitle } from "@/components/ui";
 import { getMeta } from "@/lib/queries";
 
-export const metadata = { title: "Evaluation · Recurrence Watch" };
+export const metadata = { title: "Evaluation · Recurance" };
 
 type SystemRow = {
   name: string;

@@ -14,7 +14,7 @@ import type { BriefMatch, BriefResult } from "@/lib/brief";
 import { getStore } from "@/lib/store";
 import type { Relation } from "@/lib/types";
 
-export const metadata = { title: "Pre-inquest brief · Recurrence Watch" };
+export const metadata = { title: "Pre-inquest brief · Recurance" };
 
 type Saved = { input?: { organisation?: string; concerns?: string }; result: BriefResult };
 

@@ -4,7 +4,7 @@ import { ChainRow } from "@/components/cards";
 import { EmptyState, PageHeader, Section, btnPrimary, fieldCls, formatDate, orgTypeLabel, shortTitle } from "@/components/ui";
 import { searchAll } from "@/lib/queries";
 
-export const metadata = { title: "Search · Recurrence Watch" };
+export const metadata = { title: "Search · Recurance" };
 
 const shown = (n: number, total: number) => (total > n ? `${n} of ${total.toLocaleString("en-GB")}` : `${n}`);
 

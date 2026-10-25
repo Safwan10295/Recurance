@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test for a running Recurrence Watch: every page, the expected 404 and redirect, the APIs, and one
+# Smoke test for a running Recurance: every page, the expected 404 and redirect, the APIs, and one
 # live agent run. Usage:  bash smoke.sh https://your-site      (defaults to http://localhost)
 # Add --no-agent to skip the live run (it costs about $0.006, or nothing when the brief is already saved).
 set -uo pipefail

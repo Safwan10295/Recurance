@@ -1,4 +1,4 @@
-# Recurrence Watch worker: the Python pipeline, run on a schedule (scripts/scheduler.py).
+# Recurance worker: the Python pipeline, run on a schedule (scripts/scheduler.py).
 # Build from the repository root:  docker build -f deploy/worker.Dockerfile .
 FROM python:3.11-slim
 RUN apt-get update \

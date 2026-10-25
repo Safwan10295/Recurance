@@ -1,17 +1,18 @@
 import { ImageResponse } from "next/og";
+import { LogoMark } from "@/components/shell/Logo";
 import { ogFonts } from "@/lib/og-fonts";
 import { getChain } from "@/lib/queries";
 
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "A recurrence chain on Recurrence Watch";
+export const alt = "A recurrence chain on Recurance";
 
 // The preview card when a chain link is shared: hazard, organisation, reports over time.
 export default async function Image({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
   const [{ chain }, fonts] = await Promise.all([getChain(key).catch(() => ({ chain: null })), ogFonts()]);
-  const title = chain?.hazard ?? "Recurrence Watch";
+  const title = chain?.hazard ?? "Recurance";
   const org = chain?.org.name ?? "Coroners' Prevention of Future Deaths reports";
   const years = chain ? `${chain.first_date.slice(0, 4)}–${chain.last_date.slice(0, 4)}` : "";
   const dots = chain ? chain.reports.map((r) => r.date) : [];
@@ -20,9 +21,9 @@ export default async function Image({ params }: { params: Promise<{ key: string 
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#eef0ec", padding: 64, color: "#161a17", fontFamily: "Figtree" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 26, color: "#3f8a5c" }}>
-          <div style={{ width: 34, height: 34, borderRadius: 9, background: "#3f8a5c", display: "flex" }} />
-          Recurrence Watch
+        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 34, fontWeight: 800, letterSpacing: -1.3, color: "#161a17" }}>
+          <LogoMark size={46} />
+          recurance
         </div>
         <div style={{ marginTop: 44, fontSize: 26, letterSpacing: 2, textTransform: "uppercase", color: "#5e665f" }}>{org}</div>
         <div style={{ marginTop: 14, fontSize: 60, lineHeight: 1.12, fontWeight: 600, display: "flex", maxWidth: 1060 }}>{title}</div>

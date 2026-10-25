@@ -30,7 +30,7 @@ function draw(agreed: number, answered: number, site: string): string | null {
 
   g.fillStyle = muted;
   g.font = `600 26px ${sans}`;
-  g.fillText("RECURRENCE WATCH · YOU BE THE JUDGE", 80, 110);
+  g.fillText("RECURANCE · YOU BE THE JUDGE", 80, 110);
 
   g.fillStyle = ink;
   g.font = `400 64px ${serif}`;
@@ -74,7 +74,7 @@ export default function ShareCard({ agreed, answered }: { agreed: number; answer
   const share = async () => {
     try {
       const blob = await (await fetch(url)).blob();
-      const file = new File([blob], "recurrence-watch-judge.png", { type: "image/png" });
+      const file = new File([blob], "recurance-judge.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: "You be the judge" });
     } catch {
       /* the person closed the share sheet */
@@ -86,7 +86,7 @@ export default function ShareCard({ agreed, answered }: { agreed: number; answer
       {/* eslint-disable-next-line @next/next/no-img-element -- a generated data URL, not a site asset */}
       <img src={url} alt={`Share card: I agreed with Nemotron on ${agreed} of ${answered}`} width={600} height={315} className="h-auto w-full max-w-md rounded-lg border border-rule" />
       <div className="flex flex-wrap gap-2">
-        <a href={url} download="recurrence-watch-judge.png" className={`${btnSecondary} px-3 py-2`}>
+        <a href={url} download="recurance-judge.png" className={`${btnSecondary} px-3 py-2`}>
           <Download size={16} aria-hidden /> Download the card
         </a>
         {canShare && (

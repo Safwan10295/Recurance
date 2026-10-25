@@ -8,7 +8,7 @@ Video: <YouTube address>
 
 ## Tagline
 
-Coroners warn. Organisations promise. Recurrence Watch checks whether the same concern came back.
+Coroners warn. Organisations promise. Recurance checks whether the same concern came back.
 
 ## Inspiration
 
@@ -16,7 +16,7 @@ In England and Wales, when a death reveals a risk to others, the coroner writes 
 
 ## What it does
 
-Recurrence Watch reads every report and response published since 2013 and links later concerns to earlier warnings sent to the same organisation. Each link shows the exact words from both reports, checked by code, with a relation and a confidence.
+Recurance reads every report and response published since 2013 and links later concerns to earlier warnings sent to the same organisation. Each link shows the exact words from both reports, checked by code, with a relation and a confidence.
 
 - Check a report: an agent built on NVIDIA Nemotron takes any report, new or old. Nemotron Super decides which tools to use: search the organisation's earlier warnings, judge each candidate, read what was promised, look up the chain, check the web with Tavily. It then submits a brief with verified quotes. Every tool call is shown as it happens, with tokens, time and cost.
 - Recurrence chains: 666 hazards raised again and again with one organisation, told report by report.

@@ -16,7 +16,7 @@ import type { Link as ChainLink, Promise_, ReportCard } from "@/lib/types";
 export async function generateMetadata({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
   const { chain } = await getChain(key);
-  return { title: chain ? `Pre-inquest brief: ${chain.hazard} · Recurrence Watch` : "Pre-inquest brief · Recurrence Watch" };
+  return { title: chain ? `Pre-inquest brief: ${chain.hazard} · Recurance` : "Pre-inquest brief · Recurance" };
 }
 
 const MAX_PROMISES = 3;

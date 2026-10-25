@@ -359,7 +359,7 @@ function End({ answers, total, facts, onAgain }: { answers: Answer[]; total: num
       {answered.length > 0 && <ShareCard agreed={agreed} answered={answered.length} />}
 
       <section className="space-y-4">
-        <h2 className="font-serif text-2xl">This is why we built Recurrence Watch</h2>
+        <h2 className="font-serif text-2xl">This is why we built Recurance</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="card p-5 space-y-2">
             <FileSearch size={20} className="text-accent" aria-hidden />

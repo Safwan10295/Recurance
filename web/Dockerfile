@@ -1,4 +1,4 @@
-# Recurrence Watch web app: Next.js standalone server.
+# Recurance web app: Next.js standalone server.
 FROM node:20-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./

@@ -1,10 +1,10 @@
-# Recurrence Watch
+# Recurance
 
 Coroners in England and Wales write Prevention of Future Deaths (PFD) reports when a death reveals a risk to others. The organisation that receives one must reply within 56 days with what it will change. Years later, a similar death can happen in front of a different coroner who has no way of knowing the concern was raised before.
 
-Recurrence Watch reads every published report and response, links later concerns to earlier warnings sent to the same organisation, and shows where a concern recurred after a stated action, with verbatim quotes from both documents.
+Recurance reads every published report and response, links later concerns to earlier warnings sent to the same organisation, and shows where a concern recurred after a stated action, with verbatim quotes from both documents.
 
-PFD Monitor groups concerns. The Preventable Deaths Tracker chases deadlines. Recurrence Watch tests whether promises held.
+PFD Monitor groups concerns. The Preventable Deaths Tracker chases deadlines. Recurance tests whether promises held.
 
 Built for the Nebius x NVIDIA Global AI Hackathon, Best Apps and Agents track.
 
@@ -184,9 +184,9 @@ deploy/README.md has the steps for one Linux server with Docker Compose. A worke
 
 ## Prior art
 
-Recurrence Watch builds on earlier work with the same reports, and differs in what it asks of them.
+Recurance builds on earlier work with the same reports, and differs in what it asks of them.
 
-| Project | What it does | How Recurrence Watch differs |
+| Project | What it does | How Recurance differs |
 |---|---|---|
 | PFD Monitor (pfdmonitor.org) | AI-extracted concerns grouped into themes, with stated actions | Links each later concern to the earlier warning to the same organisation, with quotes from both |
 | Preventable Deaths Tracker (preventabledeathstracker.net, Georgia Richards) | Tracks responses and overdue replies | Asks whether the concern came back after a response stated an action |

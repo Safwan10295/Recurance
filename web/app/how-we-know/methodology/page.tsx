@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/ui";
 import { GLOSSARY } from "@/lib/glossary";
 import { getMeta } from "@/lib/queries";
 
-export const metadata = { title: "Methodology and responsible use · Recurrence Watch" };
+export const metadata = { title: "Methodology and responsible use · Recurance" };
 
 export default async function Methodology() {
   const site = (await getMeta()).site;

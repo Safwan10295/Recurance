@@ -4,5 +4,5 @@
 useDefault = true
 
 [allowlist]
-description = "Recurrence Watch chain keys (sha1 prefixes of public report URLs), not secrets"
+description = "Recurance chain keys (sha1 prefixes of public report URLs), not secrets"
 regexes = ['''^[a-f0-9]{16}$''']

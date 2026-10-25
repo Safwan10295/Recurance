@@ -1,6 +1,6 @@
 # Token Factory and Nemotron feedback
 
-Notes for the Devpost feedback field, from building Recurrence Watch: 6,454 coroners' reports, 15,366 extracted concerns, 1,763 response letters and 4,061 judged report pairs, all on Nebius Token Factory. Dated observations from the build on 15 Oct 2026.
+Notes for the Devpost feedback field, from building Recurance: 6,454 coroners' reports, 15,366 extracted concerns, 1,763 response letters and 4,061 judged report pairs, all on Nebius Token Factory. Dated observations from the build on 15 Oct 2026.
 
 ## What worked well
 

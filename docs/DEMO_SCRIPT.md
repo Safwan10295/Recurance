@@ -19,7 +19,7 @@ Say:
 
 1. "A coroner warns an organisation about a risk to life. It responds with what it will do."
 2. "Years later the same concern comes up again, in front of a different coroner. Here, seven coroners, and none cited the earlier report."
-3. Point to the figures under the buttons: "Across every link we found, the later report almost never cites the earlier one, and most came from a different coroner. Recurrence Watch connects the record."
+3. Point to the figures under the buttons: "Across every link we found, the later report almost never cites the earlier one, and most came from a different coroner. Recurance connects the record."
 
 ## 0:35 to 1:00. One chain
 
@@ -73,4 +73,4 @@ On screen: back to the home page.
 Say:
 
 1. "For coroners, families, lawyers and safety teams."
-2. "PFD Monitor groups concerns. The Tracker chases deadlines. Recurrence Watch tests whether promises held."
+2. "PFD Monitor groups concerns. The Tracker chases deadlines. Recurance tests whether promises held."

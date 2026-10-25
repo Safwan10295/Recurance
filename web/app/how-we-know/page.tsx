@@ -21,7 +21,7 @@ import { EmptyState, PageHeader, Section, StatTile, btnPrimary, btnSecondary, pc
 import { byFamily, byStage, getPipelinePage } from "@/lib/queries-pipeline";
 import type { ModelFamily, Totals } from "@/lib/queries-pipeline";
 
-export const metadata = { title: "How Nemotron did the work · Recurrence Watch" };
+export const metadata = { title: "How Nemotron did the work · Recurance" };
 export const dynamic = "force-dynamic";
 
 const CRUMBS = [{ href: "/how-we-know", label: "How we know" }, { label: "Nemotron" }];

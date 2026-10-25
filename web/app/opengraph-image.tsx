@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { LogoMark } from "@/components/shell/Logo";
 import { ogFonts } from "@/lib/og-fonts";
 import { getChain, getMeta } from "@/lib/queries";
 
@@ -6,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic"; // read the live data on request, never a build-time snapshot
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Recurrence Watch: the same coroner's warning, raised again and again";
+export const alt = "Recurance: the same coroner's warning, raised again and again";
 
 const HERO_CHAIN = "c52cded99f756309";
 const MONTH = 30.44 * 86_400_000;
@@ -39,10 +40,10 @@ export default async function Image() {
     (
       <div style={{ width: "100%", height: "100%", display: "flex", background: "#eef0ec", color: "#161a17", fontFamily: "Figtree" }}>
         <div style={{ width: 84, height: "100%", background: "#161a17", display: "flex", justifyContent: "center", paddingTop: 30 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: "#88c99e", display: "flex" }} />
+          <LogoMark size={48} />
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "64px 56px 56px 64px" }}>
-          <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: 1, color: "#3e463f" }}>RECURRENCE WATCH</div>
+          <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: -1.3, color: "#161a17", display: "flex" }}>recurance</div>
           <div style={{ marginTop: 28, display: "flex", flexDirection: "column", fontSize: 76, fontWeight: 800, lineHeight: 1, letterSpacing: -3 }}>
             <span>Raised in {chain ? chain.first_date.slice(0, 4) : "2019"}.</span>
             <span>Raised again.</span>
