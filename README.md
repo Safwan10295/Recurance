@@ -109,6 +109,8 @@ Every call is in the llm_calls ledger (15,267 rows, including 258 free cache hit
 
 ## Setup
 
+The data is not in this repository: the scraped reports and working database come to about 1.3 GB. To explore the results without building anything, use https://recurance.com or its read-only API (/api/v1/chains). To rebuild everything, follow the steps below and "Running the pipeline" with your own Token Factory key: a few hours of scraping at one request a second, and about $6 of model calls. The tests need neither data nor keys.
+
 1. Install Python 3.11 and Node 20 or later.
 2. Create a virtual environment and install dependencies:
 
