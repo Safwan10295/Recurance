@@ -218,6 +218,11 @@ export async function runBrief(
       knownOrgIds = (await q<{ org_id: number }>(
         `SELECT ro.org_id FROM pub_report_orgs ro JOIN pub_orgs o ON o.id = ro.org_id WHERE ro.report_url = $1
          ORDER BY o.n_chains DESC, o.n_reports DESC`, [url])).map((r) => r.org_id);
+      // A few archived reports (mostly republished copies) have no organisation on record: read it from the page.
+      if (!knownOrgIds.length && !orgName) {
+        const page = await fetchReport(url).catch(() => null);
+        if (page?.sentTo) orgName = page.sentTo.split(/;|\|/)[0];
+      }
       if (!concernsText) concernsText = known.concerns.map((c) => c.quote).join("\n");
       step("fetch", "done", { detail: `${stripTitle(known.title)}, already in the archive` });
     } else {
