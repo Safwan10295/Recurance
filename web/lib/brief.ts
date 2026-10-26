@@ -229,7 +229,7 @@ export async function runBrief(
       const rep = await fetchReport(url);
       if (!rep) {
         step("fetch", "done", { detail: "Could not read that page" });
-        result.notes.push("That address could not be read as a Prevention of Future Deaths report page on judiciary.uk.");
+        result.notes.push("That page could not be read from judiciary.uk just now. Paste the report's concerns in Paste text instead.");
         return result;
       }
       result.report = { url, title: rep.title, date: rep.date, known: false };
@@ -254,7 +254,13 @@ export async function runBrief(
   result.organisation = org;
   step("org", "done", { detail: org ? org.name : `No match for "${orgName}"` });
   if (!org) {
-    result.notes.push(orgName ? "That organisation was not found among those that have received reports." : "Please name the organisation the concerns are addressed to.");
+    result.notes.push(
+      orgName
+        ? "That organisation was not found among those that have received reports."
+        : result.report?.known
+          ? "Our records do not say who this report was sent to. Use Paste text and name the organisation."
+          : "Please name the organisation the concerns are addressed to.",
+    );
     return result;
   }
   if (concernsText.length < 40) {
