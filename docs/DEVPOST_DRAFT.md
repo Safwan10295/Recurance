@@ -1,10 +1,10 @@
 # Devpost submission (draft to paste)
 
-Track: Best Apps and Agents. Fill in the remaining links before submitting.
+Track: Best Apps and Agents. All three links are in.
 
 Demo: https://recurance.com
 Code: https://github.com/Safwan10295/Recurance
-Video: <YouTube address>
+Video: https://youtu.be/1kQE0O57DMo
 
 ## Tagline
 
