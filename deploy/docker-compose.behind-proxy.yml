@@ -4,9 +4,16 @@
 #
 #   docker compose -f docker-compose.yml -f docker-compose.behind-proxy.yml --env-file .env up -d --build
 
+# Memory caps keep a shared server's other sites safe; raise them on a dedicated machine.
+
 services:
+  db:
+    mem_limit: ${DB_MEM:-600m}
   web:
+    mem_limit: ${WEB_MEM:-700m}
     ports:
       - "127.0.0.1:${WEB_PORT:-3100}:3000"
+  worker:
+    mem_limit: ${WORKER_MEM:-1500m}
   caddy:
     profiles: ["bundled-https"]
