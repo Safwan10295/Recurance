@@ -1,0 +1,12 @@
+# For a server that already runs a web server (nginx, Apache, Caddy) on ports 80 and 443.
+# Leaves those ports alone: the bundled Caddy does not start, and the web app listens on 127.0.0.1:3100 only,
+# for the existing web server to proxy to. See "Behind an existing web server" in deploy/README.md.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.behind-proxy.yml --env-file .env up -d --build
+
+services:
+  web:
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3100}:3000"
+  caddy:
+    profiles: ["bundled-https"]

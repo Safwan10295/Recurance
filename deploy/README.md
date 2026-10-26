@@ -83,6 +83,40 @@ Check the site:
 curl -s https://<SITE_ADDRESS>/api/health
 ```
 
+## 5b. Behind an existing web server
+
+If the server already hosts other sites, its web server holds ports 80 and 443 and the bundled Caddy cannot start. Run without it; the app then listens on 127.0.0.1:3100, reachable only from the server itself:
+
+```
+docker compose -f docker-compose.yml -f docker-compose.behind-proxy.yml --env-file .env up -d --build
+```
+
+Set SITE_URL in .env to the public address you will use (SITE_ADDRESS is not needed). Point a domain or subdomain at the server, then add a site to the existing web server. For nginx, in /etc/nginx/sites-available/recurance:
+
+```
+server {
+    server_name recurance.example.org;
+    location / {
+        proxy_pass http://127.0.0.1:3100;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Enable it and add HTTPS:
+
+```
+sudo ln -s /etc/nginx/sites-available/recurance /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d recurance.example.org
+```
+
+The existing sites are not touched. Every later docker compose command in this guide needs the same two -f options.
+
+If the repository is private, copy the code instead of cloning it: on your own PC run `git archive --format=tar.gz -o recurance-code.tar.gz HEAD`, copy it over with scp, and unpack it with `mkdir recurrence-watch && tar -xzf recurance-code.tar.gz -C recurrence-watch`.
+
 ## 6. Day to day
 
 - Refresh: the worker runs scripts/refresh.py every REFRESH_EVERY_HOURS (default weekly), with REFRESH_MAX_SPEND as the ceiling for each run, then republishes. The site picks up new data within two minutes, with no rebuild.
