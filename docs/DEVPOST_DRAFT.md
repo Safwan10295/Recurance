@@ -26,7 +26,7 @@ Recurance reads every report and response published since 2013 and links later c
 - Verified word for word: open any link to see both quotes highlighted inside the text of their source reports.
 - Ways in for a coroner, a solicitor, a family and a safety team, each opening a real report in the agent. Every brief also prints as one page.
 
-The data refreshes itself every week from judiciary.uk.
+A weekly refresh from judiciary.uk is built in. On the live site it is paused for judging, so the archive stays as tested, up to 17 Oct 2026.
 
 ## How we built it
 
@@ -72,4 +72,4 @@ A read-only JSON API (/api/v1/chains) gives researchers the same verified, redac
 
 ## Built with
 
-NVIDIA Nemotron 3 (Nano, Super, Ultra), Nebius Token Factory, Qwen3-Embedding-8B, Tavily, Python, PostgreSQL, pgvector, Next.js, Tailwind, Docker, Caddy.
+NVIDIA Nemotron 3 (Nano, Super, Ultra), Nebius Token Factory, Qwen3-Embedding-8B, Tavily, Python, PostgreSQL, pgvector, Next.js, Tailwind, Docker, nginx.
