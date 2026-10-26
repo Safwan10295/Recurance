@@ -3,7 +3,7 @@
 Track: Best Apps and Agents. Fill in the remaining links before submitting.
 
 Demo: https://recurance.com
-Code: <public GitHub address>
+Code: https://github.com/Safwan10295/Recurance
 Video: <YouTube address>
 
 ## Tagline
