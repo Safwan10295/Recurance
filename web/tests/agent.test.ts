@@ -151,3 +151,52 @@ test("a tool's own model cost (the judge) counts towards the run's limit", async
   assert.equal(out.stop, "cost");
   assert.ok(out.cost >= 0.021);
 });
+
+test("a submission without the web check runs it once, returns the result and asks again", async () => {
+  const s = scripted([
+    turn([{ name: "get_response_promises", args: { candidate_id: "E1" } }]),
+    turn([{ name: SUBMIT, args: { matches: [MATCH] } }]),
+    turn([{ name: SUBMIT, args: { matches: [{ ...MATCH, followups: [{ promise_id: "P7", classification: "not_found" }] }] } }]),
+  ]);
+  const seen: string[] = [];
+  let checks = 0;
+  const out = await runLoop({
+    chat: s.chat,
+    impls: {
+      get_response_promises: async () => ({ summary: "1 action", data: [{ promise_id: "P7" }] }),
+      tavily_check: async (args) => {
+        checks++;
+        return { summary: "2 sources", data: { promise: args.promise_id, sources: [] } };
+      },
+    },
+    messages: [],
+    maxRounds: 5,
+    maxCost: 1,
+    onEvent: (e) => seen.push(e.kind === "tool" ? `tool:${e.call.name}` : e.kind),
+    beforeSubmit: () => (checks ? null : { id: "auto", name: "tavily_check", args: { promise_id: "P7" } }),
+  });
+  assert.equal(out.stop, "submitted");
+  assert.equal(out.rounds, 3);
+  assert.equal(checks, 1);
+  assert.deepEqual(seen, ["model", "tool:get_response_promises", "model", "tool:tavily_check", "model"]);
+  assert.equal(out.submission?.matches[0].followups?.[0].promise_id, "P7");
+});
+
+test("the web check is not forced on the last round", async () => {
+  const s = scripted([turn([{ name: SUBMIT, args: { matches: [MATCH] } }])]);
+  let asked = 0;
+  const out = await runLoop({
+    chat: s.chat,
+    impls: { tavily_check: async () => ({ summary: "x", data: {} }) },
+    messages: [],
+    maxRounds: 1,
+    maxCost: 1,
+    onEvent: () => undefined,
+    beforeSubmit: () => {
+      asked++;
+      return { id: "auto", name: "tavily_check", args: { promise_id: "P1" } };
+    },
+  });
+  assert.equal(out.stop, "submitted");
+  assert.equal(asked, 0);
+});

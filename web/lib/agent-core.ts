@@ -55,9 +55,13 @@ export async function runLoop(opts: {
   maxRounds: number;
   maxCost: number;
   onEvent: (e: LoopEvent) => void;
+  // Asked once, when the model first tries to submit with rounds to spare: a tool call it should have made
+  // first (the web check on a promise it read). The loop runs it, returns the result and asks again.
+  beforeSubmit?: () => ToolCall | null;
 }): Promise<LoopOutcome> {
   const messages = [...opts.messages];
   let cost = 0;
+  let asked = false;
   for (let round = 1; round <= opts.maxRounds; round++) {
     let turn: ModelTurn;
     try {
@@ -69,8 +73,32 @@ export async function runLoop(opts: {
     opts.onEvent({ kind: "model", round, turn, calls: turn.toolCalls.map((c) => c.name) });
     if (!turn.toolCalls.length) return { submission: null, stop: "no_tool", rounds: round, cost };
     messages.push(turn.assistant);
-    for (const call of turn.toolCalls) {
-      if (call.name === SUBMIT) return { submission: normaliseSubmission(call.args), stop: "submitted", rounds: round, cost };
+    for (const [i, call] of turn.toolCalls.entries()) {
+      if (call.name === SUBMIT) {
+        const first = !asked && round < opts.maxRounds && opts.beforeSubmit ? opts.beforeSubmit() : null;
+        asked = true;
+        const impl = first ? opts.impls[first.name] : undefined;
+        if (!first || !impl) return { submission: normaliseSubmission(call.args), stop: "submitted", rounds: round, cost };
+        const t0 = Date.now();
+        let data: unknown;
+        try {
+          const result = await impl(first.args);
+          cost += result.cost ?? 0;
+          opts.onEvent({ kind: "tool", round, call: first, result, ms: Date.now() - t0 });
+          data = result.data;
+        } catch (e) {
+          const error = e instanceof Error ? e.message : String(e);
+          opts.onEvent({ kind: "tool_error", round, call: first, error });
+          data = { error: error.slice(0, 200) };
+        }
+        const content = JSON.stringify({
+          not_submitted_yet: `Ran ${first.name} first: ${JSON.stringify(first.args)}. Add any web follow-up it supports, then call ${SUBMIT} again.`,
+          result: data,
+        }).slice(0, 6000);
+        messages.push({ role: "tool", tool_call_id: call.id, content });
+        for (const rest of turn.toolCalls.slice(i + 1)) messages.push({ role: "tool", tool_call_id: rest.id, content: JSON.stringify({ skipped: true }) });
+        break;
+      }
       const impl = opts.impls[call.name];
       const t0 = Date.now();
       let content: string;

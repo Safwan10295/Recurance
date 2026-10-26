@@ -150,6 +150,7 @@ export async function runAgent(ctx: AgentContext, emit: (s: Step) => void): Prom
   const candidates = new Map<string, Candidate>();
   const byUrl = new Map<string, string>();
   const promises = new Map<string, { id: number; quote: string; timescale: string | null; report_url: string }>();
+  let webChecked = false;
   const web = new Map<string, string>();
   const verdicts = new Map<string, ReturnType<typeof checkMatches>[number]>();
   const newText = ctx.concerns.map((c) => c.quote).join("\n") + "\n" + ctx.concernsText;
@@ -277,6 +278,7 @@ export async function runAgent(ctx: AgentContext, emit: (s: Step) => void): Prom
       };
     },
     tavily_check: async (args) => {
+      webChecked = true;
       const pid = String(args.promise_id);
       const p = promises.get(pid);
       if (!p) return { summary: "Unknown promise", data: { error: "unknown promise_id; use an id from get_response_promises" } };
@@ -335,6 +337,12 @@ export async function runAgent(ctx: AgentContext, emit: (s: Step) => void): Prom
     messages: [{ role: "system", content: SYSTEM }, { role: "user", content: user }],
     maxRounds: MAX_ROUNDS,
     maxCost: MAX_COST,
+    // If it read what was promised but never looked for what happened next, check the first promise once.
+    beforeSubmit: () => {
+      if (webChecked || !promises.size || !process.env.TAVILY_API_KEY) return null;
+      const pid = [...promises.keys()][0];
+      return { id: `auto-web-${pid}`, name: "tavily_check", args: { promise_id: pid } };
+    },
     onEvent: (e: LoopEvent) => {
       if (e.kind === "model") {
         const chose = e.calls.map((n) => (n === SUBMIT ? "submit its findings" : n)).join(", ");
