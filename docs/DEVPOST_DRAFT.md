@@ -62,6 +62,19 @@ We needed ground truth that did not come from the model, so we used the coroners
 - The deceased's names appear in coroners' own words. They are now replaced with [the deceased] after quote verification, so the check still holds.
 - Our first agent wrote its own quotes inside tool-call arguments and changed their wording. Moving judging into a structured judge tool fixed it, and the agent then found four earlier warnings on a test report where the fixed pipeline found two.
 
+## Accomplishments that we're proud of
+
+- Every quote on the site is an exact substring of its source, checked in code, across 15,044 concerns.
+- The whole archive cost $5.65 on Token Factory, with every call in a cost ledger.
+- An evaluation built on ground truth the coroners wrote themselves, with every miss listed.
+- A live agent that checks any report in about 20 seconds for under a cent, and falls back to a fixed pipeline if it fails.
+
+## What we learned
+
+- Small models are enough for reading. The judgement is where a larger model earns its cost: 66% of the pairs that looked alike were judged not the same hazard.
+- Most misses happened before the judge, in finding candidates, not in the model's decision.
+- When the model wrote its own quotes, their wording drifted. Giving it tools that return checked quotes fixed that.
+
 ## What's next
 
 Human labels to measure precision, other jurisdictions with the same report-and-response duty, and alerts for organisations when a new report repeats an earlier warning.
