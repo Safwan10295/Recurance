@@ -182,21 +182,32 @@ test("a submission without the web check runs it once, returns the result and as
   assert.equal(out.submission?.matches[0].followups?.[0].promise_id, "P7");
 });
 
-test("the web check is not forced on the last round", async () => {
-  const s = scripted([turn([{ name: SUBMIT, args: { matches: [MATCH] } }])]);
-  let asked = 0;
+test("before the forced final round, a missing web check runs once and its result reaches the model", async () => {
+  const s = scripted([
+    turn([{ name: "get_response_promises", args: { candidate_id: "E1" } }]),
+    turn([{ name: "get_chain", args: { candidate_id: "E1" } }]),
+    turn([{ name: SUBMIT, args: { matches: [MATCH] } }]),
+  ]);
+  const seen: string[] = [];
+  let checks = 0;
   const out = await runLoop({
     chat: s.chat,
-    impls: { tavily_check: async () => ({ summary: "x", data: {} }) },
-    messages: [],
-    maxRounds: 1,
-    maxCost: 1,
-    onEvent: () => undefined,
-    beforeSubmit: () => {
-      asked++;
-      return { id: "auto", name: "tavily_check", args: { promise_id: "P1" } };
+    impls: {
+      get_response_promises: async () => ({ summary: "1 action", data: [{ promise_id: "P7" }] }),
+      get_chain: async () => ({ summary: "none", data: [] }),
+      tavily_check: async () => {
+        checks++;
+        return { summary: "2 sources", data: { sources: [] } };
+      },
     },
+    messages: [],
+    maxRounds: 3,
+    maxCost: 1,
+    onEvent: (e) => seen.push(e.kind === "tool" ? `tool:${e.call.name}` : e.kind),
+    beforeSubmit: () => (checks ? null : { id: "auto", name: "tavily_check", args: { promise_id: "P7" } }),
   });
   assert.equal(out.stop, "submitted");
-  assert.equal(asked, 0);
+  assert.equal(checks, 1);
+  assert.deepEqual(s.forced, [false, false, true]);
+  assert.deepEqual(seen, ["model", "tool:get_response_promises", "model", "tool:get_chain", "tool:tavily_check", "model"]);
 });

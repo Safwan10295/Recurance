@@ -63,6 +63,26 @@ export async function runLoop(opts: {
   let cost = 0;
   let asked = false;
   for (let round = 1; round <= opts.maxRounds; round++) {
+    // Before the forced final round, the same check: run it and show the model the result.
+    if (round === opts.maxRounds && round > 1 && !asked && opts.beforeSubmit) {
+      asked = true;
+      const first = opts.beforeSubmit();
+      const impl = first ? opts.impls[first.name] : undefined;
+      if (first && impl) {
+        const t0 = Date.now();
+        try {
+          const result = await impl(first.args);
+          cost += result.cost ?? 0;
+          opts.onEvent({ kind: "tool", round, call: first, result, ms: Date.now() - t0 });
+          messages.push({
+            role: "user",
+            content: `Before you submit: ${first.name} ran on ${JSON.stringify(first.args)}. Result: ${JSON.stringify(result.data).slice(0, 5000)} Add any web follow-up it supports.`,
+          });
+        } catch (e) {
+          opts.onEvent({ kind: "tool_error", round, call: first, error: e instanceof Error ? e.message : String(e) });
+        }
+      }
+    }
     let turn: ModelTurn;
     try {
       turn = await opts.chat(messages, round === opts.maxRounds);
