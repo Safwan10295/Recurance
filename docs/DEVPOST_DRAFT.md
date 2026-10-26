@@ -1,4 +1,4 @@
-# Devpost submission (draft to paste)
+# Devpost submission (as pasted)
 
 Track: Best Apps and Agents. All three links are in.
 
@@ -12,76 +12,58 @@ Coroners warn. Organisations promise. Recurance checks whether the same concern 
 
 ## Inspiration
 
-In England and Wales, when a death reveals a risk to others, the coroner writes a Prevention of Future Deaths report to the organisation that can act. It must reply within 56 days with what it will do. Years later a similar death can happen in front of a different coroner, who has no practical way to know the concern was raised before. In 99% of the recurrences we found, the later report did not cite the earlier one.
+When a death reveals a risk to others, a coroner in England or Wales writes a Prevention of Future Deaths report to the organisation that can act, and it must reply with what it will do. Years later, the same concern can come back to the same organisation through a different coroner, who has no practical way to know it was raised before. In 99% of the repeats we found, the later report never cited the earlier one.
 
 ## What it does
 
-Recurance reads every report and response published since 2013 and links later concerns to earlier warnings sent to the same organisation. Each link shows the exact words from both reports, checked by code, with a relation and a confidence.
+Recurance reads all 6,454 reports published since 2013 and links later concerns to earlier warnings sent to the same organisation: 666 repeated warnings, each shown in the exact words of both reports, with a verdict and a confidence.
 
-- Check a report: an agent built on NVIDIA Nemotron takes any report, new or old. Nemotron Super decides which tools to use: search the organisation's earlier warnings, judge each candidate, read what was promised, look up the chain, check the web with Tavily. It then submits a brief with verified quotes. Every tool call is shown as it happens, with tokens, time and cost.
-- Recurrence chains: 666 hazards raised again and again with one organisation, told report by report.
-- Promises, then the same concern: 563 cases where a response stated an action and a later coroner raised the same concern.
-- Hazard map: 15,044 concerns placed by meaning, with the recurrences drawn between them and a replay year by year.
-- You be the judge: decide whether two concerns are the same hazard, then compare your call with Nemotron Super's.
-- Verified word for word: open any link to see both quotes highlighted inside the text of their source reports.
-- Ways in for a coroner, a solicitor, a family and a safety team, each opening a real report in the agent. Every brief also prints as one page.
-
-A weekly refresh from judiciary.uk is built in. On the live site it is paused for judging, so the archive stays as tested, up to 17 Oct 2026.
+- **Check a report:** an agent checks any report live in about 20 seconds, for under a cent, showing every step.
+- **Repeated warnings:** each hazard told report by report, with what the organisation promised in between.
+- **Verified word for word:** every quote opens inside its original report on judiciary.uk.
+- **You be the judge:** make the call on two concerns, then see Nemotron's verdict and reasoning.
+- **Hazard map:** 15,044 concerns placed by meaning, with the repeats drawn between them.
 
 ## How we built it
 
-All model calls run on Nebius Token Factory, routed to the smallest model that does the job:
+Every model call runs on Nebius Token Factory, routed to the smallest model that does the job:
 
-- Nemotron 3 Nano extracts concerns and stated actions, with structured JSON output and reasoning switched off.
-- Nemotron 3 Super judges each candidate pair, with low-effort reasoning, and drives the live agent through native tool calling, with a forced final call so every run ends within five rounds.
-- Nemotron 3 Ultra drafts dossiers for the strongest chains, which a person reviews before publication.
-- Qwen3-Embedding-8B (on Token Factory) finds candidates by meaning, alongside TF-IDF.
+- **Nemotron Nano** extracts each concern with an exact quote.
+- **Qwen3 embeddings** with pgvector find earlier concerns sent to the same organisation.
+- **Nemotron Super** judges whether each pair is the same hazard, and drives the live agent through tool calling.
+- **Nemotron Ultra** drafts dossiers for the strongest chains, reviewed by a person.
+- **Plain code** checks every quote word for word. The model never writes the quotes we show.
+- **Tavily** checks what happened after a promise.
 
-A Python pipeline scrapes and parses the archive, with OCR for scanned PDFs, and normalises organisation names. Every call goes through one wrapper with a request-hash cache, a cost ledger and a hard budget stop. Results are published into PostgreSQL with pgvector, and a Next.js app reads them live. The whole stack runs from one Docker Compose file on a small Linux server, live at recurance.com: database, web app and a refresh worker, while every model call runs on Nebius Token Factory.
+A Python pipeline with OCR, a request cache and a cost ledger feeds PostgreSQL, and a Next.js app serves it at recurance.com. Processing the whole archive cost **$5.65**.
 
-The agent's model never writes the quotes we show. Verdicts come from a judge tool whose quotes are checked in code, and if the agent fails or hits a limit, a fixed pipeline takes over. The agent loop is tested offline with a scripted model.
+## How we know it works
 
-Tavily checks what happened after a promise. 269 stated actions in the chains were checked, starting with the demo chains and those with a dossier. Nano classified the sources, quoting them word for word: evidence found for 28, contradicting for 2, and nothing either way for 239. We never present that last group as "did not happen". The live agent can run its own Tavily checks within a daily cap.
-
-The full archive cost $5.65 on Token Factory: 6,454 reports, 15,366 concerns, 4,543 pairs judged. A live agent run costs about half a cent.
-
-## Evaluation
-
-We needed ground truth that did not come from the model, so we used the coroners themselves. Where a later report names an earlier one, we removed that citation and asked each system to find the earlier report. At the same number of links shown, TF-IDF found 34%, embeddings 41%, and the hybrid with the Nemotron Super judge 52% (15 of 29). With 29 pairs the 95% ranges overlap, and the evaluation page says so. It also lists every miss: 9 of the 14 never reached the judge, which tells us the next improvement is in retrieval for large national bodies, not in the judge. We then tried a second candidate route by whole-report wording. It found many new verified links across the archive but no extra test pairs, and the evaluation page shows it as a separate post-hoc result rather than folding it into the comparison.
+We used the coroners as ground truth. Where a later report names an earlier one, we hid that citation and asked each system to find it. At the same number of links, TF-IDF found 10 of 29, embeddings 12, and the Nemotron judge 15. Every miss is listed on the site. Most never reached the judge, so the next gain is in retrieval.
 
 ## Responsible use
 
-- A link shows that a similar concern was raised again, not why. Model text is checked against blaming words, and there are no rankings of organisations.
-- Every quote is an exact substring of its source.
-- Staff and family names are redacted, and the deceased are referred to by the report title only.
+A link shows that a similar concern was raised again, not why. There are no rankings of organisations, staff and family names are redacted, and the deceased are named only in the report title.
 
 ## Challenges
 
-- Nano sometimes looped under guided JSON decoding. Bounding arrays and strings in the schema fixed it.
-- Chains first merged different hazards at large national bodies. Joining links through shared concerns fixed it.
-- The deceased's names appear in coroners' own words. They are now replaced with [the deceased] after quote verification, so the check still holds.
-- Our first agent wrote its own quotes inside tool-call arguments and changed their wording. Moving judging into a structured judge tool fixed it, and the agent then found four earlier warnings on a test report where the fixed pipeline found two.
+- Our first agent reworded quotes inside its tool calls. Moving the judgement into a judge tool that returns checked quotes fixed it.
+- Chains at large national bodies first merged different hazards. Linking only through shared concerns fixed it.
+- Nano sometimes looped under guided JSON. Bounding the schema fixed it.
 
 ## Accomplishments that we're proud of
 
-- Every quote on the site is an exact substring of its source, checked in code, across 15,044 concerns.
-- The whole archive cost $5.65 on Token Factory, with every call in a cost ledger.
-- An evaluation built on ground truth the coroners wrote themselves, with every miss listed.
-- A live agent that checks any report in about 20 seconds for under a cent, and falls back to a fixed pipeline if it fails.
+- Every quote on the site is an exact substring of its source, across 15,044 concerns.
+- A whole national archive processed for $5.65, with every call in a ledger.
+- An honest evaluation, misses included.
 
 ## What we learned
 
-- Small models are enough for reading. The judgement is where a larger model earns its cost: 66% of the pairs that looked alike were judged not the same hazard.
-- Most misses happened before the judge, in finding candidates, not in the model's decision.
-- When the model wrote its own quotes, their wording drifted. Giving it tools that return checked quotes fixed that.
+Small models are enough for reading. The judgement is where a bigger model earns its cost: 66% of the pairs that looked alike were not the same hazard. And when a model writes quotes, the wording drifts. Tools that return checked quotes are the fix.
 
 ## What's next
 
-Human labels to measure precision, other jurisdictions with the same report-and-response duty, and alerts for organisations when a new report repeats an earlier warning.
-
-## Open data
-
-A read-only JSON API (/api/v1/chains) gives researchers the same verified, redacted chains.
+Human labels to measure precision, other jurisdictions with the same duty, and alerts when a new report repeats an earlier warning.
 
 ## Built with
 
