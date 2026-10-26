@@ -67,7 +67,7 @@ The limits are 5 rounds and $0.015 per run. The model never writes a shown quote
 
 ### Other Nebius services
 
-The site is packaged to run on one Nebius AI Cloud CPU virtual machine with Docker Compose: PostgreSQL with pgvector, the web app, a weekly refresh worker and Caddy for HTTPS (deploy/README.md).
+The site runs on one Linux server with Docker Compose: PostgreSQL with pgvector, the web app, a weekly refresh worker, and Caddy for HTTPS or an existing web server in front (deploy/README.md). It is live at https://recurance.com. Every model call runs on Nebius Token Factory.
 
 ### Tavily
 

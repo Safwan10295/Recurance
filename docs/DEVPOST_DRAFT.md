@@ -1,8 +1,8 @@
 # Devpost submission (draft to paste)
 
-Track: Best Apps and Agents. Fill in the two links before submitting.
+Track: Best Apps and Agents. Fill in the remaining links before submitting.
 
-Demo: <site address>
+Demo: https://recurance.com
 Code: <public GitHub address>
 Video: <YouTube address>
 
@@ -37,7 +37,7 @@ All model calls run on Nebius Token Factory, routed to the smallest model that d
 - Nemotron 3 Ultra drafts dossiers for the strongest chains, which a person reviews before publication.
 - Qwen3-Embedding-8B (on Token Factory) finds candidates by meaning, alongside TF-IDF.
 
-A Python pipeline scrapes and parses the archive, with OCR for scanned PDFs, and normalises organisation names. Every call goes through one wrapper with a request-hash cache, a cost ledger and a hard budget stop. Results are published into PostgreSQL with pgvector, and a Next.js app reads them live. The whole stack runs from one Docker Compose file on a Nebius AI Cloud CPU virtual machine: database, web app, a weekly refresh worker and Caddy for HTTPS.
+A Python pipeline scrapes and parses the archive, with OCR for scanned PDFs, and normalises organisation names. Every call goes through one wrapper with a request-hash cache, a cost ledger and a hard budget stop. Results are published into PostgreSQL with pgvector, and a Next.js app reads them live. The whole stack runs from one Docker Compose file on a small Linux server, live at recurance.com: database, web app and a refresh worker, while every model call runs on Nebius Token Factory.
 
 The agent's model never writes the quotes we show. Verdicts come from a judge tool whose quotes are checked in code, and if the agent fails or hits a limit, a fixed pipeline takes over. The agent loop is tested offline with a scripted model.
 
