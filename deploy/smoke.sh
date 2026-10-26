@@ -13,7 +13,8 @@ check() {  # expected-code path
 }
 
 for p in / /brief /judge /recent /chains "/chains?view=across" /chains/c52cded99f756309 /promises /map /organisations \
-         /nemotron /evaluation /methodology "/search?q=smart+motorway" /reports/david-levett-prevention-of-future-deaths-report \
+         /how-we-know /how-we-know/evaluation /how-we-know/methodology "/search?q=smart+motorway" \
+         /reports/david-levett-prevention-of-future-deaths-report \
          /api/health /api/hazard-map "/api/search?q=motorway" "/api/reports/suggest?q=levett" \
          "/api/v1/chains?org=National+Highways" /api/v1/chains/c52cded99f756309 /robots.txt; do
   check 200 "$p"
@@ -21,6 +22,8 @@ done
 check 404 /chains/no-such-chain
 check 404 /reports/no-such-report
 check 307 /chains/7d7b41f91717dc72
+# The old addresses now redirect into How we know.
+for p in /nemotron /evaluation /methodology; do check 308 "$p"; done
 
 health=$(curl -s -m 15 "$BASE/api/health")
 echo "health: $health"

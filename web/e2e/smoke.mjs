@@ -193,7 +193,7 @@ try {
     const p = await page(ctx);
     await p.goto(BASE + "/brief", { waitUntil: "networkidle" });
     await p.getByRole("button", { name: /smart motorway death/ }).click();
-    await p.getByText("Tokens in").waitFor({ timeout: 15000 });
+    await p.getByText("Tokens in").first().waitFor({ timeout: 15000 });
     await p.locator(".badge-super").first().waitFor({ timeout: 15000 });
     await p.getByText(/earlier warnings? to/).first().waitFor({ timeout: 20000 });
     await ctx.close();
