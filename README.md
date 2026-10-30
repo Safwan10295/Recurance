@@ -164,6 +164,23 @@ npm start
 
 web/.env.local sets DATABASE_URL to a read-only role on the published tables. Pages read PostgreSQL directly, so a publish shows up within two minutes with no rebuild. On Windows, start_site.cmd starts PostgreSQL in WSL and then the site.
 
+Without a local PostgreSQL, Docker can run just the database while the site runs natively:
+
+1. Fill in POSTGRES_PASSWORD and WEB_DB_PASSWORD in deploy/.env (see deploy/README.md).
+2. Add deploy/docker-compose.override.yml to expose the database on a free local port:
+
+```
+services:
+  db:
+    ports:
+      - "127.0.0.1:5433:5432"
+```
+
+3. Start it with `docker compose --env-file .env up -d db` from deploy/, then load the tables with `python -m pipeline.cli publish`.
+4. Set DATABASE_URL in web/.env.local to `postgresql://rw_web:<WEB_DB_PASSWORD>@127.0.0.1:5433/recurrence`.
+
+Until a publish has run, most pages load empty and the home page cannot render.
+
 The live brief needs NEBIUS_LIVE_API_KEY, a separate key from the pipeline's. Without it the brief shows precomputed examples.
 
 ## Running on a server
